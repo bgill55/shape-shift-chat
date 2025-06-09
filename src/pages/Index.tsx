@@ -34,8 +34,8 @@ const Index = () => {
   const addChatbot = (url: string) => {
     const name = url.split('/').pop() || 'Unknown Bot';
     const newChatbot: Chatbot = {
-      id: Date.now().toString(),
-      name: name.replace('-', ' '),
+       id: crypto.randomUUID(),
+       name: name.replace(/-/g, ' '),
       url
     };
     setChatbots([...chatbots, newChatbot]);
