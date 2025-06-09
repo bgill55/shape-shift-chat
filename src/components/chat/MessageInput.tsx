@@ -33,7 +33,7 @@ export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessag
     const currentImagePreviewUrl = imagePreviewUrl;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       content: currentInput,
       sender: 'user',
       timestamp: new Date(),
