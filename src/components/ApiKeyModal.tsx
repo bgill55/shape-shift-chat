@@ -36,7 +36,9 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
       return;
     }
 
-    if (apiKey.length < 20) {
+    // Basic validation - adjust pattern based on actual Shapes API key format
+    const isValidApiKeyFormat = apiKey.length >= 20 && /^[A-Z0-9]+$/i.test(apiKey);
+    if (!isValidApiKeyFormat) {
       toast({
         title: "Error",
         description: "Please enter a valid API key format",
