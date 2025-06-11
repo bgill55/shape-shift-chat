@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useShapesAuth() {
   const [oneTimeCode, setOneTimeCode] = useState('');
@@ -9,6 +10,7 @@ export function useShapesAuth() {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { refreshShapesAuthStatus } = useAuth();
 
   const redirectToShapesAuth = () => {
     // Use the correct app_id for Euclidian - the Shapes API testing app
@@ -61,6 +63,8 @@ export function useShapesAuth() {
       localStorage.setItem('shapes_auth_token', auth_token);
       localStorage.setItem('shapes_app_id', 'f6263f80-2242-428d-acd4-10e1feec44ee');
       
+      refreshShapesAuthStatus();
+
       toast({
         title: "Success!",
         description: "Successfully authenticated with Shapes. You can now chat with authenticated access.",

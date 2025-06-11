@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  refreshShapesAuthStatus: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -98,6 +99,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshShapesAuthStatus = () => {
+    setLoading(true);
+    const shapesAuthToken = localStorage.getItem('shapes_auth_token');
+    if (shapesAuthToken) {
+      const mockUser = {
+        id: 'shapes-user',
+        email: 'shapes-user@shapes.local',
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        app_metadata: {},
+        user_metadata: {
+          provider: 'shapes',
+          shapes_auth_token: shapesAuthToken
+        }
+      } as User;
+      setUser(mockUser);
+    } else {
+      setUser(null);
+    }
+    setSession(null); // Shapes auth is not Supabase session based
+    setLoading(false);
+  };
+
   const value = {
     user,
     session,
@@ -105,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signOut,
+    refreshShapesAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
