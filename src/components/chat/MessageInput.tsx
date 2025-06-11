@@ -1,11 +1,12 @@
 
-import { useState } from 'react';
-import { Send } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Send, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useSuggestedResponses } from '../../hooks/useSuggestedResponses';
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
@@ -16,6 +17,8 @@ interface MessageInputProps {
 
 export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessage }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     selectedImageFile,
     imagePreviewUrl,
@@ -24,6 +27,7 @@ export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessag
     handleFileSelected,
     handleRemoveSelectedImage,
   } = useImageUpload();
+  const { suggestions, isLoading: suggestionsLoading, error: suggestionsError, fetchSuggestions } = useSuggestedResponses();
 
   const sendMessage = async () => {
     if ((!inputValue.trim() && !selectedImageFile) || selectedChatbots.length === 0 || !apiKey) return;
@@ -68,8 +72,58 @@ export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessag
           Please configure your API key to start chatting
         </div>
       ) : null}
+
+      {showSuggestions && (
+        <div
+          className="mb-2 p-3 border border-neutral-600 rounded text-sm bg-[#40444b] text-neutral-300"
+          style={{ minHeight: '60px' }}
+        >
+          {suggestionsLoading ? (
+            <p className="w-full text-center py-2">Loading suggestions...</p>
+          ) : suggestionsError ? (
+            <p className="w-full text-center py-2 text-red-500">Error: {suggestionsError.message}</p>
+          ) : suggestions.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((suggestion) => (
+                <Button
+                  key={suggestion.id}
+                  variant="outline"
+                  size="sm"
+                  title={suggestion.text}
+                  onClick={() => {
+                    setInputValue(suggestion.text);
+                    setShowSuggestions(false);
+                    inputRef.current?.focus();
+                  }}
+                  className="truncate bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600"
+                >
+                  {suggestion.text}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <p className="w-full text-center py-2">No suggestions available.</p>
+          )}
+        </div>
+      )}
       
       <div className="flex space-x-2 items-center">
+        <Button
+          variant="outline"
+          onClick={() => {
+            const newShowSuggestions = !showSuggestions;
+            setShowSuggestions(newShowSuggestions);
+            if (newShowSuggestions) {
+              // TODO: Replace with actual chat history
+              fetchSuggestions([{ role: 'user', content: 'Hello' }]);
+            }
+          }}
+          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+          className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
+          aria-label="Toggle suggested responses"
+        >
+          <Lightbulb className="w-5 h-5" />
+        </Button>
         <Button
           variant="outline"
           onClick={handleImageUploadButtonClick}
@@ -88,6 +142,7 @@ export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessag
           data-testid="hidden-file-input"
         />
         <Input
+          ref={inputRef}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
