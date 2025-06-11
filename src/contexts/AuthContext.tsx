@@ -38,17 +38,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // If no Supabase session, check for Shapes auth
       if (!session) {
         const shapesAuthToken = localStorage.getItem('shapes_auth_token');
+        const shapesUserId = localStorage.getItem('shapes_user_id');
         if (shapesAuthToken) {
           // Create a mock user object for Shapes authentication
           const mockUser = {
-            id: 'shapes-user',
+            id: shapesUserId || 'shapes-user-fallback',
             email: 'shapes-user@shapes.local',
             aud: 'authenticated',
             created_at: new Date().toISOString(),
             app_metadata: {},
             user_metadata: {
               provider: 'shapes',
-              shapes_auth_token: shapesAuthToken
+              shapes_auth_token: shapesAuthToken,
+              actual_shapes_user_id: shapesUserId || undefined,
             }
           } as User;
           
@@ -87,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Clear Shapes auth tokens
     localStorage.removeItem('shapes_auth_token');
     localStorage.removeItem('shapes_app_id');
+    localStorage.removeItem('shapes_user_id');
     
     const { error } = await supabase.auth.signOut();
     
@@ -102,16 +105,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshShapesAuthStatus = () => {
     setLoading(true);
     const shapesAuthToken = localStorage.getItem('shapes_auth_token');
+    const shapesUserId = localStorage.getItem('shapes_user_id');
     if (shapesAuthToken) {
       const mockUser = {
-        id: 'shapes-user',
+        id: shapesUserId || 'shapes-user-fallback-refresh',
         email: 'shapes-user@shapes.local',
         aud: 'authenticated',
         created_at: new Date().toISOString(),
         app_metadata: {},
         user_metadata: {
           provider: 'shapes',
-          shapes_auth_token: shapesAuthToken
+          shapes_auth_token: shapesAuthToken,
+          actual_shapes_user_id: shapesUserId || undefined,
         }
       } as User;
       setUser(mockUser);
