@@ -1,0 +1,125 @@
+import React, { useState, useEffect } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+
+export function ProfileSettings() {
+  const { user, displayName, updateDisplayName } = useAuth();
+  const { toast } = useToast();
+  const [newDisplayName, setNewDisplayName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (displayName) {
+      setNewDisplayName(displayName);
+    } else {
+      setNewDisplayName(''); // Initialize as empty if no displayName yet
+    }
+  }, [displayName]);
+
+  const handleSaveChanges = async () => {
+    if (!user) {
+      setError("You must be logged in to update your profile.");
+      toast({ title: "Authentication Error", description: "You must be logged in.", variant: "destructive" });
+      return;
+    }
+
+    const trimmedNewDisplayName = newDisplayName.trim();
+
+    // Button should be disabled if this is the case, but as a safeguard:
+    if (trimmedNewDisplayName === (displayName || '')) {
+      return;
+    }
+    if (trimmedNewDisplayName.length < 3) {
+      setError("Display name must be at least 3 characters long.");
+      // Toast is optional here as the button's disabled state and local error message provide feedback
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const { error: updateError } = await updateDisplayName(trimmedNewDisplayName);
+
+    if (updateError) {
+      const errorMessage = updateError.message || "Failed to update display name.";
+      setError(errorMessage);
+      toast({
+        title: 'Update Failed',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Success!',
+        description: 'Display name updated successfully.',
+      });
+      // If the update was successful, newDisplayName already matches what was sent.
+      // The `displayName` from context will update, and useEffect will re-sync
+      // `newDisplayName` if `displayName` changes due to external factors.
+    }
+    setIsLoading(false);
+  };
+
+  // Disable button if display name is unchanged, or shorter than 3 chars (after trim), or loading
+  const isButtonDisabled =
+    isLoading ||
+    newDisplayName.trim().length < 3 ||
+    newDisplayName.trim() === (displayName || '');
+
+  return (
+    <div className="flex justify-center items-start pt-10 min-h-screen bg-background text-foreground">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl">Profile Settings</CardTitle>
+          <CardDescription>
+            Manage your display name. This name will be visible to others.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="displayName">Display Name</Label>
+            <Input
+              id="displayName"
+              type="text"
+              value={newDisplayName}
+              onChange={(e) => setNewDisplayName(e.target.value)}
+              placeholder="Enter your display name"
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+        </CardContent>
+        <CardFooter>
+          <Button
+            className="w-full"
+            onClick={handleSaveChanges}
+            disabled={isButtonDisabled}
+          >
+            {isLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
+
+// Export default for lazy loading if ever needed, or keep as named.
+// export default ProfileSettings;
+```
+
+Now, before I mark that file as "created", I need to check if `Label` is available. If not, I'll use the standard HTML `label`. I'll assume `@/components/ui/label` exists as it's common with `shadcn/ui`. If it causes an error later, I'll adjust.
+
+Next, I'll modify `src/App.tsx`. I need to read its content first.
