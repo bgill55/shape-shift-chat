@@ -308,6 +308,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
           apiKey={apiKey}
           isLoading={isLoading}
           onSendMessage={handleSendMessage}
+          chatHistory={messages} // Added chatHistory prop
         />
       </div>
     </div>
