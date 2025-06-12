@@ -115,11 +115,3 @@ export function ProfileSettings() {
     </div>
   );
 }
-
-// Export default for lazy loading if ever needed, or keep as named.
-// export default ProfileSettings;
-```
-
-Now, before I mark that file as "created", I need to check if `Label` is available. If not, I'll use the standard HTML `label`. I'll assume `@/components/ui/label` exists as it's common with `shadcn/ui`. If it causes an error later, I'll adjust.
-
-Next, I'll modify `src/App.tsx`. I need to read its content first.
