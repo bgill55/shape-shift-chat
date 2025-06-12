@@ -13,9 +13,16 @@ interface MessageInputProps {
   apiKey: string;
   isLoading: boolean;
   onSendMessage: (userMessage: Message, imageFile: File | null, textInput: string) => void;
+  chatHistory: Message[]; // Added
 }
 
-export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessage }: MessageInputProps) {
+export function MessageInput({
+  selectedChatbots,
+  apiKey,
+  isLoading,
+  onSendMessage,
+  chatHistory // Added
+}: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -114,11 +121,13 @@ export function MessageInput({ selectedChatbots, apiKey, isLoading, onSendMessag
             const newShowSuggestions = !showSuggestions;
             setShowSuggestions(newShowSuggestions);
             if (newShowSuggestions) {
-              // TODO: Replace with actual chat history
-              fetchSuggestions([{ role: 'user', content: 'Hello' }]);
+              const primaryChatbot = selectedChatbots && selectedChatbots.length > 0 ? selectedChatbots[0] : undefined;
+              const channelId = primaryChatbot?.id;
+              const modelShapeName = primaryChatbot?.name;
+              fetchSuggestions(chatHistory, channelId, modelShapeName);
             }
           }}
-          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+          disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
           className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
           aria-label="Toggle suggested responses"
         >
