@@ -12,10 +12,12 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom'; // Added
 
 export function ProfileSettings() {
   const { user, displayName, updateDisplayName } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate(); // Added
   const [newDisplayName, setNewDisplayName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,9 +67,7 @@ export function ProfileSettings() {
         title: 'Success!',
         description: 'Display name updated successfully.',
       });
-      // If the update was successful, newDisplayName already matches what was sent.
-      // The `displayName` from context will update, and useEffect will re-sync
-      // `newDisplayName` if `displayName` changes due to external factors.
+      navigate('/'); // Added redirect
     }
     setIsLoading(false);
   };
@@ -79,32 +79,32 @@ export function ProfileSettings() {
     newDisplayName.trim() === (displayName || '');
 
   return (
-    <div className="flex justify-center items-start pt-10 min-h-screen bg-background text-foreground">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Profile Settings</CardTitle>
-          <CardDescription>
+    <div className="flex justify-center items-start pt-10 min-h-screen bg-[#36393f] text-white">
+      <Card className="w-full max-w-md shadow-lg bg-[#2f3136] border-[#202225]">
+        <CardHeader className="text-center"> {/* Added text-center to match Auth.tsx aesthetic */}
+          <CardTitle className="text-2xl text-white">Profile Settings</CardTitle>
+          <CardDescription className="text-[#96989d]">
             Manage your display name. This name will be visible to others.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6"> {/* Added pt-6 for spacing like Auth.tsx */}
           <div className="space-y-2">
-            <Label htmlFor="displayName">Display Name</Label>
+            <Label htmlFor="displayName" className="text-[#b9bbbe]">Display Name</Label>
             <Input
               id="displayName"
               type="text"
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
               placeholder="Enter your display name"
-              className="w-full"
+              className="w-full bg-[#40444b] border-[#202225] text-white placeholder-[#72767d] focus:ring-[#5865f2] focus:border-[#5865f2]"
               disabled={isLoading}
             />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm text-red-500">{error}</p>} {/* Ensured error text color */}
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full"
+            className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white"
             onClick={handleSaveChanges}
             disabled={isButtonDisabled}
           >
