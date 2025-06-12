@@ -1,100 +1,94 @@
 -- supabase/setup_profiles.sql
 
+-- Ensure the `public` schema exists (though it typically does in PostgreSQL)
+CREATE SCHEMA IF NOT EXISTS public;
+
 -- 1. Create the `profiles` table
 -- This table will store user profile data, extending the `auth.users` table.
 CREATE TABLE public.profiles (
-  id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   updated_at TIMESTAMPTZ DEFAULT now(),
-  display_name TEXT, -- Can be used to store the user's preferred name.
-  avatar_url TEXT,   -- For future use, to store URL of user's avatar image.
-
-  CONSTRAINT display_name_length CHECK (char_length(display_name) >= 3 OR display_name IS NULL) -- Example constraint
+  display_name TEXT, -- User's preferred public display name. Can be NULL.
+  avatar_url TEXT    -- URL to the user's avatar image. Can be NULL. For future use.
 );
 
-COMMENT ON TABLE public.profiles IS 'Stores public profile information for each user.';
-COMMENT ON COLUMN public.profiles.id IS 'References the internal Supabase auth user ID.';
-COMMENT ON COLUMN public.profiles.display_name IS 'User''s preferred public display name. Can be NULL.';
-COMMENT ON COLUMN public.profiles.avatar_url IS 'URL to the user''s avatar image. Can be NULL.';
+-- Add comments to the table and columns for clarity
+COMMENT ON TABLE public.profiles IS 'Stores public profile information for each user, extending auth.users.';
+COMMENT ON COLUMN public.profiles.id IS 'References the internal Supabase auth.users ID. Primary key.';
+COMMENT ON COLUMN public.profiles.updated_at IS 'Timestamp of the last profile update.';
+COMMENT ON COLUMN public.profiles.display_name IS 'User''s preferred public display name. Can be NULL initially.';
+COMMENT ON COLUMN public.profiles.avatar_url IS 'URL to the user''s avatar image. Intended for future use.';
+
+-- Add a check constraint for display_name length, allowing NULL
+ALTER TABLE public.profiles
+ADD CONSTRAINT display_name_length_check CHECK (char_length(display_name) >= 3 OR display_name IS NULL);
 
 -- 2. Enable Row Level Security (RLS) on the `profiles` table
--- This ensures that the policies defined below are enforced.
+-- This is crucial for ensuring data privacy and that users can only access their own data as per policies.
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- 3. Create RLS Policies
 
--- Policy 1: "Profiles are viewable by users who created them."
--- This policy allows users to select (read) their own profile data.
-CREATE POLICY "Profiles are viewable by users who created them."
+-- Policy: Users can view their own profile.
+-- Allows a user to SELECT (read) their own profile data.
+CREATE POLICY "Users can view their own profile."
 ON public.profiles FOR SELECT
 USING (auth.uid() = id);
 
--- Policy 2: "Users can insert their own profile."
--- This policy allows users to insert a new profile entry for themselves.
--- The `WITH CHECK` clause ensures that a user cannot insert a profile for someone else.
+-- Policy: Users can insert their own profile.
+-- Allows a user to create a profile entry for themselves.
+-- The WITH CHECK clause ensures that a user cannot insert a profile for someone else.
 CREATE POLICY "Users can insert their own profile."
 ON public.profiles FOR INSERT
 WITH CHECK (auth.uid() = id);
 
--- Policy 3: "Users can update their own profile."
--- This policy allows users to update their own profile data.
--- The `WITH CHECK` clause (though often the same as USING for UPDATE if not specifying columns)
--- ensures a user cannot change the `id` to someone else's during an update,
--- though this is also protected by it being a primary key.
+-- Policy: Users can update their own profile.
+-- Allows a user to update their own profile data.
+-- The WITH CHECK clause ensures a user cannot modify another user's profile.
 CREATE POLICY "Users can update their own profile."
 ON public.profiles FOR UPDATE
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- (Optional, for future consideration)
--- Policy 4: "Authenticated users can view other users' display_name and avatar_url."
--- This policy would allow any authenticated user to see basic public info of other users.
--- For now, this is commented out to keep profiles private to their owners.
---
--- CREATE POLICY "Authenticated users can view basic public profile info."
--- ON public.profiles FOR SELECT
--- TO authenticated
--- USING (true); -- Allows selection of all rows, but column-level security would be needed
-                 -- or ensure only non-sensitive columns are exposed via views/RPC functions.
-                 -- A better approach for this specific scenario might be a view or function
-                 -- that only exposes `id`, `display_name`, and `avatar_url`.
+-- Note: A DELETE policy is not explicitly added here.
+-- Profile deletion is handled by the `ON DELETE CASCADE` constraint on the `id` column,
+-- meaning if a user is deleted from `auth.users`, their corresponding profile in `public.profiles`
+-- will be automatically deleted. Allowing direct deletion from `profiles` might be undesirable.
 
--- Note on public access: If you wanted display_name and avatar_url to be truly public (even for non-authenticated users),
--- you would create a policy specifically for that, or more likely, create a security definer function or a view
--- that exposes only these non-sensitive fields.
-
--- Example of a function to handle profile creation automatically on new user sign-up (trigger-based)
--- This is often preferred over relying on users to insert their own profile record manually.
+-- 4. Database function `public.handle_new_user()`
+-- This function is triggered when a new user signs up (a new entry is made in `auth.users`).
+-- It automatically creates a corresponding profile entry in `public.profiles`.
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY DEFINER SET search_path = public
+SECURITY DEFINER -- Important: Executes with the permissions of the user who defined the function (usually an admin/postgres role)
+SET search_path = public, extensions; -- Ensure correct schema context
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, display_name)
-  VALUES (NEW.id, NEW.raw_user_meta_data->>'display_name'); -- Example: try to get display_name from sign-up metadata
+  -- Insert a new profile row for the new user.
+  -- `id` is taken from the new user record in `auth.users`.
+  -- `display_name` and `avatar_url` are left as NULL initially.
+  -- They can be populated from NEW.raw_user_meta_data if available during sign-up, e.g.:
+  -- NEW.raw_user_meta_data->>'display_name'
+  INSERT INTO public.profiles (id)
+  VALUES (NEW.id);
   RETURN NEW;
 END;
 $$;
 
--- Create a trigger to call the function when a new user is added to auth.users
+COMMENT ON FUNCTION public.handle_new_user() IS 'Trigger function to automatically create a profile for a new user upon registration in auth.users.';
+
+-- 5. Trigger `on_auth_user_created`
+-- This trigger fires after a new user is inserted into the `auth.users` table,
+-- executing the `handle_new_user` function to create their profile.
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Add a comment explaining the trigger.
-COMMENT ON FUNCTION public.handle_new_user() IS 'Automatically creates a profile entry for new users, optionally populating fields from metadata.';
-COMMENT ON TRIGGER on_auth_user_created ON auth.users IS 'When a new user signs up, automatically create their profile.';
+COMMENT ON TRIGGER on_auth_user_created ON auth.users IS 'Automatically creates a profile entry for new users after they are added to auth.users.';
 
--- Note: If you add the trigger, ensure the service role or postgres role has permissions if needed,
--- but SECURITY DEFINER functions run with the privileges of the user who defined the function.
--- Supabase handles this well for standard auth triggers.
-
--- Consider adding an RLS policy for DELETE if users should be able to delete their own profiles.
--- CREATE POLICY "Users can delete their own profile."
--- ON public.profiles FOR DELETE
--- USING (auth.uid() = id);
--- However, since `id` references `auth.users` with `ON DELETE CASCADE`,
--- deleting a user from `auth.users` will automatically delete their profile.
--- Allowing users to delete their profile row directly might leave their `auth.users` entry orphaned
--- if not handled carefully, so `ON DELETE CASCADE` is often the primary mechanism.
+-- End of script.
+-- Consider running these commands in the Supabase SQL Editor.
+-- Ensure this user (definer of handle_new_user) has necessary permissions on public.profiles.
+-- Supabase's default postgres user usually has these.
 ```
