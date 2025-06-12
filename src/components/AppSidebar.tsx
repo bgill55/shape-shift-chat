@@ -13,7 +13,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator"; // Added
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@/contexts/AuthContext"; // Added
+import { UserMenu } from "@/components/UserMenu"; // Added
 import { Chatbot } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +38,7 @@ export function AppSidebar({
   onOpenApiConfig 
 }: AppSidebarProps) {
   const { open } = useSidebar();
+  const { user } = useAuth(); // Added
 
   const isChatbotSelected = (chatbot: Chatbot) => {
     return selectedChatbots.some(selected => selected.id === chatbot.id);
@@ -159,7 +163,7 @@ export function AppSidebar({
         )}
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-[#202225]">
+      <SidebarFooter className="p-4 border-t border-[#202225] space-y-3">
         <SidebarMenuButton 
           onClick={onOpenApiConfig}
           className="w-full justify-start text-left px-2 py-2 rounded hover:bg-[#393c43] text-[#96989d]"
@@ -167,6 +171,15 @@ export function AppSidebar({
           <Settings className="w-4 h-4 mr-3" />
           <span>API Configuration</span>
         </SidebarMenuButton>
+
+        {user && (
+          <>
+            <Separator className="bg-[#393c43]" />
+            <div className="flex items-center justify-center w-full">
+              <UserMenu />
+            </div>
+          </>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
