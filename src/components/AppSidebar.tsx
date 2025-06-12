@@ -38,7 +38,8 @@ export function AppSidebar({
   onOpenApiConfig 
 }: AppSidebarProps) {
   const { open } = useSidebar();
-  const { user } = useAuth(); // Added
+  const { user } = useAuth();
+  console.log('AppSidebar: user from useAuth():', user); // Added console log
 
   const isChatbotSelected = (chatbot: Chatbot) => {
     return selectedChatbots.some(selected => selected.id === chatbot.id);
