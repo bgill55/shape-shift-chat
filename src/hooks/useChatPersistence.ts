@@ -38,6 +38,7 @@ export function useChatPersistence() {
       const { data, error } = await supabase
         .from('chats')
         .select('*')
+        .eq('user_id', user.id) // Added filter for user_id
         .order('updated_at', { ascending: false });
 
       if (error) throw error;

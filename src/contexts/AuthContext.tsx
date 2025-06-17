@@ -231,17 +231,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const { error: updateError } = await supabase // Renamed error to updateError
-        .from('profiles')
-        .update({ display_name: newName, updated_at: new Date().toISOString() })
-        .eq('id', user.id);
+      const profileDataToUpsert = {
+        id: user.id, // This is the user's UUID, acting as the primary key
+        display_name: newName.trim(),
+        updated_at: new Date().toISOString(),
+      };
 
-      if (updateError) {
-        console.error('Error updating display name:', updateError);
-        return { error: updateError };
+      // Using upsert:
+      // If a row with `id: user.id` exists, it will be updated.
+      // If it doesn't exist, a new row will be inserted.
+      // Supabase client infers the conflict target from the primary key (`id`).
+      const { data, error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(profileDataToUpsert)
+        .select() // Select the upserted row(s)
+        .single(); // Expecting a single row
+
+      if (upsertError) {
+        console.error('Error upserting display name:', upsertError);
+        return { error: upsertError };
       }
 
-      setDisplayName(newName);
+      // `data` here would be the upserted profile record.
+      // We can use data.display_name if we want to be absolutely sure,
+      // but newName should be what was set.
+      if (data) {
+        setDisplayName(data.display_name);
+      } else {
+        // Fallback if data is not returned, though .select().single() should ensure it or error out
+        setDisplayName(newName.trim());
+      }
       return { error: null };
     } catch (e: any) {
       console.error('Exception updating display name:', e);
