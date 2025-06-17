@@ -35,7 +35,15 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
     setError(null);
     setSuggestions([]); // Clear previous suggestions
 
+    // Access Environment Variable for Static API Key
+    const apiKey = import.meta.env.VITE_SHAPESINC_API_KEY;
+
     // Early Exit checks
+    if (!apiKey) {
+      setError(new Error("VITE_SHAPESINC_API_KEY is not set."));
+      setIsLoading(false);
+      return;
+    }
     if (!channelId) {
       setError(new Error("Missing channel info for suggestions."));
       setIsLoading(false);
@@ -86,7 +94,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${shapesAuthToken}`,
+          'Authorization': `Bearer ${apiKey}`, // Use static API key for Bearer token
           'X-User-Id': currentUserId,
           'X-Channel-Id': channelId,
         },
