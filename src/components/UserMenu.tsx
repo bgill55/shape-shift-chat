@@ -7,13 +7,15 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel, // Added
   DropdownMenuTrigger,
-  DropdownMenuSeparator, // Added for visual separation
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings } from 'lucide-react'; // Added Settings
-import { Link } from 'react-router-dom'; // Added
+import { User, LogOut, Settings, Sun, Moon } from 'lucide-react'; // Added Sun, Moon
+import { Link } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext'; // Added useTheme
 
 export function UserMenu() {
-  const { user, displayName, signOut } = useAuth(); // Added displayName
+  const { user, displayName, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme(); // Added theme and toggleTheme
 
   if (!user) return null;
 
@@ -34,6 +36,14 @@ export function UserMenu() {
             <Settings className="w-4 h-4 mr-2" />
             Profile Settings
           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={toggleTheme} className="text-white hover:!bg-[#393c43] focus:!bg-[#393c43] cursor-pointer">
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 mr-2" />
+          ) : (
+            <Moon className="w-4 h-4 mr-2" />
+          )}
+          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-[#393c43]" />
         <DropdownMenuItem onClick={signOut} className="text-white hover:!bg-[#393c43] focus:!bg-[#393c43] cursor-pointer">

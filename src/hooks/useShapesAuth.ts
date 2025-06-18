@@ -75,10 +75,6 @@ export function useShapesAuth() {
 
       toast({
         title: "Success!",
-        // ...
-      });
-      toast({
-        title: "Success!",
         description: "Successfully authenticated with Shapes. You can now chat with authenticated access.",
       });
 

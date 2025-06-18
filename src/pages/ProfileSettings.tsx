@@ -79,32 +79,32 @@ export function ProfileSettings() {
     newDisplayName.trim() === (displayName || '');
 
   return (
-    <div className="flex justify-center items-start pt-10 min-h-screen bg-[#36393f] text-white">
-      <Card className="w-full max-w-md shadow-lg bg-[#2f3136] border-[#202225]">
-        <CardHeader className="text-center"> {/* Added text-center to match Auth.tsx aesthetic */}
-          <CardTitle className="text-2xl text-white">Profile Settings</CardTitle>
-          <CardDescription className="text-[#96989d]">
+    <div className="flex justify-center items-start pt-10 min-h-screen bg-background text-foreground">
+      <Card className="w-full max-w-md shadow-lg bg-card text-card-foreground border-border">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl text-card-foreground">Profile Settings</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Manage your display name. This name will be visible to others.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 pt-6"> {/* Added pt-6 for spacing like Auth.tsx */}
+        <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="displayName" className="text-[#b9bbbe]">Display Name</Label>
+            <Label htmlFor="displayName" className="text-foreground">Display Name</Label>
             <Input
               id="displayName"
               type="text"
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
               placeholder="Enter your display name"
-              className="w-full bg-[#40444b] border-[#202225] text-white placeholder-[#72767d] focus:ring-[#5865f2] focus:border-[#5865f2]"
+              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
               disabled={isLoading}
             />
           </div>
-          {error && <p className="text-sm text-red-500">{error}</p>} {/* Ensured error text color */}
+          {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={handleSaveChanges}
             disabled={isButtonDisabled}
           >
