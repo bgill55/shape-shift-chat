@@ -4,9 +4,10 @@ import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
 import { MessageInput } from './chat/MessageInput';
 import { useMessages } from '@/hooks/useMessages';
-import { useChatPersistence } from '@/hooks/useChatPersistence';
+import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence'; // Import SavedChat
 import { Message } from '@/types/message';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext'; // Added useAuth
 import { Button } from '@/components/ui/button';
 import { Save, FileText, Trash2 } from 'lucide-react';
 import { parseMentions, getUniqueMentionedChatbots } from '@/utils/mentionUtils';
@@ -43,6 +44,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   } = useChatPersistence();
 
   const { toast } = useToast();
+  const { user } = useAuth(); // Added user from useAuth
 
   // Auto-save chat every 5 minutes (without toast notification)
   useEffect(() => {
@@ -56,30 +58,65 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     }
   }, [messages, selectedChatbots, saveChat]);
 
-  // Clear chat when chatbot selection changes
+  // Effect to load initial or selected chat
   useEffect(() => {
-    if (selectedChatbots.length > 0) {
+    const loadInitialChat = async () => {
+      if (!user || selectedChatbots.length === 0) {
+        // Optionally clear messages if user logs out or no bot selected
+        // This might be redundant if other effects or direct calls handle it,
+        // but good for explicit state reset if needed here.
+        // clearMessages();
+        // setCurrentChatId(null);
+        return;
+      }
+
+      // Clear previous state when context (user or selected bot) changes
+      console.log('[ChatArea useEffect] Clearing messages and currentChatId due to user/bot change.');
       clearMessages();
       setCurrentChatId(null);
-      
-      // For now, we'll load the most recent chat from the first selected chatbot
-      // This could be enhanced later to handle group chat persistence
-      loadSavedChats().then(() => {
-        const mostRecentChat = savedChats
-          .filter(chat => chat.chatbot_id === selectedChatbots[0].id)
-          .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
 
-        if (mostRecentChat) {
-          loadChat(mostRecentChat.id).then((loadedMessages) => {
-            if (loadedMessages.length > 0) {
-              loadMessages(loadedMessages);
-              setCurrentChatId(mostRecentChat.id);
-            }
-          });
+      // loadSavedChats now returns the chats and also sets them in its own state.
+      // We can use the returned value directly.
+      const allUserSavedChats: SavedChat[] = await loadSavedChats();
+
+      if (allUserSavedChats && allUserSavedChats.length > 0) {
+        const primarySelectedBotId = selectedChatbots[0].id;
+        console.log(`[ChatArea useEffect] Primary selected bot ID: ${primarySelectedBotId}`);
+
+        const mostRecentChatForSelectedBot = allUserSavedChats
+          .filter(chat => chat.chatbot_id === primarySelectedBotId)
+          // Already sorted by updated_at desc in loadSavedChats, but if not, sort here.
+          // .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+          [0]; // Get the first one after filtering (should be most recent)
+
+        if (mostRecentChatForSelectedBot) {
+          console.log(`[ChatArea useEffect] Found most recent chat for selected bot: ${mostRecentChatForSelectedBot.id}`);
+          const loadedMessages = await loadChat(mostRecentChatForSelectedBot.id);
+          if (loadedMessages && loadedMessages.length > 0) {
+            console.log(`[ChatArea useEffect] Loading ${loadedMessages.length} messages for chat ${mostRecentChatForSelectedBot.id}`);
+            loadMessages(loadedMessages);
+            setCurrentChatId(mostRecentChatForSelectedBot.id);
+          } else {
+            console.log(`[ChatArea useEffect] No messages found for chat ${mostRecentChatForSelectedBot.id}, starting new chat implicitly.`);
+          }
+        } else {
+          console.log(`[ChatArea useEffect] No saved chats found for bot ${primarySelectedBotId}. Starting new chat implicitly.`);
         }
-      });
-    }
-  }, [selectedChatbots.map(bot => bot.id).join(',')]); // Only trigger when the chatbot IDs change
+      } else {
+        console.log('[ChatArea useEffect] No saved chats found for the user. Starting new chat implicitly.');
+      }
+    };
+
+    loadInitialChat();
+  }, [
+    user,
+    selectedChatbots.map(bot => bot.id).join(','), // Still use derived key for chatbots
+    loadSavedChats,
+    loadChat,
+    loadMessages,
+    clearMessages,
+    setCurrentChatId
+  ]);
 
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
@@ -290,7 +327,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       </div>
 
       {/* Messages area - fixed height container with flex */}
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0"> {/* Changed overflow-hidden to min-h-0 */}
         <MessageList 
           messages={messages} 
           isLoading={isLoading}
@@ -308,6 +345,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
           apiKey={apiKey}
           isLoading={isLoading}
           onSendMessage={handleSendMessage}
+          chatHistory={messages} // Added chatHistory prop
         />
       </div>
     </div>
