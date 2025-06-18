@@ -22,22 +22,23 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-white hover:bg-[#393c43]">
+        {/* Button color should adapt to theme or be explicitly set for header if sidebar doesn't change */}
+        <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent hover:text-accent-foreground">
           <User className="w-5 h-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-[#2f3136] border-[#202225] w-56">
-        <DropdownMenuLabel className="font-normal px-2 py-1.5 text-[#b9bbbe]">
+      <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground w-56">
+        <DropdownMenuLabel className="font-normal px-2 py-1.5 text-muted-foreground">
           <div className="truncate">{displayName || user.email || 'User'}</div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-[#393c43]" />
-        <DropdownMenuItem asChild className="text-white hover:!bg-[#393c43] focus:!bg-[#393c43] cursor-pointer">
-          <Link to="/settings/profile">
+        <DropdownMenuSeparator className="bg-border" />
+        <DropdownMenuItem asChild className="cursor-pointer hover:!bg-accent focus:!bg-accent">
+          <Link to="/settings/profile" className="flex items-center"> {/* Ensure Link takes full width and flex properties */}
             <Settings className="w-4 h-4 mr-2" />
             Profile Settings
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={toggleTheme} className="text-white hover:!bg-[#393c43] focus:!bg-[#393c43] cursor-pointer">
+        <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 mr-2" />
           ) : (
@@ -45,8 +46,8 @@ export function UserMenu() {
           )}
           <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-[#393c43]" />
-        <DropdownMenuItem onClick={signOut} className="text-white hover:!bg-[#393c43] focus:!bg-[#393c43] cursor-pointer">
+        <DropdownMenuSeparator className="bg-border" />
+        <DropdownMenuItem onClick={signOut} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
           <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </DropdownMenuItem>
