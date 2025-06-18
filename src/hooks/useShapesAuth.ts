@@ -72,7 +72,8 @@ export function useShapesAuth() {
       }
 
       refreshShapesAuthStatus();
-      
+       fix/shapes-auth-redirect
+       master
       toast({
         title: "Success!",
         description: "Successfully authenticated with Shapes. You can now chat with authenticated access.",
