@@ -31,17 +31,19 @@ export function useChatPersistence() {
     }
   }, [user]);
 
-  const loadSavedChats = async () => {
-    if (!user) return;
+  const loadSavedChats = async (): Promise<SavedChat[]> => {
+    if (!user) return []; // Return empty array if no user
     
     try {
       const { data, error } = await supabase
         .from('chats')
         .select('*')
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
       setSavedChats(data || []);
+      return data || []; // Return fetched data
     } catch (error) {
       console.error('Error loading chats:', error);
       toast({
@@ -49,6 +51,7 @@ export function useChatPersistence() {
         description: "Could not load saved chats from database.",
         variant: "destructive"
       });
+      return []; // Return empty array on error
     }
   };
 
