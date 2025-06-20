@@ -78,7 +78,8 @@ export function useShapesAuth() {
       // The console.error for missing user object from response is removed.
 
       refreshShapesAuthStatus(); // This will now use the client-managed shapes_user_id
-      // Check for user and user.id, then store shapes_user_id
+
+         // Check for user and user.id, then store shapes_user_id
       if (user && user.id) {
         localStorage.setItem('shapes_user_id', user.id);
       } else {

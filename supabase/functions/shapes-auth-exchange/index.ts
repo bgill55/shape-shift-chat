@@ -63,6 +63,7 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
+
     }
 
     let shapesData;
@@ -96,6 +97,7 @@ serve(async (req) => {
         }
       );
     }
+
 
     // Log specific fields from shapesData
     console.log('[shapes-auth-exchange] shapesData.auth_token:', shapesData?.auth_token);
