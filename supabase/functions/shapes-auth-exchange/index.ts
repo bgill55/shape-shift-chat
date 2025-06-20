@@ -81,6 +81,22 @@ serve(async (req) => {
       );
     }
 
+    let shapesData;
+    try {
+      shapesData = JSON.parse(responseText);
+      console.log('[shapes-auth-exchange] Shapes API parsed JSON response:', shapesData);
+    } catch (jsonParseError) {
+      console.error('[shapes-auth-exchange] Error parsing Shapes API response as JSON:', jsonParseError.message);
+      console.error('[shapes-auth-exchange] Raw response text that failed to parse:', responseText);
+      return new Response(
+        JSON.stringify({ error: 'Failed to parse response from Shapes API', details: responseText }),
+        {
+          status: 500, // Internal server error type because we couldn't parse a supposedly OK response
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     // Log specific fields from shapesData
     console.log('[shapes-auth-exchange] shapesData.auth_token:', shapesData?.auth_token);
     console.log('[shapes-auth-exchange] shapesData.user object:', shapesData?.user);
@@ -89,9 +105,15 @@ serve(async (req) => {
       console.log('[shapes-auth-exchange] shapesData.user.id (from user object):', shapesData.user.id);
     }
     
-    // Return the auth token and any user data
+    // Log specific fields from shapesData
+    console.log('[shapes-auth-exchange] shapesData.auth_token:', shapesData?.auth_token);
+    // Removed logs for user, user_id, and user.id from shapesData as they are not expected
+
+    // Return only the auth token
     return new Response(
       JSON.stringify({
+        auth_token: shapesData.auth_token
+        // No 'user' field anymore
         auth_token: shapesData.auth_token,
         // Ensure user object is consistent, preferring shapesData.user if it exists
         user: shapesData.user || (shapesData.user_id ? { id: shapesData.user_id } : undefined)

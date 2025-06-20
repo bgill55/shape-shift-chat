@@ -57,12 +57,27 @@ export function useShapesAuth() {
         throw new Error(errorData.error || 'Failed to exchange code for token');
       }
 
-      const { auth_token, user } = await response.json();
+      const { auth_token } = await response.json(); // User object no longer expected
+
+      if (!auth_token) {
+        throw new Error('Auth token not found in response from auth exchange function');
+      }
       
       // Store the auth token and app_id in localStorage
       localStorage.setItem('shapes_auth_token', auth_token);
       localStorage.setItem('shapes_app_id', 'f6263f80-2242-428d-acd4-10e1feec44ee');
+      // Implement client-side shapes_user_id logic
+      let userId = localStorage.getItem('shapes_user_id');
+      if (!userId) {
+        userId = crypto.randomUUID();
+        localStorage.setItem('shapes_user_id', userId);
+        console.log('[useShapesAuth] New Shapes User ID generated and stored:', userId);
+      } else {
+        console.log('[useShapesAuth] Existing Shapes User ID found in localStorage:', userId);
+      }
+      // The console.error for missing user object from response is removed.
 
+      refreshShapesAuthStatus(); // This will now use the client-managed shapes_user_id
       // Check for user and user.id, then store shapes_user_id
       if (user && user.id) {
         localStorage.setItem('shapes_user_id', user.id);
