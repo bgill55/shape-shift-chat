@@ -95,5 +95,5 @@ export function useTheme(): ThemeContextType {
   return context;
 }
 
-// 7. Export ThemeProvider and useTheme (already done by export keyword)
-```
+// 7. Export ThemeProvider and useTheme (already done by export keyword
+
