@@ -137,6 +137,7 @@ export function useMessages() {
   };
 
   const clearMessages = () => {
+    console.log('[useMessages] clearMessages CALLED. Stack:', new Error().stack); // Added stack for more context
     setMessages([]);
   };
 
