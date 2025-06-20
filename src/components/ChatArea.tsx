@@ -329,6 +329,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
       {/* Messages area - fixed height container with flex */}
       <div className="flex-1 flex flex-col min-h-0 border-2 border-green-500"> {/* Changed overflow-hidden to min-h-0 */}
+      <div className="flex-1 flex flex-col min-h-0"> {/* Changed overflow-hidden to min-h-0 */}
         <MessageList 
           messages={messages} 
           isLoading={isLoading}

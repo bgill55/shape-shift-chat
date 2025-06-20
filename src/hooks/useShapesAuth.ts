@@ -66,7 +66,6 @@ export function useShapesAuth() {
       // Store the auth token and app_id in localStorage
       localStorage.setItem('shapes_auth_token', auth_token);
       localStorage.setItem('shapes_app_id', 'f6263f80-2242-428d-acd4-10e1feec44ee');
-
       // Implement client-side shapes_user_id logic
       let userId = localStorage.getItem('shapes_user_id');
       if (!userId) {
@@ -79,7 +78,15 @@ export function useShapesAuth() {
       // The console.error for missing user object from response is removed.
 
       refreshShapesAuthStatus(); // This will now use the client-managed shapes_user_id
-      
+      // Check for user and user.id, then store shapes_user_id
+      if (user && user.id) {
+        localStorage.setItem('shapes_user_id', user.id);
+      } else {
+        console.error('User ID not found in Shapes auth response:', user);
+        // Potentially show a toast to the user as well, or handle this more gracefully
+      }
+
+      refreshShapesAuthStatus();
       toast({
         title: "Success!",
         description: "Successfully authenticated with Shapes. You can now chat with authenticated access.",
