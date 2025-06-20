@@ -262,7 +262,8 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#36393f] pt-16 md:pt-0">
+      // This is also a main container variant, apply border here too for consistency in debugging.
+      <div className="flex-1 flex items-center justify-center bg-[#36393f] pt-16 md:pt-0 border-2 border-red-500">
         <div className="text-center text-[#96989d] px-4">
           <h2 className="text-2xl font-semibold mb-2">Welcome to Shapes Chat</h2>
           <p className="mb-4">Select a shape from the sidebar to start an individual conversation</p>
@@ -281,11 +282,11 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto">
+    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto border-2 border-red-500">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
       
       {/* Chat Controls */}
-      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0">
+      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-yellow-500">
         <Button
           size="sm"
           variant="outline"
@@ -327,7 +328,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       </div>
 
       {/* Messages area - fixed height container with flex */}
-      <div className="flex-1 flex flex-col min-h-0"> {/* Changed overflow-hidden to min-h-0 */}
+      <div className="flex-1 flex flex-col min-h-0 border-2 border-green-500"> {/* Changed overflow-hidden to min-h-0 */}
         <MessageList 
           messages={messages} 
           isLoading={isLoading}
@@ -339,7 +340,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       </div>
 
       {/* Input area - fixed at bottom */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 border-2 border-blue-500">
         <MessageInput 
           selectedChatbots={selectedChatbots}
           apiKey={apiKey}
