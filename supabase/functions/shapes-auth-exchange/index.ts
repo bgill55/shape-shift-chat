@@ -63,7 +63,6 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
-
     }
 
     let shapesData;
@@ -80,31 +79,6 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       );
-    }
-
-    let shapesData;
-    try {
-      shapesData = JSON.parse(responseText);
-      console.log('[shapes-auth-exchange] Shapes API parsed JSON response:', shapesData);
-    } catch (jsonParseError) {
-      console.error('[shapes-auth-exchange] Error parsing Shapes API response as JSON:', jsonParseError.message);
-      console.error('[shapes-auth-exchange] Raw response text that failed to parse:', responseText);
-      return new Response(
-        JSON.stringify({ error: 'Failed to parse response from Shapes API', details: responseText }),
-        {
-          status: 500, // Internal server error type because we couldn't parse a supposedly OK response
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-
-    // Log specific fields from shapesData
-    console.log('[shapes-auth-exchange] shapesData.auth_token:', shapesData?.auth_token);
-    console.log('[shapes-auth-exchange] shapesData.user object:', shapesData?.user);
-    console.log('[shapes-auth-exchange] shapesData.user_id (if exists directly):', shapesData?.user_id);
-    if (shapesData?.user) {
-      console.log('[shapes-auth-exchange] shapesData.user.id (from user object):', shapesData.user.id);
     }
     
     // Log specific fields from shapesData
@@ -116,9 +90,6 @@ serve(async (req) => {
       JSON.stringify({
         auth_token: shapesData.auth_token
         // No 'user' field anymore
-        auth_token: shapesData.auth_token,
-        // Ensure user object is consistent, preferring shapesData.user if it exists
-        user: shapesData.user || (shapesData.user_id ? { id: shapesData.user_id } : undefined)
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
