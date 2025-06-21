@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
@@ -29,10 +29,15 @@ export function useChatPersistence() {
       setSavedChats([]);
       setCurrentChatId(null);
     }
-  }, [user]);
+  // The dependency array for this useEffect should include the memoized loadSavedChats
+  // if loadSavedChats itself were not called directly but passed somewhere else.
+  // Since it's called directly, its own definition being hoisted or available is enough.
+  // However, to be extremely correct, if loadSavedChats is memoized, this useEffect
+  // should depend on that memoized version.
+  }, [user, loadSavedChats]); // Added loadSavedChats to dependency array
 
-  const loadSavedChats = async (): Promise<SavedChat[]> => {
-    if (!user) return []; // Return empty array if no user
+  const loadSavedChats = useCallback(async (): Promise<SavedChat[]> => {
+    if (!user) return [];
     
     try {
       const { data, error } = await supabase
@@ -53,9 +58,9 @@ export function useChatPersistence() {
       });
       return []; // Return empty array on error
     }
-  };
+  }, [user, toast]); // setSavedChats and toast are dependencies
 
-  const saveChat = async (chatbot: Chatbot, messages: Message[], title?: string, showToast: boolean = true) => {
+  const saveChat = useCallback(async (chatbot: Chatbot, messages: Message[], title?: string, showToast: boolean = true) => {
     if (messages.length === 0 || !user) return null;
 
     setIsLoading(true);
@@ -133,9 +138,9 @@ export function useChatPersistence() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, currentChatId, toast, loadSavedChats]); // setIsLoading, setCurrentChatId are stable
 
-  const loadChat = async (chatId: string): Promise<Message[]> => {
+  const loadChat = useCallback(async (chatId: string): Promise<Message[]> => {
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -161,9 +166,9 @@ export function useChatPersistence() {
       });
       return [];
     }
-  };
+  }, [toast]);
 
-  const deleteChat = async (chatId: string) => {
+  const deleteChat = useCallback(async (chatId: string) => {
     try {
       // Delete messages first
       await supabase
@@ -197,11 +202,11 @@ export function useChatPersistence() {
         variant: "destructive"
       });
     }
-  };
+  }, [currentChatId, toast, loadSavedChats]); // setCurrentChatId is stable
 
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     setCurrentChatId(null);
-  };
+  }, []); // setCurrentChatId is stable
 
   return {
     savedChats,
