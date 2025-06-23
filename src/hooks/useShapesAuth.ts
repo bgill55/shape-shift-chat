@@ -78,6 +78,8 @@ export function useShapesAuth() {
       }
       // The console.error for missing user object from response is removed.
 
+      refreshShapesAuthStatus(); // This will now use the client-managed shapes_user_id
+      
       refreshShapesAuthStatus(); // This will now use the client-managed shapes_user_id.
       toast({
         title: "Success!",

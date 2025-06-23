@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useRef } from 'react'; // Added useMemo, useRef
+import { User as SupabaseUser } from '@supabase/supabase-js'; // For User type
 import { useEffect, useMemo } from 'react'; // Added useMemo
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
@@ -44,6 +46,11 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   } = useChatPersistence();
 
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Refs to store previous dependency values for detailed logging
+  const prevUserRef = useRef<SupabaseUser | null>();
+  const prevSelectedBotIdsKeyRef = useRef<string>();
   const { user } = useAuth(); // Added user from useAuth
 
   // Auto-save chat every 5 minutes (without toast notification)
@@ -64,6 +71,28 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
   // Effect to load initial or selected chat
   useEffect(() => {
+    // Detailed logging for dependency changes
+    console.log('[ChatArea useEffect] Chat loading useEffect CORE LOGIC TRIGGERED.');
+    if (prevUserRef.current !== user) {
+      console.log('[ChatArea useEffect] Dependency changed: user. Prev ID:', prevUserRef.current?.id, 'New ID:', user?.id);
+    }
+    if (prevSelectedBotIdsKeyRef.current !== selectedBotIdsKey) {
+      console.log('[ChatArea useEffect] Dependency changed: selectedBotIdsKey. Prev:', prevSelectedBotIdsKeyRef.current, 'New:', selectedBotIdsKey);
+    }
+    // Could add similar checks for function references if they were suspected, e.g.
+    // if (prevLoadSavedChatsRef.current !== loadSavedChats) console.log('[ChatArea useEffect] Dependency changed: loadSavedChats function reference.');
+
+
+    // The existing log is also valuable:
+    console.log(
+      '[ChatArea useEffect] Current state for execution. User ID:', user?.id,
+      'SelectedBot IDs Key:', selectedBotIdsKey
+    );
+
+    const loadInitialChat = async () => {
+      console.log('[ChatArea] loadInitialChat EXECUTING.');
+      if (!user || selectedChatbots.length === 0) {
+        console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.');
     console.log(
       '[ChatArea] Chat loading useEffect TRIGGERED. User ID:', user?.id,
 
@@ -119,6 +148,16 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     };
 
     loadInitialChat();
+
+    // Update refs for the next run AFTER all logic including loadInitialChat call
+    // It's important this is after the main logic, or at least after comparisons.
+    // For useEffect, these updates will be effective for the *next* render/effect run.
+    prevUserRef.current = user;
+    prevSelectedBotIdsKeyRef.current = selectedBotIdsKey;
+
+  }, [
+    user,
+    selectedBotIdsKey,
   }, [
     user,
     selectedBotIdsKey, // Use the memoized version
