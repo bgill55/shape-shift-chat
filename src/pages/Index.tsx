@@ -83,7 +83,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#36393f] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <SidebarProvider defaultOpen={false}>
         <div className="min-h-screen flex w-full relative">
           {/* Mobile Header */}
