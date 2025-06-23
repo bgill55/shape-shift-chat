@@ -107,7 +107,7 @@ export function MessageList({
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col h-full">
+    <div className="flex-1 overflow-hidden flex flex-col h-full border-2 border-purple-500">
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
