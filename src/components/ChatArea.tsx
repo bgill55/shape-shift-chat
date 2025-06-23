@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'; // Added useMemo, useRef
 import { User as SupabaseUser } from '@supabase/supabase-js'; // For User type
+import { useEffect, useMemo } from 'react'; // Added useMemo
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
@@ -50,6 +51,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   // Refs to store previous dependency values for detailed logging
   const prevUserRef = useRef<SupabaseUser | null>();
   const prevSelectedBotIdsKeyRef = useRef<string>();
+  const { user } = useAuth(); // Added user from useAuth
 
   // Auto-save chat every 5 minutes (without toast notification)
   useEffect(() => {
@@ -91,6 +93,15 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       console.log('[ChatArea] loadInitialChat EXECUTING.');
       if (!user || selectedChatbots.length === 0) {
         console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.');
+    console.log(
+      '[ChatArea] Chat loading useEffect TRIGGERED. User ID:', user?.id,
+
+      'SelectedBot IDs Key:', selectedBotIdsKey // Log the memoized key
+      'SelectedBot IDs:', selectedChatbots.map(bot => bot.id).join(',')
+    );
+    const loadInitialChat = async () => {
+      console.log('[ChatArea] loadInitialChat EXECUTING.');
+      if (!user || selectedChatbots.length === 0) {
         // Optionally clear messages if user logs out or no bot selected
         // This might be redundant if other effects or direct calls handle it,
         // but good for explicit state reset if needed here.
@@ -147,6 +158,10 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   }, [
     user,
     selectedBotIdsKey,
+  }, [
+    user,
+    selectedBotIdsKey, // Use the memoized version
+    selectedChatbots.map(bot => bot.id).join(','), // Still use derived key for chatbots
     loadSavedChats,
     loadChat,
     loadMessages,
