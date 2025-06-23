@@ -66,7 +66,9 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   useEffect(() => {
     console.log(
       '[ChatArea] Chat loading useEffect TRIGGERED. User ID:', user?.id,
+
       'SelectedBot IDs Key:', selectedBotIdsKey // Log the memoized key
+      'SelectedBot IDs:', selectedChatbots.map(bot => bot.id).join(',')
     );
     const loadInitialChat = async () => {
       console.log('[ChatArea] loadInitialChat EXECUTING.');
@@ -120,6 +122,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   }, [
     user,
     selectedBotIdsKey, // Use the memoized version
+    selectedChatbots.map(bot => bot.id).join(','), // Still use derived key for chatbots
     loadSavedChats,
     loadChat,
     loadMessages,
