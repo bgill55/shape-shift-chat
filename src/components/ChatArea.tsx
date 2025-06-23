@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react'; // Added useMemo
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
@@ -58,10 +58,16 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     }
   }, [messages, selectedChatbots, saveChat]);
 
+  const selectedBotIdsKey = useMemo(() => {
+    return selectedChatbots.map(bot => bot.id).join(',');
+  }, [selectedChatbots]);
+
   // Effect to load initial or selected chat
   useEffect(() => {
     console.log(
       '[ChatArea] Chat loading useEffect TRIGGERED. User ID:', user?.id,
+
+      'SelectedBot IDs Key:', selectedBotIdsKey // Log the memoized key
       'SelectedBot IDs:', selectedChatbots.map(bot => bot.id).join(',')
     );
     const loadInitialChat = async () => {
@@ -115,6 +121,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     loadInitialChat();
   }, [
     user,
+    selectedBotIdsKey, // Use the memoized version
     selectedChatbots.map(bot => bot.id).join(','), // Still use derived key for chatbots
     loadSavedChats,
     loadChat,
