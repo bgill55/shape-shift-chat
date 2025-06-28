@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
@@ -21,27 +21,25 @@ export function useChatPersistence() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Load saved chats on mount and when user changes
-  useEffect(() => {
-    if (user) {
-      loadSavedChats();
-    } else {
-      setSavedChats([]);
-      setCurrentChatId(null);
-    }
-  }, [user]);
+  // Define memoized functions first
 
-  const loadSavedChats = async () => {
-    if (!user) return;
+  const loadSavedChats = useCallback(async (): Promise<SavedChat[]> => {
+    if (!user) {
+      setSavedChats([]); // Clear state if no user
+      setCurrentChatId(null);
+      return [];
+    }
     
     try {
       const { data, error } = await supabase
         .from('chats')
         .select('*')
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
       setSavedChats(data || []);
+      return data || []; // Return fetched data
     } catch (error) {
       console.error('Error loading chats:', error);
       toast({
@@ -49,10 +47,11 @@ export function useChatPersistence() {
         description: "Could not load saved chats from database.",
         variant: "destructive"
       });
+      return []; // Return empty array on error
     }
-  };
+  }, [user, toast, setSavedChats, setCurrentChatId]); // Added setSavedChats, setCurrentChatId as they are used in the !user path
 
-  const saveChat = async (chatbot: Chatbot, messages: Message[], title?: string, showToast: boolean = true) => {
+  const saveChat = useCallback(async (chatbot: Chatbot, messages: Message[], title?: string, showToast: boolean = true) => {
     if (messages.length === 0 || !user) return null;
 
     setIsLoading(true);
@@ -130,9 +129,9 @@ export function useChatPersistence() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, currentChatId, toast, loadSavedChats]); // setIsLoading, setCurrentChatId are stable
 
-  const loadChat = async (chatId: string): Promise<Message[]> => {
+  const loadChat = useCallback(async (chatId: string): Promise<Message[]> => {
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -158,9 +157,9 @@ export function useChatPersistence() {
       });
       return [];
     }
-  };
+  }, [toast]);
 
-  const deleteChat = async (chatId: string) => {
+  const deleteChat = useCallback(async (chatId: string) => {
     try {
       // Delete messages first
       await supabase
@@ -194,11 +193,24 @@ export function useChatPersistence() {
         variant: "destructive"
       });
     }
-  };
+  }, [currentChatId, toast, loadSavedChats, setCurrentChatId]); // Added setCurrentChatId
 
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     setCurrentChatId(null);
-  };
+  }, [setCurrentChatId]); // Added setCurrentChatId
+
+  // useEffect hooks AFTER function definitions
+  // Load saved chats on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      loadSavedChats(); // Now this is safe, loadSavedChats is defined above
+    } else {
+      // If user becomes null (logout), clear local state.
+      // loadSavedChats will also do this if called when user is null, but this is more direct for logout.
+      setSavedChats([]);
+      setCurrentChatId(null);
+    }
+  }, [user, loadSavedChats]); // loadSavedChats is stable due to useCallback
 
   return {
     savedChats,

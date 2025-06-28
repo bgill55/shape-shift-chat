@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react'; // Added useCallback
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
 import { useToast } from '@/hooks/use-toast';
@@ -8,7 +8,9 @@ export function useMessages() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const performApiCall = async (apiKey: string, selectedChatbot: Chatbot, messageContent: any) => {
+  // Wrapped with useCallback. Assuming `toast` is stable.
+  // localStorage access is a side effect within the function, not a dependency from props or state.
+  const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: any) => {
     setIsLoading(true);
     try {
       const shapeUsername = selectedChatbot.url.split('/').pop() || selectedChatbot.name.toLowerCase().replace(/\s+/g, '-');
@@ -79,19 +81,19 @@ export function useMessages() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]); // `setMessages` and `setIsLoading` are stable
 
-  const addMessage = (message: Message) => {
+  const addMessage = useCallback((message: Message) => {
     setMessages(prev => [...prev, message]);
-  };
+  }, []); // `setMessages` is stable
 
-  const updateMessage = (messageId: string, updates: Partial<Message>) => {
+  const updateMessage = useCallback((messageId: string, updates: Partial<Message>) => {
     setMessages(prev => prev.map(msg => 
       msg.id === messageId ? { ...msg, ...updates } : msg
     ));
-  };
+  }, []); // `setMessages` is stable
 
-  const editMessage = (messageId: string, newContent: string) => {
+  const editMessage = useCallback((messageId: string, newContent: string) => {
     setMessages(prev => prev.map(msg =>
       msg.id === messageId ? { ...msg, content: newContent } : msg
     ));
@@ -99,46 +101,44 @@ export function useMessages() {
       title: "Message Updated",
       description: "Message has been successfully updated.",
     });
-  };
+  }, [toast]); // `setMessages` and `toast` (assumed stable)
 
-  const deleteMessage = (messageId: string) => {
+  const deleteMessage = useCallback((messageId: string) => {
     setMessages(prev => prev.filter(msg => msg.id !== messageId));
     toast({
       title: "Message Deleted",
       description: "Message has been removed from the chat.",
     });
-  };
+  }, [toast]); // `setMessages` and `toast` (assumed stable)
 
-  const regenerateMessage = async (messageId: string, apiKey: string, selectedChatbot: Chatbot) => {
-    // Find the message to regenerate and the previous user message
+  // regenerateMessage depends on `messages` state and `performApiCall` (which is now memoized)
+  const regenerateMessage = useCallback(async (messageId: string, apiKey: string, selectedChatbot: Chatbot) => {
     const messageIndex = messages.findIndex(msg => msg.id === messageId);
     if (messageIndex === -1) return;
 
-    // Find the last user message before this bot message
     const userMessages = messages.slice(0, messageIndex).filter(msg => msg.sender === 'user');
     if (userMessages.length === 0) return;
 
     const lastUserMessage = userMessages[userMessages.length - 1];
     
-    // Remove the current bot message
     setMessages(prev => prev.filter(msg => msg.id !== messageId));
     
-    // Regenerate the response
     await performApiCall(apiKey, selectedChatbot, lastUserMessage.content);
     
     toast({
       title: "Message Regenerated",
       description: "A new response has been generated.",
     });
-  };
+  }, [messages, performApiCall, toast]); // `setMessages` is stable
 
-  const loadMessages = (newMessages: Message[]) => {
+  const loadMessages = useCallback((newMessages: Message[]) => {
     setMessages(newMessages);
-  };
+  }, []); // `setMessages` is stable
 
-  const clearMessages = () => {
+  const clearMessages = useCallback(() => {
+    console.log('[useMessages] clearMessages CALLED. Stack:', new Error().stack);
     setMessages([]);
-  };
+  }, []); // `setMessages` is stable
 
   return {
     messages,
