@@ -136,7 +136,7 @@ export function useMessages() {
   }, []); // `setMessages` is stable
 
   const clearMessages = useCallback(() => {
-    console.log('[useMessages] clearMessages CALLED. Stack:', new Error().stack);
+    // console.log('[useMessages] clearMessages CALLED. Stack:', new Error().stack); // Removed log
     setMessages([]);
   }, []); // `setMessages` is stable
 
