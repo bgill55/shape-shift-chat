@@ -1,17 +1,17 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react'; // Added useMemo, useRef
+import { User as SupabaseUser } from '@supabase/supabase-js'; // For User type
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
 import { MessageInput } from './chat/MessageInput';
 import { useMessages } from '@/hooks/useMessages';
-import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
+import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence'; // Import SavedChat
 import { Message } from '@/types/message';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext'; // Added useAuth
 import { Button } from '@/components/ui/button';
 import { Save, FileText, Trash2 } from 'lucide-react';
 import { parseMentions, getUniqueMentionedChatbots } from '@/utils/mentionUtils';
-import { useAuth } from '@/contexts/AuthContext';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface ChatAreaProps {
   selectedChatbots: Chatbot[];
@@ -19,12 +19,11 @@ interface ChatAreaProps {
 }
 
 export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
-  const { user } = useAuth();
-  const {
-    messages,
-    isLoading: messagesLoading,
-    addMessage,
-    updateMessage,
+  const { 
+    messages, 
+    isLoading, 
+    addMessage, 
+    updateMessage, 
     performApiCall,
     editMessage,
     deleteMessage,
@@ -32,53 +31,57 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     loadMessages,
     clearMessages
   } = useMessages();
-
+  
   const {
     currentChatId,
-    isLoading: persistenceIsLoading,
+    isLoading: isSaving,
     saveChat,
     startNewChat,
     loadSavedChats,
     loadChat,
     deleteChat,
+    savedChats,
     setCurrentChatId
   } = useChatPersistence();
 
   const { toast } = useToast();
+  const { user } = useAuth();
 
+  // Refs to store previous dependency values for detailed logging
   const prevUserRef = useRef<SupabaseUser | null>();
   const prevSelectedBotIdsKeyRef = useRef<string>();
+
+  // Auto-save chat every 5 minutes (without toast notification)
+  useEffect(() => {
+    if (messages.length > 0 && selectedChatbots.length > 0) {
+      const timeoutId = setTimeout(() => {
+        // Use the first chatbot for saving purposes (we might want to enhance this later)
+        saveChat(selectedChatbots[0], messages, undefined, false);
+      }, 300000); // 5 minutes = 300,000 milliseconds
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, selectedChatbots, saveChat]);
 
   const selectedBotIdsKey = useMemo(() => {
     return selectedChatbots.map(bot => bot.id).join(',');
   }, [selectedChatbots]);
 
-  // Auto-save chat (moved outside the main data loading useEffect)
+  // Effect to load initial or selected chat
   useEffect(() => {
-    if (messages.length > 0 && selectedChatbots.length > 0 && user && currentChatId) { // Ensure user and chatId for saving
-      const timeoutId = setTimeout(() => {
-        saveChat(selectedChatbots[0], messages, undefined, false); // false for no toast on auto-save
-      }, 300000); // 5 minutes
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [messages, selectedChatbots, user, currentChatId, saveChat]);
-
-
-  useEffect(() => {
-    console.log('[ChatArea useEffect] TRIGGERED.');
-
+    // Detailed logging for dependency changes
+    console.log('[ChatArea useEffect] Chat loading useEffect CORE LOGIC TRIGGERED.');
     if (prevUserRef.current !== user) {
       console.log('[ChatArea useEffect] Dependency changed: user. Prev ID:', prevUserRef.current?.id, 'New ID:', user?.id);
     }
-    // Note: For selectedBotIdsKey, also log if selectedChatbots array ref itself changed if values are same
     if (prevSelectedBotIdsKeyRef.current !== selectedBotIdsKey) {
       console.log('[ChatArea useEffect] Dependency changed: selectedBotIdsKey. Prev:', prevSelectedBotIdsKeyRef.current, 'New:', selectedBotIdsKey);
     }
+    // Could add similar checks for function references if they were suspected, e.g.
+    // if (prevLoadSavedChatsRef.current !== loadSavedChats) console.log('[ChatArea useEffect] Dependency changed: loadSavedChats function reference.');
 
-    prevUserRef.current = user;
-    prevSelectedBotIdsKeyRef.current = selectedBotIdsKey;
 
+    // The existing log is also valuable:
     console.log(
       '[ChatArea useEffect] Current state for execution. User ID:', user?.id,
       'SelectedBot IDs Key:', selectedBotIdsKey
@@ -87,78 +90,123 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     const loadInitialChat = async () => {
       console.log('[ChatArea] loadInitialChat EXECUTING.');
       if (!user || selectedChatbots.length === 0) {
-        console.log('[ChatArea] loadInitialChat: Aborting - no user or no selected chatbots. Clearing messages.');
-        clearMessages(); // Clear messages if context is not valid for loading
-        setCurrentChatId(null);
+        console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.');
+        // Optionally clear messages if user logs out or no bot selected
+        // This might be redundant if other effects or direct calls handle it,
+        // but good for explicit state reset if needed here.
+        // clearMessages();
+        // setCurrentChatId(null);
         return;
       }
 
-      console.log('[ChatArea] loadInitialChat: About to call clearMessages() due to user/bot change.');
+      // Clear previous state when context (user or selected bot) changes
+      console.log('[ChatArea] loadInitialChat: About to call clearMessages()');
       clearMessages();
       setCurrentChatId(null);
 
-      const primarySelectedBot = selectedChatbots[0];
-      console.log('[ChatArea] loadInitialChat: Primary selected bot ID:', primarySelectedBot.id);
-      console.log('[ChatArea] loadInitialChat: Attempting to load saved chats for user:', user.id);
+      // loadSavedChats now returns the chats and also sets them in its own state.
+      // We can use the returned value directly.
       const allUserSavedChats: SavedChat[] = await loadSavedChats();
-      console.log('[ChatArea] loadInitialChat: Loaded allUserSavedChats:', allUserSavedChats);
 
       if (allUserSavedChats && allUserSavedChats.length > 0) {
+        const primarySelectedBotId = selectedChatbots[0].id;
+        console.log(`[ChatArea useEffect] Primary selected bot ID: ${primarySelectedBotId}`);
+
         const mostRecentChatForSelectedBot = allUserSavedChats
-          .filter(chat => chat.chatbot_id === primarySelectedBot.id)
-          .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
+          .filter(chat => chat.chatbot_id === primarySelectedBotId)
+          // Already sorted by updated_at desc in loadSavedChats, but if not, sort here.
+          // .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+          [0]; // Get the first one after filtering (should be most recent)
 
         if (mostRecentChatForSelectedBot) {
-          console.log('[ChatArea] loadInitialChat: Found most recent chat for bot:', mostRecentChatForSelectedBot.id);
-          const loadedMsgs = await loadChat(mostRecentChatForSelectedBot.id); // Renamed to avoid conflict
-          console.log('[ChatArea] loadInitialChat: Loaded messages for chat ID', mostRecentChatForSelectedBot.id, 'Messages:', loadedMsgs);
-          if (loadedMsgs && loadedMsgs.length > 0) {
-            loadMessages(loadedMsgs);
+          console.log(`[ChatArea useEffect] Found most recent chat for selected bot: ${mostRecentChatForSelectedBot.id}`);
+          const loadedMessages = await loadChat(mostRecentChatForSelectedBot.id);
+          if (loadedMessages && loadedMessages.length > 0) {
+            console.log(`[ChatArea useEffect] Loading ${loadedMessages.length} messages for chat ${mostRecentChatForSelectedBot.id}`);
+            loadMessages(loadedMessages);
             setCurrentChatId(mostRecentChatForSelectedBot.id);
-            console.log('[ChatArea] loadInitialChat: Setting messages and currentChatId:', mostRecentChatForSelectedBot.id);
           } else {
-            console.log('[ChatArea] loadInitialChat: No messages found for chat ID', mostRecentChatForSelectedBot.id, 'Starting new chat implicitly.');
+            console.log(`[ChatArea useEffect] No messages found for chat ${mostRecentChatForSelectedBot.id}, starting new chat implicitly.`);
           }
         } else {
-          console.log('[ChatArea] loadInitialChat: No saved chats found for bot', primarySelectedBot.id, '. Starting new chat implicitly.');
+          console.log(`[ChatArea useEffect] No saved chats found for bot ${primarySelectedBotId}. Starting new chat implicitly.`);
         }
       } else {
-        console.log('[ChatArea] loadInitialChat: No saved chats found for the user. Starting new chat implicitly.');
+        console.log('[ChatArea useEffect] No saved chats found for the user. Starting new chat implicitly.');
       }
     };
 
     loadInitialChat();
-  }, [user, selectedBotIdsKey, loadSavedChats, loadChat, loadMessages, clearMessages, setCurrentChatId]); // Key dependencies
 
-  const handleSendMessage = async (userMessageText: string, imageFile: File | null) => { // Updated signature
-    if (!user) return; // Should not happen if UI is guarded
+    // Update refs for the next run AFTER all logic including loadInitialChat call
+    // It's important this is after the main logic, or at least after comparisons.
+    // For useEffect, these updates will be effective for the *next* render/effect run.
+    prevUserRef.current = user;
+    prevSelectedBotIdsKeyRef.current = selectedBotIdsKey;
 
-    const newMessage: Message = {
-        id: crypto.randomUUID(),
-        content: userMessageText,
-        sender: 'user',
-        timestamp: new Date(),
-        // imageUrl will be handled if imageFile is present
-    };
+  }, [
+    user,
+    selectedBotIdsKey,
+    loadSavedChats,
+    loadChat,
+    loadMessages,
+    clearMessages,
+    setCurrentChatId
+  ]);
 
-    if (!imageFile) {
-        addMessage(newMessage);
-    }
+  const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
+    addMessage(userMessage);
 
+    // For single chatbot, always respond. For multiple chatbots, parse mentions
     if (selectedChatbots.length === 1) {
       const chatbot = selectedChatbots[0];
-      await performApiCall(apiKey, chatbot, userMessageText, imageFile, newMessage.id, addMessage, updateMessage);
+      
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const base64DataUri = e.target?.result as string;
+          if (!base64DataUri) {
+            console.error("Failed to read file as Base64.");
+            updateMessage(userMessage.id, {
+              content: `${userMessage.content} [Image send failed (read error)]`
+            });
+            return;
+          }
+
+          const apiMessageContent: any[] = [];
+          if (textInput.trim()) {
+            apiMessageContent.push({ type: "text", text: textInput.trim() });
+          }
+          apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
+          
+          performApiCall(apiKey, chatbot, apiMessageContent);
+        };
+        reader.onerror = (error) => {
+          console.error("FileReader error:", error);
+          updateMessage(userMessage.id, {
+            content: `${userMessage.content} [Image send failed (read error)]`
+          });
+          toast({
+            title: "File Read Error",
+            description: "Could not read the selected image file.",
+            variant: "destructive"
+          });
+        };
+        reader.readAsDataURL(imageFile);
+      } else {
+        await performApiCall(apiKey, chatbot, textInput);
+      }
     } else {
-      const mentions = parseMentions(userMessageText, selectedChatbots);
+      // Group chat mode - parse @ mentions
+      const mentions = parseMentions(textInput, selectedChatbots);
       const mentionedChatbots = getUniqueMentionedChatbots(mentions);
+
       const chatbotsToRespond = mentionedChatbots.length > 0 ? mentionedChatbots : [];
 
       if (chatbotsToRespond.length === 0 && selectedChatbots.length > 1) {
-        if (imageFile) {
-            addMessage({ ...newMessage, content: `${userMessageText} [Image will be sent if you @mention a bot]` });
-        }
+        // Show helper message for multi-bot setup
         const helperMessage: Message = {
-          id: crypto.randomUUID(),
+          id: (Date.now() + 1).toString(),
           content: `💡 Tip: Use @mentions to talk to specific shapes! Available: ${selectedChatbots.map(bot => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`,
           sender: 'bot',
           timestamp: new Date()
@@ -166,16 +214,44 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
         addMessage(helperMessage);
         return;
       }
-      if (imageFile && chatbotsToRespond.length > 0) {
-        addMessage({ ...newMessage, content: `${userMessageText} [Image uploading...]` });
-      } else if (imageFile && chatbotsToRespond.length === 0) {
-        // Handled above
-      } else if (!imageFile) {
-        // Already added if no imageFile
-      }
 
+      // Process each mentioned chatbot
       for (const chatbot of chatbotsToRespond) {
-        await performApiCall(apiKey, chatbot, userMessageText, imageFile, newMessage.id, addMessage, updateMessage);
+        if (imageFile) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const base64DataUri = e.target?.result as string;
+            if (!base64DataUri) {
+              console.error("Failed to read file as Base64.");
+              updateMessage(userMessage.id, {
+                content: `${userMessage.content} [Image send failed (read error)]`
+              });
+              return;
+            }
+
+            const apiMessageContent: any[] = [];
+            if (textInput.trim()) {
+              apiMessageContent.push({ type: "text", text: textInput.trim() });
+            }
+            apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
+            
+            performApiCall(apiKey, chatbot, apiMessageContent);
+          };
+          reader.onerror = (error) => {
+            console.error("FileReader error:", error);
+            updateMessage(userMessage.id, {
+              content: `${userMessage.content} [Image send failed (read error)]`
+            });
+            toast({
+              title: "File Read Error",
+              description: "Could not read the selected image file.",
+              variant: "destructive"
+            });
+          };
+          reader.readAsDataURL(imageFile);
+        } else {
+          await performApiCall(apiKey, chatbot, textInput);
+        }
       }
     }
   };
@@ -189,16 +265,18 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   };
 
   const handleRegenerateMessage = async (messageId: string) => {
-    if (selectedChatbots.length === 0 || !user) return;
+    if (selectedChatbots.length === 0) return;
+    // Use the first chatbot for regeneration (could be enhanced to remember which bot sent the message)
     await regenerateMessage(messageId, apiKey, selectedChatbots[0]);
   };
 
   const handleSaveChat = async () => {
-    if (selectedChatbots.length === 0 || messages.length === 0 || !user) return;
+    if (selectedChatbots.length === 0 || messages.length === 0) return;
     await saveChat(selectedChatbots[0], messages);
   };
 
   const handleNewChat = () => {
+    clearMessages();
     startNewChat();
     toast({
       title: "New Chat Started",
@@ -207,8 +285,11 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   };
 
   const handleDeleteChat = async () => {
-    if (!currentChatId || !user) return;
+    if (!currentChatId) return;
+    
     await deleteChat(currentChatId);
+    clearMessages();
+    
     toast({
       title: "Chat Deleted",
       description: "The current chat has been deleted.",
@@ -217,17 +298,18 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-background text-foreground pt-16 md:pt-0 border-2 border-red-500">
-        <div className="text-center text-muted-foreground px-4">
-          <h2 className="text-2xl font-semibold mb-2 text-foreground">Welcome to Shapes Chat</h2>
+      // This is also a main container variant, apply border here too for consistency in debugging.
+      <div className="flex-1 flex items-center justify-center bg-[#36393f] pt-16 md:pt-0 border-2 border-red-500">
+        <div className="text-center text-[#96989d] px-4">
+          <h2 className="text-2xl font-semibold mb-2">Welcome to Shapes Chat</h2>
           <p className="mb-4">Select a shape from the sidebar to start an individual conversation</p>
-          <p className="text-sm mb-2">
+          <p className="text-sm text-[#72767d] mb-2">
             💬 Individual channels: Click on any shape for one-on-one chat
           </p>
-          <p className="text-sm">
+          <p className="text-sm text-[#72767d]">
             👥 Group chat: Use checkboxes to select up to 3 shapes and use @mentions
           </p>
-          <p className="text-sm mt-2">
+          <p className="text-sm text-[#72767d] mt-2">
             On mobile, tap the menu button in the top left to open the sidebar
           </p>
         </div>
@@ -236,55 +318,56 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background text-foreground pt-16 md:pt-0 h-screen md:h-auto border-2 border-red-500">
+    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto border-2 border-red-500">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
-
-      <div className="px-4 py-2 bg-card border-b border-border flex gap-2 flex-shrink-0 border-2 border-yellow-500">
+      
+      {/* Chat Controls */}
+      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-yellow-500">
         <Button
           size="sm"
           variant="outline"
           onClick={handleNewChat}
-          className="bg-secondary text-secondary-foreground hover:bg-muted"
+          className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
         >
           <FileText className="w-4 h-4 mr-1" />
           New Chat
         </Button>
-
+        
         <Button
           size="sm"
           variant="outline"
           onClick={handleSaveChat}
-          disabled={messages.length === 0 || persistenceIsLoading}
-          className="bg-secondary text-secondary-foreground hover:bg-muted"
+          disabled={messages.length === 0 || isSaving}
+          className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
         >
           <Save className="w-4 h-4 mr-1" />
-          {persistenceIsLoading ? 'Saving...' : 'Save Chat'}
+          {isSaving ? 'Saving...' : 'Save Chat'}
         </Button>
-
+        
         {currentChatId && (
           <Button
             size="sm"
-            variant="destructive"
+            variant="outline"
             onClick={handleDeleteChat}
-            className="hover:bg-destructive/90"
+            className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#dc2626] hover:text-white"
           >
             <Trash2 className="w-4 h-4 mr-1" />
             Delete Chat
           </Button>
         )}
-
+        
         {currentChatId && (
-          <span className="text-xs text-muted-foreground self-center ml-2">
-            Chat ID: {currentChatId.substring(0,8)}... Auto-saved
+          <span className="text-xs text-[#72767d] self-center ml-2">
+            Auto-saved to database
           </span>
         )}
       </div>
 
-      {/* MessageList Wrapper */}
-      <div className="flex-1 flex flex-col min-h-0 border-2 border-green-500">
-        <MessageList
-          messages={messages}
-          isLoading={messagesLoading}
+      {/* Messages area - fixed height container with flex */}
+      <div className="flex-1 flex flex-col min-h-0 border-2 border-green-500"> {/* Changed overflow-hidden to min-h-0 */}
+        <MessageList 
+          messages={messages} 
+          isLoading={isLoading}
           onEditMessage={handleEditMessage}
           onDeleteMessage={handleDeleteMessage}
           onRegenerateMessage={handleRegenerateMessage}
@@ -292,14 +375,14 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
         />
       </div>
 
-      {/* MessageInput Wrapper */}
+      {/* Input area - fixed at bottom */}
       <div className="flex-shrink-0 border-2 border-blue-500">
-        <MessageInput
+        <MessageInput 
           selectedChatbots={selectedChatbots}
           apiKey={apiKey}
-          isLoading={messagesLoading} // Pass messagesLoading here
+          isLoading={isLoading}
           onSendMessage={handleSendMessage}
-          chatHistory={messages} // Pass current messages as chatHistory
+          chatHistory={messages} // Added chatHistory prop
         />
       </div>
     </div>

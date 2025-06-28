@@ -21,23 +21,14 @@ export function useChatPersistence() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Load saved chats on mount and when user changes
-  useEffect(() => {
-    if (user) {
-      loadSavedChats();
-    } else {
-      setSavedChats([]);
-      setCurrentChatId(null);
-    }
-  // The dependency array for this useEffect should include the memoized loadSavedChats
-  // if loadSavedChats itself were not called directly but passed somewhere else.
-  // Since it's called directly, its own definition being hoisted or available is enough.
-  // However, to be extremely correct, if loadSavedChats is memoized, this useEffect
-  // should depend on that memoized version.
-  }, [user, loadSavedChats]); // Added loadSavedChats to dependency array
+  // Define memoized functions first
 
   const loadSavedChats = useCallback(async (): Promise<SavedChat[]> => {
-    if (!user) return [];
+    if (!user) {
+      setSavedChats([]); // Clear state if no user
+      setCurrentChatId(null);
+      return [];
+    }
     
     try {
       const { data, error } = await supabase
@@ -58,7 +49,7 @@ export function useChatPersistence() {
       });
       return []; // Return empty array on error
     }
-  }, [user, toast]); // setSavedChats and toast are dependencies
+  }, [user, toast, setSavedChats, setCurrentChatId]); // Added setSavedChats, setCurrentChatId as they are used in the !user path
 
   const saveChat = useCallback(async (chatbot: Chatbot, messages: Message[], title?: string, showToast: boolean = true) => {
     if (messages.length === 0 || !user) return null;
@@ -202,11 +193,24 @@ export function useChatPersistence() {
         variant: "destructive"
       });
     }
-  }, [currentChatId, toast, loadSavedChats]); // setCurrentChatId is stable
+  }, [currentChatId, toast, loadSavedChats, setCurrentChatId]); // Added setCurrentChatId
 
   const startNewChat = useCallback(() => {
     setCurrentChatId(null);
-  }, []); // setCurrentChatId is stable
+  }, [setCurrentChatId]); // Added setCurrentChatId
+
+  // useEffect hooks AFTER function definitions
+  // Load saved chats on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      loadSavedChats(); // Now this is safe, loadSavedChats is defined above
+    } else {
+      // If user becomes null (logout), clear local state.
+      // loadSavedChats will also do this if called when user is null, but this is more direct for logout.
+      setSavedChats([]);
+      setCurrentChatId(null);
+    }
+  }, [user, loadSavedChats]); // loadSavedChats is stable due to useCallback
 
   return {
     savedChats,
