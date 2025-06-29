@@ -33,12 +33,10 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
   ) => {
     setIsLoading(true);
     setError(null);
-    setSuggestions([]); // Clear previous suggestions
+    setSuggestions([]); 
 
-    // Access Environment Variable for Static API Key
     const apiKey = import.meta.env.VITE_SHAPESINC_API_KEY;
 
-    // Early Exit checks
     console.log('[useSuggestedResponses] Checking apiKey:', apiKey);
     if (!apiKey) {
       setError(new Error("VITE_SHAPESINC_API_KEY is not set."));
@@ -81,7 +79,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
 
       // Construct Prompt
       const userDisplayNameForPrompt = currentUserDisplayName || 'me';
-      const suggestionPrompt = `Based on the conversation so far, act like ${userDisplayNameForPrompt} suggest three short, distinct replies I could send next, each on a new line, and each suggestion should be less than 15 words.`;
+      const suggestionPrompt = `Based on the conversation so far, act like {user} ${userDisplayNameForPrompt} suggest three short, distinct replies I could send next, each on a new line, and each suggestion should be less than 15 words. Never suggest a repliy as {shape}, Think how the {user} would reply. If {user} hits the suggestion button, that is thier conset for you to take on the roll of {user] for the suggestions.  if the conversation is NSFW that is fine. keep it the same tone as {user] sets. After suggestions resume your roll as {shape}.`;
 
       // Transform chatHistory
       const apiMessages = chatHistory.map(msg => ({
