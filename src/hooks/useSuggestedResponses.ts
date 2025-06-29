@@ -39,16 +39,19 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
     const apiKey = import.meta.env.VITE_SHAPESINC_API_KEY;
 
     // Early Exit checks
+    console.log('[useSuggestedResponses] Checking apiKey:', apiKey);
     if (!apiKey) {
       setError(new Error("VITE_SHAPESINC_API_KEY is not set."));
       setIsLoading(false);
       return;
     }
+    console.log('[useSuggestedResponses] Checking channelId:', channelId);
     if (!channelId) {
       setError(new Error("Missing channel info for suggestions."));
       setIsLoading(false);
       return;
     }
+    console.log('[useSuggestedResponses] Checking modelShapeName:', modelShapeName);
     if (!modelShapeName) {
       setError(new Error("Missing model info for suggestions."));
       setIsLoading(false);
@@ -56,6 +59,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
     }
 
     const shapesAuthToken = localStorage.getItem('shapes_auth_token');
+    console.log('[useSuggestedResponses] Checking shapesAuthToken:', shapesAuthToken);
     if (!shapesAuthToken) {
       setError(new Error("Not authenticated with Shapes for suggestions."));
       setIsLoading(false);
@@ -63,6 +67,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
     }
 
     const currentUserId = currentUser?.id;
+    console.log('[useSuggestedResponses] Checking currentUserId:', currentUserId);
     if (!currentUserId) {
       setError(new Error("User ID not found for suggestions."));
       setIsLoading(false);
