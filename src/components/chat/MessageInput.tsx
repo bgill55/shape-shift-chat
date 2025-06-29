@@ -13,7 +13,7 @@ interface MessageInputProps {
   apiKey: string;
   isLoading: boolean;
   onSendMessage: (userMessage: Message, imageFile: File | null, textInput: string) => void;
-  chatHistory: Message[]; // Added
+  chatHistory: Message[]; 
 }
 
 export function MessageInput({
@@ -21,7 +21,7 @@ export function MessageInput({
   apiKey,
   isLoading,
   onSendMessage,
-  chatHistory // Added
+  chatHistory 
 }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);

@@ -5,17 +5,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel, // Added
+  DropdownMenuLabel, 
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, Sun, Moon } from 'lucide-react'; // Added Sun, Moon
+import { User, LogOut, Settings, Sun, Moon } from 'lucide-react'; 
 import { Link } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext'; // Added useTheme
+import { useTheme } from '@/contexts/ThemeContext'; 
 
 export function UserMenu() {
   const { user, displayName, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme(); // Added theme and toggleTheme
+  const { theme, toggleTheme } = useTheme(); 
 
   if (!user) return null;
 

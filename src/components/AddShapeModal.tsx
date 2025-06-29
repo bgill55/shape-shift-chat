@@ -63,7 +63,7 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
         <div className="mt-4">
           <p className="text-[#96989d] text-sm mb-4">
             Enter a Shape's vanity URL to add it to your collection. Example: 
-            https://shapes.inc/bella-donna
+            https://shapes.inc/jarvis-dev
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

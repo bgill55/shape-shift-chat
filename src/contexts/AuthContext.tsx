@@ -60,10 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setDisplayName(name);
           console.log('AuthContext: Fetched profile for Supabase user - displayName:', name);
         } else {
-          // This else branch is hit on SIGNED_OUT or if session becomes null for other reasons.
-          // We need to check if it's a Shapes auth case specifically if user is null but shapes token might exist.
-          // However, refreshShapesAuthStatus() or checkExistingSession() would typically handle Shapes user revival.
-          // For onAuthStateChange, if session is null, currentUser is null.
           console.log('AuthContext: No Supabase session, clearing Supabase user specific data.');
           setDisplayName(null);
         }
@@ -72,7 +68,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // Check for existing session
     const checkExistingSession = async () => {
       const { data: { session: initialSession } } = await supabase.auth.getSession();
       console.log('AuthContext checkExistingSession: Initial session data:', initialSession);
@@ -86,7 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setDisplayName(name);
         console.log('AuthContext checkExistingSession: Fetched profile for Supabase user - displayName:', name);
       } else {
-        // If no Supabase session, check for Shapes auth
         const shapesAuthToken = localStorage.getItem('shapes_auth_token');
         const shapesUserId = localStorage.getItem('shapes_user_id');
         if (shapesAuthToken && shapesUserId) {
@@ -161,14 +155,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('shapes_app_id');
     localStorage.removeItem('shapes_user_id');
     
-    // Supabase signOut will trigger onAuthStateChange, which handles resetting state including displayName
     const { error } = await supabase.auth.signOut();
     
     if (!error) {
       window.location.href = '/auth';
     } else {
-      // If Supabase signout fails, but we want to ensure local state is cleared if somehow inconsistent
-      // (onAuthStateChange should ideally still handle it based on lack of session)
       console.error("Error signing out from Supabase:", error);
       setUser(null);
       setSession(null);
@@ -178,7 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshShapesAuthStatus = async () => {
     setLoading(true);
-    setSession(null); // Clear Supabase session for Shapes auth refresh
+    setSession(null); 
     console.log('AuthContext refreshShapesAuthStatus: Attempting to refresh Shapes auth status.');
     const shapesAuthToken = localStorage.getItem('shapes_auth_token');
     const shapesUserId = localStorage.getItem('shapes_user_id');
@@ -201,7 +192,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const name = await fetchProfileDisplayName(shapesUserId);
       setDisplayName(name);
       console.log('AuthContext refreshShapesAuthStatus: Fetched profile for Shapes user - displayName:', name);
-    } else if (shapesAuthToken) { // Token but no ID
+    } else if (shapesAuthToken) { 
       const mockUser = {
         id: 'shapes-user-fallback-refresh',
         email: 'shapes-user@shapes.local',
@@ -232,33 +223,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const profileDataToUpsert = {
-        id: user.id, // This is the user's UUID, acting as the primary key
+        id: user.id, 
         display_name: newName.trim(),
         updated_at: new Date().toISOString(),
       };
 
-      // Using upsert:
-      // If a row with `id: user.id` exists, it will be updated.
-      // If it doesn't exist, a new row will be inserted.
-      // Supabase client infers the conflict target from the primary key (`id`).
       const { data, error: upsertError } = await supabase
         .from('profiles')
         .upsert(profileDataToUpsert)
-        .select() // Select the upserted row(s)
-        .single(); // Expecting a single row
+        .select() 
+        .single(); 
 
       if (upsertError) {
         console.error('Error upserting display name:', upsertError);
         return { error: upsertError };
       }
 
-      // `data` here would be the upserted profile record.
-      // We can use data.display_name if we want to be absolutely sure,
-      // but newName should be what was set.
       if (data) {
         setDisplayName(data.display_name);
       } else {
-        // Fallback if data is not returned, though .select().single() should ensure it or error out
         setDisplayName(newName.trim());
       }
       return { error: null };

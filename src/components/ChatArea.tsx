@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useRef } from 'react'; // Added useMemo, useRef
-import { User as SupabaseUser } from '@supabase/supabase-js'; // For User type
+import { useEffect, useMemo, useRef } from 'react'; 
+import { User as SupabaseUser } from '@supabase/supabase-js'; 
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
 import { MessageInput } from './chat/MessageInput';
 import { useMessages } from '@/hooks/useMessages';
-import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence'; // Import SavedChat
+import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence'; 
 import { Message } from '@/types/message';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext'; // Added useAuth
+import { useAuth } from '@/contexts/AuthContext'; 
 import { Button } from '@/components/ui/button';
 import { Save, FileText, Trash2 } from 'lucide-react';
 import { parseMentions, getUniqueMentionedChatbots } from '@/utils/mentionUtils';
@@ -40,22 +40,21 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     loadSavedChats,
     loadChat,
     deleteChat,
-    // savedChats, // savedChats from useChatPersistence is not directly used in ChatArea after refactor
+    savedChats,
     setCurrentChatId
   } = useChatPersistence();
 
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Removed prevUserRef and prevSelectedBotIdsKeyRef
+  const prevUserRef = useRef<SupabaseUser | null>();
+  const prevSelectedBotIdsKeyRef = useRef<string>();
 
-  // Auto-save chat every 5 minutes (without toast notification)
   useEffect(() => {
     if (messages.length > 0 && selectedChatbots.length > 0) {
       const timeoutId = setTimeout(() => {
-        // Use the first chatbot for saving purposes (we might want to enhance this later)
         saveChat(selectedChatbots[0], messages, undefined, false);
-      }, 300000); // 5 minutes = 300,000 milliseconds
+      }, 300000); 
 
       return () => clearTimeout(timeoutId);
     }
@@ -65,22 +64,29 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
     return selectedChatbots.map(bot => bot.id).join(',');
   }, [selectedChatbots]);
 
-  // Effect to load initial or selected chat
   useEffect(() => {
-    // Removed detailed dependency change logs and prevValue refs
-    // console.log(
-    //   '[ChatArea useEffect] Current state for execution. User ID:', user?.id,
-    //   'SelectedBot IDs Key:', selectedBotIdsKey
-    // );
+    console.log('[ChatArea useEffect] Chat loading useEffect CORE LOGIC TRIGGERED.');
+    if (prevUserRef.current !== user) {
+      console.log('[ChatArea useEffect] Dependency changed: user. Prev ID:', prevUserRef.current?.id, 'New ID:', user?.id);
+    }
+    if (prevSelectedBotIdsKeyRef.current !== selectedBotIdsKey) {
+      console.log('[ChatArea useEffect] Dependency changed: selectedBotIdsKey. Prev:', prevSelectedBotIdsKeyRef.current, 'New:', selectedBotIdsKey);
+    }
+    
+
+    console.log(
+      '[ChatArea useEffect] Current state for execution. User ID:', user?.id,
+      'SelectedBot IDs Key:', selectedBotIdsKey
+    );
 
     const loadInitialChat = async () => {
-      // console.log('[ChatArea] loadInitialChat EXECUTING.'); // Removed
+      console.log('[ChatArea] loadInitialChat EXECUTING.');
       if (!user || selectedChatbots.length === 0) {
-        // console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.'); // Removed
+        console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.');
         return;
       }
 
-      // console.log('[ChatArea] loadInitialChat: About to call clearMessages()'); // Removed
+      console.log('[ChatArea] loadInitialChat: About to call clearMessages()');
       clearMessages();
       setCurrentChatId(null);
 
@@ -88,31 +94,34 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
       if (allUserSavedChats && allUserSavedChats.length > 0) {
         const primarySelectedBotId = selectedChatbots[0].id;
-        // console.log(`[ChatArea useEffect] Primary selected bot ID: ${primarySelectedBotId}`); // Removed
+        console.log(`[ChatArea useEffect] Primary selected bot ID: ${primarySelectedBotId}`);
 
         const mostRecentChatForSelectedBot = allUserSavedChats
           .filter(chat => chat.chatbot_id === primarySelectedBotId)
-          [0];
+          [0]; 
 
         if (mostRecentChatForSelectedBot) {
-          // console.log(`[ChatArea useEffect] Found most recent chat for selected bot: ${mostRecentChatForSelectedBot.id}`); // Removed
+          console.log(`[ChatArea useEffect] Found most recent chat for selected bot: ${mostRecentChatForSelectedBot.id}`);
           const loadedMessages = await loadChat(mostRecentChatForSelectedBot.id);
           if (loadedMessages && loadedMessages.length > 0) {
-            // console.log(`[ChatArea useEffect] Loading ${loadedMessages.length} messages for chat ${mostRecentChatForSelectedBot.id}`); // Removed
+            console.log(`[ChatArea useEffect] Loading ${loadedMessages.length} messages for chat ${mostRecentChatForSelectedBot.id}`);
             loadMessages(loadedMessages);
             setCurrentChatId(mostRecentChatForSelectedBot.id);
           } else {
-            // console.log(`[ChatArea useEffect] No messages found for chat ${mostRecentChatForSelectedBot.id}, starting new chat implicitly.`); // Removed
+            console.log(`[ChatArea useEffect] No messages found for chat ${mostRecentChatForSelectedBot.id}, starting new chat implicitly.`);
           }
         } else {
-          // console.log(`[ChatArea useEffect] No saved chats found for bot ${primarySelectedBotId}. Starting new chat implicitly.`); // Removed
+          console.log(`[ChatArea useEffect] No saved chats found for bot ${primarySelectedBotId}. Starting new chat implicitly.`);
         }
       } else {
-        // console.log('[ChatArea useEffect] No saved chats found for the user. Starting new chat implicitly.'); // Removed
+        console.log('[ChatArea useEffect] No saved chats found for the user. Starting new chat implicitly.');
       }
     };
 
     loadInitialChat();
+
+    prevUserRef.current = user;
+    prevSelectedBotIdsKeyRef.current = selectedBotIdsKey;
 
   }, [
     user,
@@ -127,7 +136,6 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
 
-    // For single chatbot, always respond. For multiple chatbots, parse mentions
     if (selectedChatbots.length === 1) {
       const chatbot = selectedChatbots[0];
       
@@ -167,14 +175,12 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
         await performApiCall(apiKey, chatbot, textInput);
       }
     } else {
-      // Group chat mode - parse @ mentions
       const mentions = parseMentions(textInput, selectedChatbots);
       const mentionedChatbots = getUniqueMentionedChatbots(mentions);
 
       const chatbotsToRespond = mentionedChatbots.length > 0 ? mentionedChatbots : [];
 
       if (chatbotsToRespond.length === 0 && selectedChatbots.length > 1) {
-        // Show helper message for multi-bot setup
         const helperMessage: Message = {
           id: (Date.now() + 1).toString(),
           content: `💡 Tip: Use @mentions to talk to specific shapes! Available: ${selectedChatbots.map(bot => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`,
@@ -184,8 +190,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
         addMessage(helperMessage);
         return;
       }
-
-      // Process each mentioned chatbot
+      
       for (const chatbot of chatbotsToRespond) {
         if (imageFile) {
           const reader = new FileReader();
@@ -236,7 +241,6 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
   const handleRegenerateMessage = async (messageId: string) => {
     if (selectedChatbots.length === 0) return;
-    // Use the first chatbot for regeneration (could be enhanced to remember which bot sent the message)
     await regenerateMessage(messageId, apiKey, selectedChatbots[0]);
   };
 
@@ -268,9 +272,9 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-background text-foreground pt-16 md:pt-0">
-        <div className="text-center text-muted-foreground px-4">
-          <h2 className="text-2xl font-semibold mb-2 text-foreground">Welcome to Shapes Chat</h2>
+      <div className="flex-1 flex items-center justify-center bg-[#36393f] pt-16 md:pt-0 border-2 border-cyan-500">
+        <div className="text-center text-[#96989d] px-4">
+          <h2 className="text-2xl font-semibold mb-2">Welcome to Shapes Chat</h2>
           <p className="mb-4">Select a shape from the sidebar to start an individual conversation</p>
           <p className="text-sm text-[#72767d] mb-2">
             💬 Individual channels: Click on any shape for one-on-one chat
@@ -287,78 +291,14 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   }
 
   return (
-    // Removed border-2 border-red-500
-    <div className="flex-1 flex flex-col bg-background text-foreground pt-16 md:pt-0 h-screen md:h-auto">
+    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
       
       {/* Chat Controls */}
-      {/* Removed border-2 border-yellow-500, assuming theme variables are used for bg/border */}
-      <div className="px-4 py-2 bg-card border-b border-border flex gap-2 flex-shrink-0">
+      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
         <Button
           size="sm"
           variant="outline"
-          // Assuming these buttons should also use theme variables if not custom styled for dark explicitly
-          className="bg-card hover:bg-accent hover:text-accent-foreground border-border text-muted-foreground"
-        >
-          <FileText className="w-4 h-4 mr-1" />
-          New Chat
-        </Button>
-
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleSaveChat}
-          disabled={messages.length === 0 || isSaving}
-          className="bg-card hover:bg-accent hover:text-accent-foreground border-border text-muted-foreground"
-        >
-          <Save className="w-4 h-4 mr-1" />
-          {isSaving ? 'Saving...' : 'Save Chat'}
-        </Button>
-
-        {currentChatId && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDeleteChat}
-            className="bg-card hover:bg-destructive hover:text-destructive-foreground border-border text-muted-foreground"
-          >
-            <Trash2 className="w-4 h-4 mr-1" />
-            Delete Chat
-          </Button>
-        )}
-
-        {currentChatId && (
-          <span className="text-xs text-muted-foreground self-center ml-2">
-            Auto-saved to database
-          </span>
-        )}
-      </div>
-
-      {/* Messages area - fixed height container with flex */}
-      <div className="flex-1 flex flex-col min-h-0"> {/* Removed border-2 border-green-500 */}
-        <MessageList
-          messages={messages}
-          isLoading={isLoading}
-          onEditMessage={handleEditMessage}
-          onDeleteMessage={handleDeleteMessage}
-          onRegenerateMessage={handleRegenerateMessage}
-          selectedChatbots={selectedChatbots}
-        />
-      </div>
-
-      {/* Input area - fixed at bottom */}
-      <div className="flex-shrink-0"> {/* Removed border-2 border-blue-500 */}
-        <MessageInput
-          selectedChatbots={selectedChatbots}
-          apiKey={apiKey}
-          isLoading={isLoading}
-          onSendMessage={handleSendMessage}
-          chatHistory={messages}
-        />
-      </div>
-    </div>
-  );
-}
           onClick={handleNewChat}
           className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
         >
@@ -397,7 +337,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       </div>
 
       {/* Messages area - fixed height container with flex */}
-      <div className="flex-1 flex flex-col min-h-0 border-2 border-green-500"> {/* Changed overflow-hidden to min-h-0 */}
+      <div className="flex-1 flex flex-col min-h-0 border-2 border-cyan-600"> {/* Changed overflow-hidden to min-h-0 */}
         <MessageList 
           messages={messages} 
           isLoading={isLoading}
@@ -409,7 +349,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
       </div>
 
       {/* Input area - fixed at bottom */}
-      <div className="flex-shrink-0 border-2 border-blue-500">
+      <div className="flex-shrink-0 border-2 border-cyan-500">
         <MessageInput 
           selectedChatbots={selectedChatbots}
           apiKey={apiKey}

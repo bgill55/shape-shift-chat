@@ -53,7 +53,6 @@ export function MessageList({
   };
 
   const renderMessageContent = (message: Message) => {
-    // If this message is being edited, show the editable version
     if (editingMessageId === message.id) {
       return (
         <EditableMessage
@@ -64,7 +63,6 @@ export function MessageList({
       );
     }
 
-    // User-sent images with local preview
     if (message.sender === 'user' && message.imageUrl) {
       return (
         <div className="space-y-1">
@@ -78,7 +76,6 @@ export function MessageList({
       );
     }
 
-    // Bot messages with image URL (rendered via ImagePreview component)
     const botImageUrl = isImageUrl(message.content);
     if (botImageUrl && message.sender === 'bot') {
       const textContent = message.content.replace(botImageUrl, '').trim();
@@ -90,7 +87,6 @@ export function MessageList({
       );
     }
     
-    // Bot messages with audio URL
     const audioUrl = isAudioUrl(message.content);
     if (audioUrl && message.sender === 'bot') {
       const textContent = message.content.replace(audioUrl, '').trim();
@@ -102,7 +98,6 @@ export function MessageList({
       );
     }
     
-    // Default: plain text message (for user or bot without special content)
     return <MessageText content={message.content} />;
   };
 
@@ -132,11 +127,10 @@ export function MessageList({
                   />
                 </div>
                 <div className="pr-8 overflow-hidden">
-                  {/* Show bot indicator for multi-bot chats */}
                   {message.sender === 'bot' && selectedChatbots.length > 1 && (
                     <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
                       <Bot className="w-3 h-3" />
-                      <span>Bot Response</span>
+                      <span>Shape Response</span>
                     </div>
                   )}
                   {renderMessageContent(message)}

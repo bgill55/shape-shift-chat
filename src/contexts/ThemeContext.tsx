@@ -1,4 +1,3 @@
-// src/contexts/ThemeContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Theme = "light" | "dark";
@@ -16,7 +15,7 @@ interface ThemeContextType {
 }
 
 const initialState: ThemeContextType = {
-  theme: "dark", // Default value, will be updated by useState initialization
+  theme: "dark", 
   setTheme: () => null,
   toggleTheme: () => null,
 };
@@ -25,7 +24,7 @@ const ThemeContext = createContext<ThemeContextType>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark", // Default to dark if nothing else is set
+  defaultTheme = "dark", 
   storageKey = "vite-ui-theme",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -34,21 +33,16 @@ export function ThemeProvider({
       if (storedTheme && (storedTheme === "light" || storedTheme === "dark")) {
         return storedTheme;
       }
-      // Check system preference if no valid stored theme
       const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (systemPrefersDark) {
         return "dark";
       }
-      // Fallback to defaultTheme prop if it's 'light' or 'dark'
-      // If defaultTheme was 'system', systemPrefersDark already handled it.
       if (defaultTheme === "light" || defaultTheme === "dark") {
         return defaultTheme;
       }
-      return "dark"; // Final fallback, ensures a valid Theme type
+      return "dark"; 
     } catch (e) {
-      // localStorage might not be available (e.g., SSR or restricted env)
       console.warn('[ThemeProvider] localStorage not available for theme persistence, using defaultTheme:', defaultTheme);
-      // Fallback logic if localStorage fails, similar to above but without localStorage access
       if (defaultTheme === "light" || defaultTheme === "dark") {
         return defaultTheme;
       }
@@ -58,10 +52,9 @@ export function ThemeProvider({
             return "dark";
           }
       } catch (systemMatchError) {
-          // window.matchMedia might also not be available
           console.warn('[ThemeProvider] window.matchMedia not available, falling back to dark.');
       }
-      return "dark"; // Final hardcoded fallback
+      return "dark"; 
     }
   });
 
@@ -101,15 +94,9 @@ export function ThemeProvider({
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-  if (context === undefined) { // Check against undefined as initialState is an object
-    // This can happen if useTheme is used outside of ThemeProvider
-    // Or if the context was somehow not provided a value, though initialState should prevent that.
-    // However, the more robust check is if context is still initialState or truly undefined.
-    // For a required context, throwing an error if it's undefined is standard.
+  if (context === undefined) { 
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 }
 
-// Ensure no stray characters or markdown formatting beyond this point.
-// The file should end after the closing brace of the useTheme function.

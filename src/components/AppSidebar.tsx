@@ -61,7 +61,7 @@ export function AppSidebar({
           <div className="w-8 h-8 bg-[#5865f2] rounded-full flex items-center justify-center">
             <Bot className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-white">Shapes Chat</span>
+          <span className="font-semibold text-white">Shapes Shift</span>
         </div>
       </SidebarHeader>
 

@@ -85,7 +85,7 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
                   type={showKey ? "text" : "password"}
                   value={showKey ? apiKey : maskApiKey(apiKey)}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="NZUZL3TKUX6TIB8IJMHXWVISXCJOC7JYMHNSUBGRTFO"
+                  placeholder="NZUZL3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                   className="bg-[#40444b] border-[#202225] text-white placeholder-[#96989d] pr-20"
                 />
                 <button
