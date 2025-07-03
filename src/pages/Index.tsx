@@ -8,6 +8,7 @@ import { ApiKeyModal } from '@/components/ApiKeyModal';
 import { MobileHeader } from '@/components/MobileHeader';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
 
 export interface Chatbot {
   id: string;
@@ -23,6 +24,11 @@ const Index = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId } = useChatPersistence();
+
+  useEffect(() => {
+    loadSavedChats();
+  }, [loadSavedChats]);
 
   useEffect(() => {
     const savedApiKey = localStorage.getItem('shapes-api-key');
@@ -31,14 +37,23 @@ const Index = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const savedChatbots = localStorage.getItem('chatbots');
+    if (savedChatbots) {
+      setChatbots(JSON.parse(savedChatbots));
+    }
+  }, []);
+
   const addChatbot = (url: string) => {
     const name = url.split('/').pop() || 'Unknown Bot';
     const newChatbot: Chatbot = {
-       id: crypto.randomUUID(),
-       name: name.replace(/-/g, ' '),
+      id: url,
+      name: name.replace(/-/g, ' '),
       url
     };
-    setChatbots([...chatbots, newChatbot]);
+    const newChatbots = [...chatbots, newChatbot];
+    setChatbots(newChatbots);
+    localStorage.setItem('chatbots', JSON.stringify(newChatbots));
     
     // Select only the newly added chatbot (individual channel)
     setSelectedChatbots([newChatbot]);
@@ -77,6 +92,20 @@ const Index = () => {
     });
   };
 
+  const handleLoadChat = async (chat: SavedChat) => {
+    const chatbot = chatbots.find(cb => cb.id === chat.chatbot_id);
+    if (chatbot) {
+      setSelectedChatbots([chatbot]);
+      setCurrentChatId(chat.id);
+    } else {
+      toast({
+        title: "Error",
+        description: "Could not find the associated chatbot for this chat.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const saveApiKey = (key: string) => {
     setApiKey(key);
     localStorage.setItem('shapes-api-key', key);
@@ -99,6 +128,8 @@ const Index = () => {
             onSelectSingleChatbot={handleSelectSingleChatbot}
             onAddShape={() => setIsAddShapeModalOpen(true)}
             onOpenApiConfig={() => setIsApiKeyModalOpen(true)}
+            savedChats={savedChats}
+            onLoadChat={handleLoadChat}
           />
           
           {/* Main content area with responsive margins */}
@@ -106,6 +137,7 @@ const Index = () => {
             <ChatArea 
               selectedChatbots={selectedChatbots}
               apiKey={apiKey}
+              currentChatId={currentChatId}
             />
           </div>
         </div>

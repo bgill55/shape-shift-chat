@@ -16,9 +16,10 @@ import { parseMentions, getUniqueMentionedChatbots } from '@/utils/mentionUtils'
 interface ChatAreaProps {
   selectedChatbots: Chatbot[];
   apiKey: string;
+  currentChatId: string | null;
 }
 
-export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
+export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentChatId }: ChatAreaProps) {
   const { 
     messages, 
     isLoading, 
@@ -33,16 +34,19 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   } = useMessages();
   
   const {
-    currentChatId,
     isLoading: isSaving,
     saveChat,
     startNewChat,
-    loadSavedChats,
     loadChat,
     deleteChat,
-    savedChats,
     setCurrentChatId
   } = useChatPersistence();
+
+  useEffect(() => {
+    if (propCurrentChatId) {
+      setCurrentChatId(propCurrentChatId);
+    }
+  }, [propCurrentChatId, setCurrentChatId]);
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -51,87 +55,17 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   const prevSelectedBotIdsKeyRef = useRef<string>();
 
   useEffect(() => {
-    if (messages.length > 0 && selectedChatbots.length > 0) {
-      const timeoutId = setTimeout(() => {
-        saveChat(selectedChatbots[0], messages, undefined, false);
-      }, 300000); 
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [messages, selectedChatbots, saveChat]);
-
-  const selectedBotIdsKey = useMemo(() => {
-    return selectedChatbots.map(bot => bot.id).join(',');
-  }, [selectedChatbots]);
-
-  useEffect(() => {
-    console.log('[ChatArea useEffect] Chat loading useEffect CORE LOGIC TRIGGERED.');
-    if (prevUserRef.current !== user) {
-      console.log('[ChatArea useEffect] Dependency changed: user. Prev ID:', prevUserRef.current?.id, 'New ID:', user?.id);
-    }
-    if (prevSelectedBotIdsKeyRef.current !== selectedBotIdsKey) {
-      console.log('[ChatArea useEffect] Dependency changed: selectedBotIdsKey. Prev:', prevSelectedBotIdsKeyRef.current, 'New:', selectedBotIdsKey);
-    }
-    
-
-    console.log(
-      '[ChatArea useEffect] Current state for execution. User ID:', user?.id,
-      'SelectedBot IDs Key:', selectedBotIdsKey
-    );
-
-    const loadInitialChat = async () => {
-      console.log('[ChatArea] loadInitialChat EXECUTING.');
-      if (!user || selectedChatbots.length === 0) {
-        console.log('[ChatArea] loadInitialChat: Aborting due to no user or no selected bots.');
-        return;
-      }
-
-      console.log('[ChatArea] loadInitialChat: About to call clearMessages()');
+    if (propCurrentChatId) {
       clearMessages();
-      setCurrentChatId(null);
-
-      const allUserSavedChats: SavedChat[] = await loadSavedChats();
-
-      if (allUserSavedChats && allUserSavedChats.length > 0) {
-        const primarySelectedBotId = selectedChatbots[0].id;
-        console.log(`[ChatArea useEffect] Primary selected bot ID: ${primarySelectedBotId}`);
-
-        const mostRecentChatForSelectedBot = allUserSavedChats
-          .filter(chat => chat.chatbot_id === primarySelectedBotId)
-          [0]; 
-
-        if (mostRecentChatForSelectedBot) {
-          console.log(`[ChatArea useEffect] Found most recent chat for selected bot: ${mostRecentChatForSelectedBot.id}`);
-          const loadedMessages = await loadChat(mostRecentChatForSelectedBot.id);
-          if (loadedMessages && loadedMessages.length > 0) {
-            console.log(`[ChatArea useEffect] Loading ${loadedMessages.length} messages for chat ${mostRecentChatForSelectedBot.id}`);
-            loadMessages(loadedMessages);
-            setCurrentChatId(mostRecentChatForSelectedBot.id);
-          } else {
-            console.log(`[ChatArea useEffect] No messages found for chat ${mostRecentChatForSelectedBot.id}, starting new chat implicitly.`);
-          }
-        } else {
-          console.log(`[ChatArea useEffect] No saved chats found for bot ${primarySelectedBotId}. Starting new chat implicitly.`);
+      loadChat(propCurrentChatId).then((loadedMessages) => {
+        if (loadedMessages && loadedMessages.length > 0) {
+          loadMessages(loadedMessages);
         }
-      } else {
-        console.log('[ChatArea useEffect] No saved chats found for the user. Starting new chat implicitly.');
-      }
-    };
-
-    loadInitialChat();
-
-    prevUserRef.current = user;
-    prevSelectedBotIdsKeyRef.current = selectedBotIdsKey;
-
-  }, [
-    user,
-    selectedBotIdsKey,
-    loadSavedChats,
-    loadChat,
-    loadMessages,
-    clearMessages,
-    setCurrentChatId
-  ]);
+      });
+    } else {
+      clearMessages();
+    }
+  }, [propCurrentChatId, loadChat, loadMessages, clearMessages]);
 
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
@@ -259,9 +193,9 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
   };
 
   const handleDeleteChat = async () => {
-    if (!currentChatId) return;
+    if (!propCurrentChatId) return;
     
-    await deleteChat(currentChatId);
+    await deleteChat(propCurrentChatId);
     clearMessages();
     
     toast({
@@ -317,7 +251,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
           {isSaving ? 'Saving...' : 'Save Chat'}
         </Button>
         
-        {currentChatId && (
+        {propCurrentChatId && (
           <Button
             size="sm"
             variant="outline"
@@ -329,7 +263,7 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
           </Button>
         )}
         
-        {currentChatId && (
+        {propCurrentChatId && (
           <span className="text-xs text-[#72767d] self-center ml-2">
             Auto-saved to database
           </span>
@@ -354,7 +288,9 @@ export function ChatArea({ selectedChatbots, apiKey }: ChatAreaProps) {
           selectedChatbots={selectedChatbots}
           apiKey={apiKey}
           isLoading={isLoading}
+          isSaving={isSaving}
           onSendMessage={handleSendMessage}
+          onSaveChat={handleSaveChat}
           chatHistory={messages} // Added chatHistory prop
         />
       </div>

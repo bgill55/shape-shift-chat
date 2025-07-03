@@ -1,5 +1,5 @@
 
-import { Plus, Bot, Settings, MessageCircle, Users } from 'lucide-react';
+import { Plus, Bot, Settings, MessageCircle, Users, History } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator"; // Added
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext"; // Added
 import { UserMenu } from "@/components/UserMenu"; // Added
-import { Chatbot } from '@/pages/Index';
+import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
 
 interface AppSidebarProps {
@@ -27,6 +27,8 @@ interface AppSidebarProps {
   onSelectSingleChatbot: (chatbot: Chatbot) => void;
   onAddShape: () => void;
   onOpenApiConfig: () => void;
+  savedChats: SavedChat[];
+  onLoadChat: (chat: SavedChat) => void;
 }
 
 export function AppSidebar({ 
@@ -35,7 +37,9 @@ export function AppSidebar({
   onSelectChatbot, 
   onSelectSingleChatbot,
   onAddShape, 
-  onOpenApiConfig 
+  onOpenApiConfig,
+  savedChats,
+  onLoadChat
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
@@ -139,6 +143,28 @@ export function AppSidebar({
                       </span>
                     </div>
                   </div>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[#96989d] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
+            <History className="w-3 h-3" />
+            Saved Chats
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {savedChats.map((chat) => (
+                <SidebarMenuItem key={chat.id}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => onLoadChat(chat)}
+                    className="w-full justify-start text-left px-2 py-1 rounded hover:bg-[#393c43] text-[#96989d]"
+                  >
+                    <span className="truncate">{chat.title}</span>
+                  </Button>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

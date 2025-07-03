@@ -1,30 +1,36 @@
 
 import { useState, useRef } from 'react';
-import { Send, Lightbulb } from 'lucide-react';
+import { Send, Lightbulb, Wand2, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useSuggestedResponses } from '../../hooks/useSuggestedResponses';
+import { CommandToolbar } from './CommandToolbar';
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
   apiKey: string;
   isLoading: boolean;
+  isSaving: boolean;
   onSendMessage: (userMessage: Message, imageFile: File | null, textInput: string) => void;
-  chatHistory: Message[]; 
+  onSaveChat: () => void;
+  chatHistory: Message[];
 }
 
 export function MessageInput({
   selectedChatbots,
   apiKey,
   isLoading,
+  isSaving,
   onSendMessage,
-  chatHistory 
+  onSaveChat,
+  chatHistory,
 }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showCommands, setShowCommands] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const {
     selectedImageFile,
@@ -50,7 +56,7 @@ export function MessageInput({
       timestamp: new Date(),
       imageUrl: currentImageFile ? currentImagePreviewUrl : undefined,
     };
-    
+
     setInputValue('');
     handleRemoveSelectedImage();
 
@@ -64,12 +70,22 @@ export function MessageInput({
     }
   };
 
+  const handleCommand = (command: string) => {
+    if (command === '!imagine') {
+      setInputValue('!imagine ');
+    } else {
+      setInputValue(command);
+    }
+    setShowCommands(false);
+    inputRef.current?.focus();
+  };
+
   const getPlaceholderText = () => {
-    if (selectedChatbots.length === 0) return "Select a shape to start chatting...";
+    if (selectedChatbots.length === 0) return 'Select a shape to start chatting...';
     if (selectedChatbots.length === 1) {
       return `Message ${selectedChatbots[0].name}...`;
     }
-    return `Use @mentions: ${selectedChatbots.map(bot => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`;
+    return `Use @mentions: ${selectedChatbots.map((bot) => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`;
   };
 
   return (
@@ -79,6 +95,8 @@ export function MessageInput({
           Please configure your API key to start chatting
         </div>
       ) : null}
+
+      {showCommands && <CommandToolbar onCommand={handleCommand} />}
 
       {showSuggestions && (
         <div
@@ -113,8 +131,17 @@ export function MessageInput({
           )}
         </div>
       )}
-      
+
       <div className="flex space-x-2 items-center">
+        <Button
+          variant="outline"
+          onClick={() => setShowCommands(!showCommands)}
+          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+          className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
+          aria-label="Toggle command toolbar"
+        >
+          <Wand2 className="w-5 h-5" />
+        </Button>
         <Button
           variant="outline"
           onClick={() => {
@@ -166,20 +193,25 @@ export function MessageInput({
         >
           <Send className="w-4 h-4" />
         </Button>
+        <Button
+          onClick={onSaveChat}
+          disabled={isSaving || selectedChatbots.length === 0}
+          className="bg-[#43b581] hover:bg-[#3aa873] text-white"
+        >
+          <Save className="w-4 h-4" />
+        </Button>
       </div>
       {imagePreviewUrl && selectedImageFile && (
         <div className="mt-2 flex items-center space-x-2">
-          <img 
-            src={imagePreviewUrl} 
-            alt="Selected preview" 
-            className="w-20 h-20 object-cover rounded border border-[#202225]" 
+          <img
+            src={imagePreviewUrl}
+            alt="Selected preview"
+            className="w-20 h-20 object-cover rounded border border-[#202225]"
           />
-          <div className="text-xs text-[#96989d] truncate">
-            {selectedImageFile.name}
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <div className="text-xs text-[#96989d] truncate">{selectedImageFile.name}</div>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleRemoveSelectedImage}
             className="text-red-500 hover:text-red-700 p-1"
             aria-label="Remove selected image"
