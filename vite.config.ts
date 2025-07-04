@@ -26,4 +26,7 @@ export default defineConfig(({ mode }) => ({
     setupFiles: ['./src/setupTests.ts'],
     css: false,
   },
+  build: {
+    chunkSizeWarningLimit: 1000, // Set a higher limit to suppress the warning
+  },
 }));

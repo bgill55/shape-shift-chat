@@ -85,7 +85,9 @@ export function MessageInput({
     if (selectedChatbots.length === 1) {
       return `Message ${selectedChatbots[0].name}...`;
     }
-    return `Use @mentions: ${selectedChatbots.map((bot) => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`;
+    if (selectedChatbots.length > 1) {
+      return `Message ${selectedChatbots.map(bot => bot.name).join(', ')}...`;
+    }
   };
 
   return (

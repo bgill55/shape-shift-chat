@@ -98,8 +98,6 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`, // Use static API key for Bearer token
-          'X-User-Id': currentUserId,
-          'X-Channel-Id': channelId,
         },
         body: JSON.stringify({
           model: model,

@@ -32,14 +32,6 @@ export function useMessages() {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
       
-      // Add special Shapes headers for context management
-      const userId = localStorage.getItem('shapes_user_id') || `user-${Date.now()}`;
-      if (!localStorage.getItem('shapes_user_id')) {
-        localStorage.setItem('shapes_user_id', userId);
-      }
-      headers['X-User-Id'] = userId; // Use consistent user ID
-      headers['X-Channel-Id'] = `channel-${selectedChatbot.id}`; // Use chatbot ID as channel ID
-      
       const response = await fetch('https://api.shapes.inc/v1/chat/completions', {
         method: 'POST',
         headers,

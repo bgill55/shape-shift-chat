@@ -109,22 +109,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
         await performApiCall(apiKey, chatbot, textInput);
       }
     } else {
-      const mentions = parseMentions(textInput, selectedChatbots);
-      const mentionedChatbots = getUniqueMentionedChatbots(mentions);
+      const chatbotsToRespond = selectedChatbots;
 
-      const chatbotsToRespond = mentionedChatbots.length > 0 ? mentionedChatbots : [];
-
-      if (chatbotsToRespond.length === 0 && selectedChatbots.length > 1) {
-        const helperMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          content: `💡 Tip: Use @mentions to talk to specific shapes! Available: ${selectedChatbots.map(bot => `@${bot.name.toLowerCase().replace(/\s+/g, '')}`).join(', ')}`,
-          sender: 'bot',
-          timestamp: new Date()
-        };
-        addMessage(helperMessage);
-        return;
-      }
-      
       for (const chatbot of chatbotsToRespond) {
         if (imageFile) {
           const reader = new FileReader();
@@ -214,7 +200,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
             💬 Individual channels: Click on any shape for one-on-one chat
           </p>
           <p className="text-sm text-[#72767d]">
-            👥 Group chat: Use checkboxes to select up to 3 shapes and use @mentions
+            👥 Group chat: Use checkboxes to select up to 3 shapes
           </p>
           <p className="text-sm text-[#72767d] mt-2">
             On mobile, tap the menu button in the top left to open the sidebar
