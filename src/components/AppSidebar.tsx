@@ -1,5 +1,5 @@
 
-import { Plus, Bot, Settings, MessageCircle, Users, History } from 'lucide-react';
+import { Plus, Bot, Settings, MessageCircle, Users, History, Trash2 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +19,7 @@ import { useAuth } from "@/contexts/AuthContext"; // Added
 import { UserMenu } from "@/components/UserMenu"; // Added
 import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
 
 interface AppSidebarProps {
   chatbots: Chatbot[];
@@ -29,6 +30,8 @@ interface AppSidebarProps {
   onOpenApiConfig: () => void;
   savedChats: SavedChat[];
   onLoadChat: (chat: SavedChat) => void;
+  onDeleteChat: (chatId: string) => void;
+  onDeleteChatbot: (chatbotId: string) => void;
 }
 
 export function AppSidebar({ 
@@ -39,7 +42,9 @@ export function AppSidebar({
   onAddShape, 
   onOpenApiConfig,
   savedChats,
-  onLoadChat
+  onLoadChat,
+  onDeleteChat,
+  onDeleteChatbot
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
@@ -79,11 +84,11 @@ export function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               {chatbots.map((chatbot) => (
-                <SidebarMenuItem key={chatbot.id}>
+                <SidebarMenuItem key={chatbot.id} className="flex justify-between items-center group">
                   <Button
                     variant="ghost"
                     onClick={() => onSelectSingleChatbot(chatbot)}
-                    className={`w-full justify-start text-left px-2 py-1 rounded hover:bg-[#393c43] ${
+                    className={`flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[#393c43] ${
                       selectedChatbots.length === 1 && isChatbotSelected(chatbot) 
                         ? 'bg-[#393c43] text-white' 
                         : 'text-[#96989d]'
@@ -97,6 +102,14 @@ export function AppSidebar({
                         {chatbot.name}
                       </span>
                     </div>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDeleteChatbot(chatbot.id)}
+                    className="opacity-0 group-hover:opacity-100 text-red-500 hover:bg-red-500/20 p-1 h-auto"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </SidebarMenuItem>
               ))}
@@ -156,17 +169,29 @@ export function AppSidebar({
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {savedChats.map((chat) => (
-                <SidebarMenuItem key={chat.id}>
-                  <Button
-                    variant="ghost"
-                    onClick={() => onLoadChat(chat)}
-                    className="w-full justify-start text-left px-2 py-1 rounded hover:bg-[#393c43] text-[#96989d]"
-                  >
-                    <span className="truncate">{chat.title}</span>
-                  </Button>
-                </SidebarMenuItem>
-              ))}
+              {savedChats.length === 0 ? (
+                <p className="text-[#96989d] text-sm px-2 py-1">No saved chats yet. Start a conversation and click 'Save Chat'!</p>
+              ) : (
+                savedChats.map((chat) => (
+                  <SidebarMenuItem key={chat.id} className="flex justify-between items-center group">
+                    <Button
+                      variant="ghost"
+                      onClick={() => onLoadChat(chat)}
+                      className="flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[#393c43] text-[#96989d]"
+                    >
+                      <span className="truncate">{chat.title}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDeleteChat(chat.id)}
+                      className="opacity-0 group-hover:opacity-100 text-red-500 hover:bg-red-500/20 p-1 h-auto"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -191,13 +216,16 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[#202225] space-y-3">
-        <SidebarMenuButton 
-          onClick={onOpenApiConfig}
-          className="w-full justify-start text-left px-2 py-2 rounded hover:bg-[#393c43] text-[#96989d]"
-        >
-          <Settings className="w-4 h-4 mr-3" />
-          <span>API Configuration</span>
-        </SidebarMenuButton>
+        <div className="flex items-center gap-2">
+          <SidebarMenuButton 
+            onClick={onOpenApiConfig}
+            className="flex-grow justify-start text-left px-2 py-2 rounded hover:bg-[#393c43] text-[#96989d]"
+          >
+            <Settings className="w-4 h-4 mr-3" />
+            <span>API Configuration</span>
+          </SidebarMenuButton>
+          <ThemeSwitcher />
+        </div>
 
         {user && (
           <>

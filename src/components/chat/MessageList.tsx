@@ -9,6 +9,7 @@ import { MessageText } from './MessageText';
 import { MessageActions } from './MessageActions';
 import { EditableMessage } from './EditableMessage';
 import { ScrollArea } from '../ui/scroll-area';
+import { Skeleton } from '../ui/skeleton'; // Import Skeleton component
 import { Bot } from 'lucide-react';
 
 interface MessageListProps {
@@ -144,12 +145,9 @@ export function MessageList({
           
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-[#2f3136] text-white border border-[#202225] px-4 py-2 rounded-lg">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-[#96989d] rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-[#96989d] rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-[#96989d] rounded-full animate-bounce delay-200"></div>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-8 w-[200px]" />
               </div>
             </div>
           )}

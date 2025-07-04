@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 
 interface AudioPlayerProps {
   src: string;
@@ -12,6 +13,7 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [volume, setVolume] = useState(1); // New state for volume (0 to 1)
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -26,12 +28,15 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);
 
+    // Set initial volume and update when volume state changes
+    audio.volume = volume;
+
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [volume]); // Add volume to dependency array
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -93,7 +98,16 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
         </div>
       </div>
 
-      <Volume2 className="w-4 h-4 text-[#96989d]" />
+      <div className="flex items-center space-x-2">
+        <Volume2 className="w-4 h-4 text-[#96989d]" />
+        <Slider
+          defaultValue={[100]}
+          max={100}
+          step={1}
+          className="w-[80px]"
+          onValueChange={(val) => setVolume(val[0] / 100)}
+        />
+      </div>
     </div>
   );
 }

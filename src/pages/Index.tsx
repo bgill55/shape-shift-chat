@@ -24,7 +24,7 @@ const Index = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId } = useChatPersistence();
+  const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId, deleteChat } = useChatPersistence();
 
   useEffect(() => {
     loadSavedChats();
@@ -106,6 +106,29 @@ const Index = () => {
     }
   };
 
+  const handleDeleteSavedChat = async (chatId: string) => {
+    await deleteChat(chatId);
+    loadSavedChats(); // Reload saved chats after deletion
+    toast({
+      title: "Chat Deleted",
+      description: "Saved chat has been successfully deleted.",
+    });
+  };
+
+  const handleDeleteChatbot = (chatbotId: string) => {
+    const updatedChatbots = chatbots.filter(bot => bot.id !== chatbotId);
+    setChatbots(updatedChatbots);
+    localStorage.setItem('chatbots', JSON.stringify(updatedChatbots));
+
+    // Also remove from selectedChatbots if it was selected
+    setSelectedChatbots(prev => prev.filter(bot => bot.id !== chatbotId));
+
+    toast({
+      title: "Shape Deleted",
+      description: "Chatbot has been successfully removed.",
+    });
+  };
+
   const saveApiKey = (key: string) => {
     setApiKey(key);
     localStorage.setItem('shapes-api-key', key);
@@ -130,6 +153,8 @@ const Index = () => {
             onOpenApiConfig={() => setIsApiKeyModalOpen(true)}
             savedChats={savedChats}
             onLoadChat={handleLoadChat}
+            onDeleteChat={handleDeleteSavedChat}
+            onDeleteChatbot={handleDeleteChatbot}
           />
           
           {/* Main content area with responsive margins */}

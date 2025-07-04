@@ -192,19 +192,17 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#36393f] pt-16 md:pt-0 border-2 border-cyan-500">
-        <div className="text-center text-[#96989d] px-4">
-          <h2 className="text-2xl font-semibold mb-2">Welcome to Shapes Chat</h2>
-          <p className="mb-4">Select a shape from the sidebar to start an individual conversation</p>
-          <p className="text-sm text-[#72767d] mb-2">
-            💬 Individual channels: Click on any shape for one-on-one chat
-          </p>
-          <p className="text-sm text-[#72767d]">
-            👥 Group chat: Use checkboxes to select up to 3 shapes
-          </p>
-          <p className="text-sm text-[#72767d] mt-2">
-            On mobile, tap the menu button in the top left to open the sidebar
-          </p>
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#36393f] pt-16 md:pt-0 text-center text-[#96989d] px-4">
+        <img src="/assets/X_large_image.png" alt="Welcome to Shapes Shift" className="w-48 h-48 mb-6 opacity-70" />
+        <h2 className="text-3xl font-bold mb-3">Welcome to Shapes Shift!</h2>
+        <p className="text-lg mb-2">Your AI-powered chat experience.</p>
+        <p className="text-sm mb-6 max-w-md">
+          Select a shape from the sidebar to start an individual conversation, or choose multiple shapes for a group chat.
+        </p>
+        <div className="text-left text-sm text-[#72767d] space-y-2">
+          <p>💬 Individual channels: Click on any shape for one-on-one chat.</p>
+          <p>👥 Group chat: Use checkboxes to select up to 3 shapes.</p>
+          <p>💡 Tip: On mobile, tap the menu button in the top left to open the sidebar.</p>
         </div>
       </div>
     );

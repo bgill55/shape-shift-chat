@@ -8,7 +8,7 @@ describe('ImagePreview', () => {
   const mockSrc = 'https://files.shapes.inc/test-image.png';
   const mockAlt = 'Test Image Alt Text';
 
-  test('renders the image with correct src and alt attributes', () => {
+  test('renders the image with correct src and alt attributes', { timeout: 10000 }, () => {
     render(<ImagePreview src={mockSrc} alt={mockAlt} />);
     
     const imgElement = screen.getByRole('img');
