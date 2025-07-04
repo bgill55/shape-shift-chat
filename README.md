@@ -1,8 +1,8 @@
-# Welcome to your project
+# Welcome Shape Shift
 
 ## How can I edit this code?
 
-There are several ways of editing your application.
+There are several ways of editing this application.
 
 **Use your preferred IDE**
 
