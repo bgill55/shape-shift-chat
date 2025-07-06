@@ -79,7 +79,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
 
       // Construct Prompt
       const userDisplayNameForPrompt = currentUserDisplayName || 'me';
-      const suggestionPrompt = `You are acting as ${userDisplayNameForPrompt}. Based on the previous conversation, suggest three short, distinct replies that ${userDisplayNameForPrompt} could send next. Each suggestion should be on a new line and be less than 15 words. Do not respond as the assistant. Only provide the three suggestions.`;
+      const suggestionPrompt = `You are acting as ${userDisplayNameForPrompt}. Based on the previous conversation, suggest three short, distinct replies that ${userDisplayNameForPrompt} could send next. Each suggestion should be on a new line and be less than 15 words. Make sure it is relevant to current conversation, NSFW is allowed and encouraged.  Do not respond as the assistant. Only provide the three suggestions.`;
 
       // Transform chatHistory
       const apiMessages = chatHistory.map(msg => ({
