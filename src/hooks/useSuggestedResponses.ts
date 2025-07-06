@@ -79,7 +79,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
 
       // Construct Prompt
       const userDisplayNameForPrompt = currentUserDisplayName || 'me';
-      const suggestionPrompt = `Based on the conversation so far, act like {user} ${userDisplayNameForPrompt} suggest three short, distinct replies I could send next, each on a new line, and each suggestion should be less than 15 words. Never suggest a repliy as {shape}, Think how the {user} would reply. If {user} hits the suggestion button, that is thier conset for you to take on the roll of {user] for the suggestions.  if the conversation is NSFW that is fine. keep it the same tone as {user] sets. After suggestions resume your roll as {shape}.`;
+      const suggestionPrompt = `You are acting as ${userDisplayNameForPrompt}. Based on the previous conversation, suggest three short, distinct replies that ${userDisplayNameForPrompt} could send next. Each suggestion should be on a new line and be less than 15 words. Do not respond as the assistant. Only provide the three suggestions.`;
 
       // Transform chatHistory
       const apiMessages = chatHistory.map(msg => ({
@@ -120,7 +120,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       if (typeof rawSuggestions === 'string') {
         const suggestionTexts = rawSuggestions
           .split('\n')
-          .map(text => text.trim().replace(/^- /, '')) // Remove leading hyphens/bullets if any
+          .map(text => text.trim().replace(/^\d+\.\s*|^- /, '')) // Remove leading numbers, hyphens, or bullets
           .filter(text => text.length > 0);
 
         setSuggestions(suggestionTexts.map((text, index) => ({ id: `sugg-${index}-${Date.now()}`, text })));
