@@ -195,7 +195,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   if (selectedChatbots.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-[#36393f] pt-16 md:pt-0 text-center text-[#96989d] px-4">
-        <img src="/assets/X_large_image.png" alt="Welcome to Shapes Shift" className="w-48 h-48 mb-6 opacity-70" />
+        <img src="/assets/X_large_image.png" alt="Welcome to Shapes Shift" className="w-64 h-64 mb-6 opacity-70 object-contain" />
         <h2 className="text-3xl font-bold mb-3">Welcome to Shapes Shift!</h2>
         <p className="text-lg mb-2">Your AI-powered chat experience.</p>
         <p className="text-sm mb-6 max-w-md">
