@@ -42,6 +42,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     setCurrentChatId
   } = useChatPersistence();
 
+  const selectedBotIdsKey = useMemo(() => selectedChatbots.map(bot => bot.id).sort().join(','), [selectedChatbots]);
+
   useEffect(() => {
     if (propCurrentChatId) {
       setCurrentChatId(propCurrentChatId);
@@ -65,7 +67,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     } else {
       clearMessages();
     }
-  }, [propCurrentChatId, loadChat, loadMessages, clearMessages]);
+  }, [propCurrentChatId, selectedBotIdsKey, loadChat, loadMessages, clearMessages]);
 
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
