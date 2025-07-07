@@ -15,17 +15,17 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
   ];
 
   return (
-    <div className="flex flex-wrap gap-2 p-2 bg-[#36393f] border-t border-[#202225]">
+    <div className="flex flex-wrap items-center justify-start gap-2 p-2 bg-[#36393f] border-t border-[#202225]">
       {commands.map((command) => (
         <Button
           key={command.id}
           variant="outline"
           size="sm"
           onClick={() => onCommand(command.label)}
-          className="bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600"
+          className="bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600 text-xs whitespace-nowrap"
           title={command.description}
         >
-          <Wand2 className="w-4 h-4 mr-2" />
+          <Wand2 className="w-3.5 h-3.5 mr-1.5" />
           {command.label}
         </Button>
       ))}

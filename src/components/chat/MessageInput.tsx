@@ -1,6 +1,6 @@
 
 import { useState, useRef } from 'react';
-import { Send, Lightbulb, Wand2, Save } from 'lucide-react';
+import { Send, Lightbulb, Wand2, Save, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Message } from '@/types/message';
@@ -8,6 +8,7 @@ import { Chatbot } from '@/pages/Index';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useSuggestedResponses } from '../../hooks/useSuggestedResponses';
 import { CommandToolbar } from './CommandToolbar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
@@ -32,6 +33,7 @@ export function MessageInput({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showCommands, setShowCommands] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
   const {
     selectedImageFile,
     imagePreviewUrl,
@@ -134,43 +136,45 @@ export function MessageInput({
         </div>
       )}
 
-      <div className="flex space-x-2 items-center">
-        <Button
-          variant="outline"
-          onClick={() => setShowCommands(!showCommands)}
-          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-          className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
-          aria-label="Toggle command toolbar"
-        >
-          <Wand2 className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            const newShowSuggestions = !showSuggestions;
-            setShowSuggestions(newShowSuggestions);
-            if (newShowSuggestions) {
-              const primaryChatbot = selectedChatbots && selectedChatbots.length > 0 ? selectedChatbots[0] : undefined;
-              const channelId = primaryChatbot?.id;
-              const modelShapeName = primaryChatbot?.name;
-              fetchSuggestions(chatHistory, channelId, modelShapeName);
-            }
-          }}
-          disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
-          className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
-          aria-label="Toggle suggested responses"
-        >
-          <Lightbulb className="w-5 h-5" />
-        </Button>
-        <Button
-          variant="outline"
-          onClick={handleImageUploadButtonClick}
-          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-          className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
-          aria-label="Attach image"
-        >
-          📎 Image
-        </Button>
+      <div className={`flex ${isMobile ? 'flex-wrap' : 'space-x-2'} items-center`}>
+        <div className={`flex ${isMobile ? 'w-full space-x-2 mb-2' : ''}`}>
+          <Button
+            variant="outline"
+            onClick={() => setShowCommands(!showCommands)}
+            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
+            aria-label="Toggle command toolbar"
+          >
+            <Wand2 className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const newShowSuggestions = !showSuggestions;
+              setShowSuggestions(newShowSuggestions);
+              if (newShowSuggestions) {
+                const primaryChatbot = selectedChatbots && selectedChatbots.length > 0 ? selectedChatbots[0] : undefined;
+                const channelId = primaryChatbot?.id;
+                const modelShapeName = primaryChatbot?.name;
+                fetchSuggestions(chatHistory, channelId, modelShapeName);
+              }
+            }}
+            disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
+            aria-label="Toggle suggested responses"
+          >
+            <Lightbulb className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleImageUploadButtonClick}
+            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
+            aria-label="Attach image"
+          >
+            {isMobile ? <Paperclip className="w-5 h-5" /> : '📎 Image'}
+          </Button>
+        </div>
         <input
           type="file"
           accept="image/*"
@@ -179,29 +183,31 @@ export function MessageInput({
           className="hidden"
           data-testid="hidden-file-input"
         />
-        <Input
-          ref={inputRef}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={getPlaceholderText()}
-          className="flex-1 bg-[#40444b] border-[#202225] text-white placeholder-[#96989d]"
-          disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-        />
-        <Button
-          onClick={sendMessage}
-          disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || isLoading || selectedChatbots.length === 0}
-          className="bg-[#5865f2] hover:bg-[#4752c4] text-white"
-        >
-          <Send className="w-4 h-4" />
-        </Button>
-        <Button
-          onClick={onSaveChat}
-          disabled={isSaving || selectedChatbots.length === 0}
-          className="bg-[#43b581] hover:bg-[#3aa873] text-white"
-        >
-          <Save className="w-4 h-4" />
-        </Button>
+        <div className={`flex-grow flex ${isMobile ? 'w-full' : ''} space-x-2`}>
+          <Input
+            ref={inputRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={getPlaceholderText()}
+            className="flex-1 bg-[#40444b] border-[#202225] text-white placeholder-[#96989d]"
+            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+          />
+          <Button
+            onClick={sendMessage}
+            disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || isLoading || selectedChatbots.length === 0}
+            className="bg-[#5865f2] hover:bg-[#4752c4] text-white"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+          <Button
+            onClick={onSaveChat}
+            disabled={isSaving || selectedChatbots.length === 0}
+            className="bg-[#43b581] hover:bg-[#3aa873] text-white"
+          >
+            <Save className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
       {imagePreviewUrl && selectedImageFile && (
         <div className="mt-2 flex items-center space-x-2">
