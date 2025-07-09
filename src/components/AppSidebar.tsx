@@ -13,13 +13,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator"; // Added
+import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/contexts/AuthContext"; // Added
-import { UserMenu } from "@/components/UserMenu"; // Added
+import { useAuth } from "@/contexts/AuthContext";
+import { UserMenu } from "@/components/UserMenu";
 import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
+import { InstallPWAButton } from '@/components/ui/InstallPWAButton';
 
 interface AppSidebarProps {
   chatbots: Chatbot[];
@@ -216,6 +217,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[#202225] space-y-3">
+        <InstallPWAButton />
         <div className="flex items-center gap-2">
           <SidebarMenuButton 
             onClick={onOpenApiConfig}
