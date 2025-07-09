@@ -1,4 +1,3 @@
-'''
 import { useState, useEffect } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -46,4 +45,3 @@ export const usePWAInstall = () => {
 
   return { canInstall: !!installPrompt, triggerInstall };
 };
-''
