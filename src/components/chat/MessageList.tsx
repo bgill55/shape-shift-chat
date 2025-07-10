@@ -114,8 +114,8 @@ export function MessageList({
               <div
                 className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative break-words overflow-wrap-anywhere ${
                   message.sender === 'user'
-                    ? 'bg-[#5865f2] text-white'
-                    : 'bg-[#2f3136] text-white border border-[#202225]'
+                    ? 'bg-[var(--color-message-bg-user)] text-[var(--color-message-text-user)]'
+                    : 'bg-[var(--color-message-bg-bot)] text-[var(--color-message-text-bot)] border border-[var(--color-border)]'
                 }`}
               >
                 <div className="absolute top-2 right-2">
@@ -129,7 +129,7 @@ export function MessageList({
                 </div>
                 <div className="pr-8 overflow-hidden">
                   {message.sender === 'bot' && selectedChatbots.length > 1 && (
-                    <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
+                    <div className="flex items-center gap-1 mb-1 text-xs text-[var(--color-placeholder-text)]">
                       <Bot className="w-3 h-3" />
                       <span>Shape Response</span>
                     </div>

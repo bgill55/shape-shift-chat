@@ -21,16 +21,21 @@ export default defineConfig(({ mode }) => ({
         short_name: 'ShapeShift',
         description: 'An AI-powered chat application.',
         theme_color: '#36393f',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
         icons: [
           {
             src: 'assets/android/android-launchericon-192-192.png',
             sizes: '192x192',
             type: 'image/png',
+            purpose: 'any maskable',
           },
           {
             src: 'assets/android/android-launchericon-512-512.png',
             sizes: '512x512',
             type: 'image/png',
+            purpose: 'any maskable',
           },
           {
             src: 'assets/ios/180.png',

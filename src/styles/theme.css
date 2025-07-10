@@ -1,0 +1,76 @@
+:root {
+  /* Base Colors */
+  --color-background: #36393f;
+  --color-text: #ffffff;
+  --color-primary: #5865f2;
+  --color-secondary: #40444b;
+  --color-border: #202225;
+
+  /* Chat Specific */
+  --color-chat-bg: #36393f;
+  --color-message-bg-user: #5865f2;
+  --color-message-bg-bot: #40444b;
+  --color-message-text-user: #ffffff;
+  --color-message-text-bot: #ffffff;
+  --color-input-bg: #40444b;
+  --color-input-text: #ffffff;
+  --color-placeholder-text: #96989d;
+
+  /* Sidebar Specific */
+  --color-sidebar-bg: #2f3136;
+  --color-sidebar-border: #202225;
+  --color-sidebar-text: #ffffff;
+  --color-sidebar-item-hover: #393c43;
+  --color-sidebar-item-selected: #393c43;
+  --color-sidebar-label: #96989d;
+
+  /* Button Specific */
+  --color-button-bg-primary: #5865f2;
+  --color-button-text-primary: #ffffff;
+  --color-button-bg-secondary: #40444b;
+  --color-button-text-secondary: #96989d;
+  --color-button-border-secondary: #202225;
+  --color-button-hover-secondary: #202225;
+  --color-button-hover-text-secondary: #ffffff;
+
+  /* Other UI Elements */
+  --color-toast-warning-bg: #faa61a;
+  --color-toast-warning-text: #000000;
+  --color-separator: #393c43;
+}
+
+.theme-light {
+  --color-background: #f2f3f5;
+  --color-text: #2f3136;
+  --color-primary: #7289da;
+  --color-secondary: #e3e5e8;
+  --color-border: #dcdfe4;
+
+  --color-chat-bg: #f2f3f5;
+  --color-message-bg-user: #7289da;
+  --color-message-bg-bot: #e3e5e8;
+  --color-message-text-user: #ffffff;
+  --color-message-text-bot: #2f3136;
+  --color-input-bg: #e3e5e8;
+  --color-input-text: #2f3136;
+  --color-placeholder-text: #72767d;
+
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-border: #dcdfe4;
+  --color-sidebar-text: #2f3136;
+  --color-sidebar-item-hover: #f2f3f5;
+  --color-sidebar-item-selected: #e3e5e8;
+  --color-sidebar-label: #72767d;
+
+  --color-button-bg-primary: #7289da;
+  --color-button-text-primary: #ffffff;
+  --color-button-bg-secondary: #e3e5e8;
+  --color-button-text-secondary: #2f3136;
+  --color-button-border-secondary: #dcdfe4;
+  --color-button-hover-secondary: #dcdfe4;
+  --color-button-hover-text-secondary: #2f3136;
+
+  --color-toast-warning-bg: #f0b400;
+  --color-toast-warning-text: #2f3136;
+  --color-separator: #dcdfe4;
+}
