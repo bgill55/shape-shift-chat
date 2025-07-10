@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { ProfileSettings } from "./pages/ProfileSettings"; // Added import
+import '@khmyznikov/pwa-install';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
       <AuthProvider>
         <Toaster />
         <Sonner />
+        <pwa-install manifest-url="/manifest.webmanifest" name="Shape Shift" icon="assets/android/android-launchericon-192-192.png"></pwa-install>
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
