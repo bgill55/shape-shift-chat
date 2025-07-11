@@ -31,13 +31,13 @@ export default function Auth() {
   // handleSubmit and handleGoogleSignIn functions are removed
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card text-card-foreground border-border shadow-lg">
+    <div className="min-h-screen bg-[var(--color-background)] flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-[var(--color-secondary)] text-[var(--color-text)] border-[var(--color-border)] shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-card-foreground">
+          <CardTitle className="text-2xl text-[var(--color-text)]">
             Sign In
           </CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardDescription className="text-[var(--color-placeholder-text)]">
             Sign in to your account using Shapes.
           </CardDescription>
         </CardHeader>
@@ -51,7 +51,7 @@ export default function Auth() {
               // Assuming this is a primary action button, use primary variant or classes
               // If this purple is a specific brand color, it might need a custom variant
               // For now, let's use standard primary button styling from shadcn/ui
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-3"
+              className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)] flex items-center gap-3"
               disabled={shapesLoading}
             >
               <img 
@@ -71,14 +71,14 @@ export default function Auth() {
                   placeholder="Enter one-time code from Shapes"
                   value={oneTimeCode}
                   onChange={(e) => setOneTimeCode(e.target.value)}
-                  className="bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
+                  className="bg-[var(--color-input-bg)] text-[var(--color-input-text)] placeholder-[var(--color-placeholder-text)] border-[var(--color-border)] focus-visible:ring-1 focus-visible:ring-ring"
                 />
               </div>
               <Button
                 onClick={exchangeCodeForToken}
                 disabled={shapesLoading || !oneTimeCode.trim()}
                 // Assuming this is also a primary action button
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)]"
               >
                 {shapesLoading ? 'Verifying...' : 'Verify & Sign In'}
               </Button>

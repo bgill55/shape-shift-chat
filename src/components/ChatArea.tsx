@@ -194,14 +194,14 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[var(--color-background)] pt-16 md:pt-0 text-center text-[var(--color-placeholder-text)] px-4">
+      <div className="flex-1 flex flex-col items-center justify-center bg-[#36393f] pt-16 md:pt-0 text-center text-[#96989d] px-4">
         <img src="/assets/X_large_image.png" alt="Welcome to Shapes Shift" className="w-64 h-64 mb-6 opacity-70 object-contain" />
-        <h2 className="text-3xl font-bold mb-3">Welcome to Shapes Shift!</h2>
-        <p className="text-lg mb-2">Your AI-powered chat experience.</p>
+        <h2 className="text-3xl font-bold mb-3">Welcome to Shape Shift!</h2>
+        <p className="text-lg mb-2">A Shift in the way you interact with your Shape.</p>
         <p className="text-sm mb-6 max-w-md">
           Select a shape from the sidebar to start an individual conversation, or choose multiple shapes for a group chat.
         </p>
-        <div className="text-left text-sm text-[var(--color-placeholder-text)] space-y-2">
+        <div className="text-left text-sm text-[#72767d] space-y-2">
           <p>💬 Individual channels: Click on any shape for one-on-one chat.</p>
           <p>👥 Group chat: Use checkboxes to select up to 3 shapes.</p>
           <p>💡 Tip: On mobile, tap the menu button in the top left to open the sidebar.</p>
@@ -211,16 +211,16 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--color-background)] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
+    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
       
       {/* Chat Controls */}
-      <div className="px-4 py-2 bg-[var(--color-sidebar-bg)] border-b border-[var(--color-sidebar-border)] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
+      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
         <Button
           size="sm"
           variant="outline"
           onClick={handleNewChat}
-          className="bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[var(--color-button-hover-secondary)] hover:text-[var(--color-button-hover-text-secondary)]"
+          className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
         >
           <FileText className="w-4 h-4 mr-1" />
           New Chat
@@ -231,7 +231,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
           variant="outline"
           onClick={handleSaveChat}
           disabled={messages.length === 0 || isSaving}
-          className="bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[var(--color-button-hover-secondary)] hover:text-[var(--color-button-hover-text-secondary)]"
+          className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
         >
           <Save className="w-4 h-4 mr-1" />
           {isSaving ? 'Saving...' : 'Save Chat'}
@@ -242,7 +242,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
             size="sm"
             variant="outline"
             onClick={handleDeleteChat}
-            className="bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[#dc2626] hover:text-[var(--color-button-hover-text-secondary)]"
+            className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#dc2626] hover:text-white"
           >
             <Trash2 className="w-4 h-4 mr-1" />
             Delete Chat
@@ -250,7 +250,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
         )}
         
         {propCurrentChatId && (
-          <span className="text-xs text-[var(--color-placeholder-text)] self-center ml-2">
+          <span className="text-xs text-[#72767d] self-center ml-2">
             Auto-saved to database
           </span>
         )}

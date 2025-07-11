@@ -63,13 +63,13 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#36393f] border-[#202225] text-white max-w-md">
+      <DialogContent className="bg-[var(--color-background)] border-[var(--color-border)] text-[var(--color-text)] max-w-md">
         <DialogHeader>
           <h2 className="text-xl font-semibold">Shapes API Configuration</h2>
         </DialogHeader>
 
         <div className="mt-4">
-          <p className="text-[#96989d] text-sm mb-4">
+          <p className="text-[var(--color-placeholder-text)] text-sm mb-4">
             Enter your Shapes API key to connect with AI bots. You can find your API key in your 
             Shapes account dashboard. We support both UUID format keys and standard API keys.
           </p>
@@ -86,26 +86,26 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
                   value={showKey ? apiKey : maskApiKey(apiKey)}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="NZUZL3XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                  className="bg-[#40444b] border-[#202225] text-white placeholder-[#96989d] pr-20"
+                  className="bg-[var(--color-input-bg)] border-[var(--color-border)] text-[var(--color-input-text)] placeholder-[var(--color-placeholder-text)] pr-20"
                 />
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#96989d] hover:text-white text-sm"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[var(--color-placeholder-text)] hover:text-[var(--color-text)] text-sm"
                 >
                   {showKey ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
 
-            <p className="text-[#96989d] text-xs">
+            <p className="text-[var(--color-placeholder-text)] text-xs">
               Any valid Shapes API key format is accepted. This app runs in the browser, 
               so your key is saved locally.
             </p>
 
             <Button
               type="submit"
-              className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white"
+              className="w-full bg-[var(--color-button-bg-primary)] hover:bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)]"
             >
               Save API Key
             </Button>

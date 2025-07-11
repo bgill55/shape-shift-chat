@@ -9,13 +9,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, Sun, Moon } from 'lucide-react'; 
+import { User, LogOut, Settings } from 'lucide-react'; 
 import { Link } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext'; 
 
 export function UserMenu() {
   const { user, displayName, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme(); 
 
   if (!user) return null;
 
@@ -37,14 +35,6 @@ export function UserMenu() {
             <Settings className="w-4 h-4 mr-2" />
             Profile Settings
           </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
-          {theme === 'dark' ? (
-            <Sun className="w-4 h-4 mr-2" />
-          ) : (
-            <Moon className="w-4 h-4 mr-2" />
-          )}
-          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem onClick={signOut} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">

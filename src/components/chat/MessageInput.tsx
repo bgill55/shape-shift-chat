@@ -93,9 +93,9 @@ export function MessageInput({
   };
 
   return (
-    <div className="p-4 bg-[var(--color-background)] border-t border-[var(--color-border)]">
+    <div className="p-4 bg-[#36393f] border-t border-[#202225]">
       {!apiKey ? (
-        <div className="bg-[var(--color-toast-warning-bg)] text-[var(--color-toast-warning-text)] px-4 py-2 rounded mb-2 text-sm">
+        <div className="bg-[#faa61a] text-black px-4 py-2 rounded mb-2 text-sm">
           Please configure your API key to start chatting
         </div>
       ) : null}
@@ -104,13 +104,13 @@ export function MessageInput({
 
       {showSuggestions && (
         <div
-          className="mb-2 p-3 border border-[var(--color-border)] rounded text-sm bg-[var(--color-secondary)] text-[var(--color-text)]"
+          className="mb-2 p-3 border border-neutral-600 rounded text-sm bg-[#40444b] text-neutral-300"
           style={{ minHeight: '60px' }}
         >
           {suggestionsLoading ? (
             <p className="w-full text-center py-2">Loading suggestions...</p>
           ) : suggestionsError ? (
-            <p className="w-full text-center py-2 text-[var(--color-destructive)]">Error: {suggestionsError.message}</p>
+            <p className="w-full text-center py-2 text-red-500">Error: {suggestionsError.message}</p>
           ) : suggestions.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {suggestions.map((suggestion) => (
@@ -124,7 +124,7 @@ export function MessageInput({
                     setShowSuggestions(false);
                     inputRef.current?.focus();
                   }}
-                  className="truncate bg-[var(--color-button-bg-secondary)] hover:bg-[var(--color-button-hover-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)]"
+                  className="truncate bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600"
                 >
                   {suggestion.text}
                 </Button>
@@ -142,7 +142,7 @@ export function MessageInput({
             variant="outline"
             onClick={() => setShowCommands(!showCommands)}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-            className="p-2 bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[var(--color-button-hover-secondary)] hover:text-[var(--color-button-hover-text-secondary)]"
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
             aria-label="Toggle command toolbar"
           >
             <Wand2 className="w-5 h-5" />
@@ -160,7 +160,7 @@ export function MessageInput({
               }
             }}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
-            className="p-2 bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[var(--color-button-hover-secondary)] hover:text-[var(--color-button-hover-text-secondary)]"
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
             aria-label="Toggle suggested responses"
           >
             <Lightbulb className="w-5 h-5" />
@@ -169,7 +169,7 @@ export function MessageInput({
             variant="outline"
             onClick={handleImageUploadButtonClick}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-            className="p-2 bg-[var(--color-button-bg-secondary)] text-[var(--color-button-text-secondary)] border-[var(--color-button-border-secondary)] hover:bg-[var(--color-button-hover-secondary)] hover:text-[var(--color-button-hover-text-secondary)]"
+            className="p-2 bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#202225] hover:text-white"
             aria-label="Attach image"
           >
             {isMobile ? <Paperclip className="w-5 h-5" /> : '📎 Image'}
@@ -190,20 +190,20 @@ export function MessageInput({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={getPlaceholderText()}
-            className="flex-1 bg-[var(--color-input-bg)] border-[var(--color-button-border-secondary)] text-[var(--color-input-text)] placeholder-[var(--color-placeholder-text)]"
+            className="flex-1 bg-[#40444b] border-[#202225] text-white placeholder-[#96989d]"
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
           />
           <Button
             onClick={sendMessage}
             disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || isLoading || selectedChatbots.length === 0}
-            className="bg-[var(--color-button-bg-primary)] hover:bg-[var(--color-button-bg-primary)] text-white"
+            className="bg-[#5865f2] hover:bg-[#4752c4] text-white"
           >
             <Send className="w-4 h-4" />
           </Button>
           <Button
             onClick={onSaveChat}
             disabled={isSaving || selectedChatbots.length === 0}
-            className="bg-[var(--color-button-bg-primary)] hover:bg-[var(--color-button-bg-primary)] text-white"
+            className="bg-[#43b581] hover:bg-[#3aa873] text-white"
           >
             <Save className="w-4 h-4" />
           </Button>
@@ -214,9 +214,9 @@ export function MessageInput({
           <img
             src={imagePreviewUrl}
             alt="Selected preview"
-            className="w-20 h-20 object-cover rounded border border-[var(--color-border)]"
+            className="w-20 h-20 object-cover rounded border border-[#202225]"
           />
-          <div className="text-xs text-[var(--color-placeholder-text)] truncate">{selectedImageFile.name}</div>
+          <div className="text-xs text-[#96989d] truncate">{selectedImageFile.name}</div>
           <Button
             variant="ghost"
             size="sm"

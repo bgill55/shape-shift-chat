@@ -1,5 +1,5 @@
 
-import { Plus, Bot, Settings, MessageCircle, Users, History, Trash2 } from 'lucide-react';
+import { Plus, Bot, Settings, Users, History, Trash2 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -19,8 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "@/components/UserMenu";
 import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/ui/ThemeSwitcher";
-import { ThemeSelector } from "@/components/ui/ThemeSelector";
+
 
 interface AppSidebarProps {
   chatbots: Chatbot[];
@@ -79,7 +78,7 @@ export function AppSidebar({
         {/* Individual Channels */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[var(--color-sidebar-label)] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
-            <MessageCircle className="w-3 h-3" />
+            <Bot className="w-3 h-3" />
             Individual Channels
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -217,7 +216,7 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[var(--color-sidebar-border)] space-y-3">
-        <ThemeSelector />
+        
         <div className="flex items-center gap-2">
           <SidebarMenuButton 
             onClick={onOpenApiConfig}
@@ -226,7 +225,7 @@ export function AppSidebar({
             <Settings className="w-4 h-4 mr-3" />
             <span>API Configuration</span>
           </SidebarMenuButton>
-          <ThemeSwitcher />
+          
         </div>
 
         {user && (
