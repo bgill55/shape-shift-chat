@@ -1,5 +1,5 @@
 
-import { Plus, Bot, Settings, Users, History, Trash2 } from 'lucide-react';
+import { Plus, Bot, Settings, MessageCircle, Users, History, Trash2 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -68,7 +68,7 @@ export function AppSidebar({
       <SidebarHeader className="p-4 border-b border-[var(--color-sidebar-border)]">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[var(--color-primary)] rounded-full flex items-center justify-center">
-            <Bot className="w-5 h-5 text-[var(--color-text)]" />
+            <MessageCircle className="w-5 h-5 text-[var(--color-text)]" />
           </div>
           <span className="font-semibold text-[var(--color-sidebar-text)]">Shapes Shift</span>
         </div>
@@ -78,7 +78,7 @@ export function AppSidebar({
         {/* Individual Channels */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[var(--color-sidebar-label)] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
-            <Bot className="w-3 h-3" />
+            <MessageCircle className="w-3 h-3" />
             Individual Channels
           </SidebarGroupLabel>
           <SidebarGroupContent>
