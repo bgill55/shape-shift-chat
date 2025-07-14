@@ -40,6 +40,7 @@ export function ThemeProvider({
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
+
   const toggleTheme = () => {
     setTheme((prevTheme) => {
       if (prevTheme === "light") return "dark";
@@ -51,6 +52,7 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme,
+
     toggleTheme,
   };
 
