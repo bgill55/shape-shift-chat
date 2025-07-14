@@ -39,6 +39,7 @@ export function ThemeProvider({
     root.classList.add(theme);
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
@@ -51,6 +52,10 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+    },
     toggleTheme,
   };
 
