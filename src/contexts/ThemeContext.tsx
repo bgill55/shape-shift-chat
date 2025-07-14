@@ -40,6 +40,7 @@ export function ThemeProvider({
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
+
   }, [theme]);
 
   const toggleTheme = () => {
