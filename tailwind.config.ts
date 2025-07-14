@@ -92,5 +92,10 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		require("tailwindcss/plugin")(function ({ addVariant }) {
+			addVariant("oled", ".oled &");
+		}),
+	],
 } satisfies Config;

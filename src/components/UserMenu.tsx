@@ -1,4 +1,5 @@
 
+import { ThemeSwitcher } from "./ui/ThemeSwitcher";
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,6 +36,10 @@ export function UserMenu() {
             <Settings className="w-4 h-4 mr-2" />
             Profile Settings
           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-border" />
+        <DropdownMenuItem className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
+          <ThemeSwitcher />
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem onClick={signOut} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">

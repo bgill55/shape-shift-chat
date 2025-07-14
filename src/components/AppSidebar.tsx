@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "@/components/UserMenu";
-import { ThemeSwitcher } from "./ui/ThemeSwitcher";
+
 import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
 
@@ -226,7 +226,7 @@ export function AppSidebar({
             <Settings className="w-4 h-4 mr-3" />
             <span>API Configuration</span>
           </SidebarMenuButton>
-          <ThemeSwitcher />
+          
         </div>
 
         {user && (
