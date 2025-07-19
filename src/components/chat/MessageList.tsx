@@ -68,10 +68,9 @@ export function MessageList({
       return (
         <div className="space-y-1">
           {message.content && <MessageText content={message.content} />}
-          <img 
+          <ImagePreview 
             src={message.imageUrl} 
             alt="User upload preview" 
-            className="max-w-[200px] h-auto rounded mt-1 border border-blue-400"
           />
         </div>
       );

@@ -28,7 +28,7 @@ export default function Auth() {
           <div className="space-y-3">
             <Button
               onClick={redirectToShapesAuth}
-              className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)] flex items-center gap-3"
+              className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)] flex items-center gap-3 border border-[var(--color-border)]"
               disabled={shapesLoading}
             >
               <img 
@@ -54,7 +54,7 @@ export default function Auth() {
               <Button
                 onClick={exchangeCodeForToken}
                 disabled={shapesLoading || !oneTimeCode.trim()}
-                className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)]"
+                className="w-full bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] hover:bg-[var(--color-button-bg-primary)] border border-[var(--color-border)]"
               >
                 {shapesLoading ? 'Verifying...' : 'Verify & Sign In'}
               </Button>
