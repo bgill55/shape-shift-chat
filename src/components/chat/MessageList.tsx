@@ -130,7 +130,7 @@ export function MessageList({
                   {message.sender === 'bot' && selectedChatbots.length > 1 && (
                     <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
                       <Bot className="w-3 h-3" />
-                      <span>Shape Response</span>
+                      <span>{message.botName || 'Shape Response'}</span>
                     </div>
                   )}
                   {renderMessageContent(message)}

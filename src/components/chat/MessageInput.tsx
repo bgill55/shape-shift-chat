@@ -104,7 +104,7 @@ export function MessageInput({
 
       {showSuggestions && (
         <div
-          className="mb-2 p-3 border border-neutral-600 rounded text-sm bg-[#40444b] text-neutral-300"
+          className="mb-2 p-3 border border-cyan-600 rounded text-sm bg-slate-700 text-neutral-300"
           style={{ minHeight: '60px' }}
         >
           {suggestionsLoading ? (
@@ -124,7 +124,7 @@ export function MessageInput({
                     setShowSuggestions(false);
                     inputRef.current?.focus();
                   }}
-                  className="truncate bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600"
+                  className="truncate bg-slate-700 hover:bg-slate-600 text-neutral-200 border-cyan-600"
                 >
                   {suggestion.text}
                 </Button>

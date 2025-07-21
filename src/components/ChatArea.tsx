@@ -30,7 +30,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     deleteMessage,
     regenerateMessage,
     loadMessages,
-    clearMessages
+    clearMessages,
+    handleGroupChatResponse
   } = useMessages();
   
   const {
@@ -93,7 +94,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
           }
           apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
           
-          performApiCall(apiKey, chatbot, apiMessageContent);
+          performApiCall(apiKey, chatbot, apiMessageContent, messages);
         };
         reader.onerror = (error) => {
           console.error("FileReader error:", error);
@@ -108,48 +109,10 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
         };
         reader.readAsDataURL(imageFile);
       } else {
-        await performApiCall(apiKey, chatbot, textInput);
+        await performApiCall(apiKey, chatbot, textInput, messages);
       }
     } else {
-      const chatbotsToRespond = selectedChatbots;
-
-      for (const chatbot of chatbotsToRespond) {
-        if (imageFile) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const base64DataUri = e.target?.result as string;
-            if (!base64DataUri) {
-              console.error("Failed to read file as Base64.");
-              updateMessage(userMessage.id, {
-                content: `${userMessage.content} [Image send failed (read error)]`
-              });
-              return;
-            }
-
-            const apiMessageContent: any[] = [];
-            if (textInput.trim()) {
-              apiMessageContent.push({ type: "text", text: textInput.trim() });
-            }
-            apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
-            
-            performApiCall(apiKey, chatbot, apiMessageContent);
-          };
-          reader.onerror = (error) => {
-            console.error("FileReader error:", error);
-            updateMessage(userMessage.id, {
-              content: `${userMessage.content} [Image send failed (read error)]`
-            });
-            toast({
-              title: "File Read Error",
-              description: "Could not read the selected image file.",
-              variant: "destructive"
-            });
-          };
-          reader.readAsDataURL(imageFile);
-        } else {
-          await performApiCall(apiKey, chatbot, textInput);
-        }
-      }
+      await handleGroupChatResponse(apiKey, selectedChatbots, userMessage, imageFile, textInput, messages);
     }
   };
 
@@ -195,13 +158,13 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   if (selectedChatbots.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-[#36393f] pt-16 md:pt-0 text-center text-[#96989d] px-4">
-        <img src="/assets/X_large_image.png" alt="Welcome to Shapes Shift" className="w-64 h-64 mb-6 opacity-70 object-contain" />
+        <video src="/assets/Label_to_Character_Transformation.mp4" alt="Welcome to Shape Shift" className="w-64 h-64 mb-6 object-contain" autoPlay loop muted playsInline /> 
         <h2 className="text-3xl font-bold mb-3">Welcome to Shape Shift!</h2>
         <p className="text-lg mb-2">A Shift in the way you interact with your Shape.</p>
         <p className="text-sm mb-6 max-w-md">
           Select a shape from the sidebar to start an individual conversation, or choose multiple shapes for a group chat.
         </p>
-        <div className="text-left text-sm text-[#72767d] space-y-2">
+        <div className="text-center text-sm text-[#72767d] space-y-2">
           <p>💬 Individual channels: Click on any shape for one-on-one chat.</p>
           <p>👥 Group chat: Use checkboxes to select up to 3 shapes.</p>
           <p>💡 Tip: On mobile, tap the menu button in the top left to open the sidebar.</p>

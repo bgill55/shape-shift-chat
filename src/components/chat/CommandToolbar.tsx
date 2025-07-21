@@ -22,7 +22,7 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
           variant="outline"
           size="sm"
           onClick={() => onCommand(command.label)}
-          className="bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border-neutral-600 text-xs whitespace-nowrap"
+          className="bg-slate-700 hover:bg-slate-600 text-slate-200 border-cyan-600 text-xs whitespace-nowrap"
           title={command.description}
         >
           <Wand2 className="w-3.5 h-3.5 mr-1.5" />

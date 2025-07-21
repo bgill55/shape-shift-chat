@@ -14,7 +14,7 @@ export function MessageText({ content, className = "text-sm" }: MessageTextProps
       {parts.map((part, index) => (
         <span
           key={index}
-          className={part.isInnerThought ? "text-purple-300 italic font-light" : ""}
+          className={part.isInnerThought ? "text-amber-600 italic font-light" : ""}
         >
           {part.text}
         </span>
