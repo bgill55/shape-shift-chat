@@ -105,53 +105,55 @@ export function MessageList({
     <div className="flex-1 overflow-hidden flex flex-col h-full">
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex group ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative break-words overflow-wrap-anywhere ${
-                  message.sender === 'user'
-                    ? 'bg-[#5865f2] text-white'
-                    : 'bg-[#2f3136] text-white border border-[#202225]'
-                }`}
+          <ul aria-live="polite" aria-atomic="false">
+            {messages.map((message) => (
+              <li
+                key={message.id}
+                className={`flex group ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className="absolute top-2 right-2">
-                  <MessageActions
-                    messageId={message.id}
-                    isBot={message.sender === 'bot'}
-                    onEdit={handleEdit}
-                    onDelete={onDeleteMessage}
-                    onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
-                  />
+                <div
+                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative break-words overflow-wrap-anywhere ${
+                    message.sender === 'user'
+                      ? 'bg-[#5865f2] text-white'
+                      : 'bg-[#2f3136] text-white border border-[#202225]'
+                  }`}
+                >
+                  <div className="absolute top-2 right-2">
+                    <MessageActions
+                      messageId={message.id}
+                      isBot={message.sender === 'bot'}
+                      onEdit={handleEdit}
+                      onDelete={onDeleteMessage}
+                      onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
+                    />
+                  </div>
+                  <div className="pr-8 overflow-hidden">
+                    {message.sender === 'bot' && selectedChatbots.length > 1 && (
+                      <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
+                        <Bot className="w-3 h-3" aria-hidden="true" />
+                        <span>{message.botName || 'Shape Response'}</span>
+                      </div>
+                    )}
+                    {renderMessageContent(message)}
+                    <p className="text-xs opacity-70 mt-1">
+                      {message.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="pr-8 overflow-hidden">
-                  {message.sender === 'bot' && selectedChatbots.length > 1 && (
-                    <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
-                      <Bot className="w-3 h-3" />
-                      <span>{message.botName || 'Shape Response'}</span>
-                    </div>
-                  )}
-                  {renderMessageContent(message)}
-                  <p className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
+              </li>
+            ))}
+            
+            {isLoading && (
+              <li className="flex justify-start" aria-busy="true" aria-live="polite">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <Skeleton className="h-8 w-[200px]" />
                 </div>
-              </div>
-            </div>
-          ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex items-center space-x-2">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-8 w-[200px]" />
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
+              </li>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </ul>
         </div>
       </ScrollArea>
     </div>

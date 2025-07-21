@@ -24,6 +24,7 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
           onClick={() => onCommand(command.label)}
           className="bg-slate-700 hover:bg-slate-600 text-slate-200 border-cyan-600 text-xs whitespace-nowrap"
           title={command.description}
+          aria-label={command.description}
         >
           <Wand2 className="w-3.5 h-3.5 mr-1.5" />
           {command.label}

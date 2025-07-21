@@ -78,13 +78,18 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
         size="sm"
         className="bg-[#5865f2] hover:bg-[#4752c4] text-white w-8 h-8 p-0"
       >
-        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+        {isPlaying ? <Pause className="w-4 h-4" aria-label="Pause audio" /> : <Play className="w-4 h-4" aria-label="Play audio" />}
       </Button>
 
       <div className="flex-1 space-y-1">
         <div 
           className="w-full h-2 bg-[#40444b] rounded-full cursor-pointer relative"
           onClick={handleSeek}
+          role="progressbar"
+          aria-valuenow={currentTime}
+          aria-valuemin={0}
+          aria-valuemax={duration}
+          aria-label="Audio progress bar"
         >
           <div 
             className="h-full bg-[#5865f2] rounded-full"
@@ -99,13 +104,14 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
       </div>
 
       <div className="flex items-center space-x-2">
-        <Volume2 className="w-4 h-4 text-[#96989d]" />
+        <Volume2 className="w-4 h-4 text-[#96989d]" aria-hidden="true" />
         <Slider
           defaultValue={[100]}
           max={100}
           step={1}
           className="w-[80px]"
           onValueChange={(val) => setVolume(val[0] / 100)}
+          aria-label="Volume control"
         />
       </div>
     </div>
