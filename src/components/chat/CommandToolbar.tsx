@@ -15,14 +15,14 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
   ];
 
   return (
-    <div className="flex flex-wrap items-center justify-start gap-2 p-2 bg-[#36393f] border-t border-[#202225]">
+    <div className="flex flex-wrap items-center justify-start gap-2 p-2 bg-[rgb(var(--card))] border-t border-[#202225]">
       {commands.map((command) => (
         <Button
           key={command.id}
           variant="outline"
           size="sm"
           onClick={() => onCommand(command.label)}
-          className="bg-slate-700 hover:bg-slate-600 text-slate-200 border-cyan-600 text-xs whitespace-nowrap"
+          className="bg-[rgb(var(--card))] hover:bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-cyan-600 text-xs whitespace-nowrap"
           title={command.description}
           aria-label={command.description}
         >

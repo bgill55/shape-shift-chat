@@ -157,14 +157,14 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#36393f] pt-16 md:pt-0 text-center text-[#96989d] px-4">
+      <div className="flex-1 flex flex-col items-center justify-center bg-[rgb(var(--bg))] pt-16 md:pt-0 text-center text-[rgb(var(--fg))] px-4">
         <video src="/assets/Label_to_Character_Transformation.mp4" alt="Welcome to Shape Shift" className="w-64 h-64 mb-6 object-contain" autoPlay loop muted playsInline /> 
-        <h2 className="text-3xl font-bold mb-3 text-gray-100">Welcome to Shape Shift!</h2>
-        <p className="text-lg mb-2 text-gray-100">A Shift in the way you interact with your Shape.</p>
-        <p className="text-sm mb-6 max-w-md text-gray-100">
+        <h2 className="text-3xl font-bold mb-3 text-[rgb(var(--fg))]">Welcome to Shape Shift!</h2>
+        <p className="text-lg mb-2 text-[rgb(var(--fg))]">A Shift in the way you interact with your Shape.</p>
+        <p className="text-sm mb-6 max-w-md text-[rgb(var(--fg))]">
           Select a shape from the sidebar to start an individual conversation, or choose multiple shapes for a group chat.
         </p>
-        <div className="text-center text-sm text-gray-100 space-y-2">
+        <div className="text-center text-sm text-[rgb(var(--fg))] space-y-2">
           <p>💬 Individual channels: Click on any shape for one-on-one chat.</p>
           <p>👥 Group chat: Use checkboxes to select up to 3 shapes.</p>
           <p>💡 Tip: On mobile, tap the menu button in the top left to open the sidebar.</p>
@@ -174,16 +174,16 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#36393f] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
+    <div className="flex-1 flex flex-col bg-[rgb(var(--bg))] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
       
       {/* Chat Controls */}
-      <div className="px-4 py-2 bg-[#2f3136] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
+      <div className="px-4 py-2 bg-[rgb(var(--card))] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
         <Button
           size="sm"
           variant="outline"
           onClick={handleNewChat}
-          className="bg-[#40444b] text-white border-[#202225] hover:bg-[#202225] hover:text-white"
+          className="bg-[#40444b] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
         >
           <FileText className="w-4 h-4 mr-1" />
           New Chat
@@ -194,7 +194,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
           variant="outline"
           onClick={handleSaveChat}
           disabled={messages.length === 0 || isSaving}
-          className="bg-[#40444b] text-white border-[#202225] hover:bg-[#202225] hover:text-white"
+          className="bg-[#40444b] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
         >
           <Save className="w-4 h-4 mr-1" aria-hidden="true" />
           {isSaving ? 'Saving...' : 'Save Chat'}
@@ -205,7 +205,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
             size="sm"
             variant="outline"
             onClick={handleDeleteChat}
-            className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#dc2626] hover:text-white"
+            className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#dc2626] hover:text-[rgb(var(--fg))]"
           >
             <Trash2 className="w-4 h-4 mr-1" />
             Delete Chat

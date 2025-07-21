@@ -114,8 +114,8 @@ export function MessageList({
                 <div
                   className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative break-words overflow-wrap-anywhere ${
                     message.sender === 'user'
-                      ? 'bg-[#5865f2] text-white'
-                      : 'bg-[#2f3136] text-white border border-[#202225]'
+                      ? 'bg-[#5865f2] text-[rgb(var(--fg))]'
+                      : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225]'
                   }`}
                 >
                   <div className="absolute top-2 right-2">

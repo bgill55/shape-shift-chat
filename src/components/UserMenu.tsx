@@ -22,13 +22,15 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* Button color should adapt to theme or be explicitly set for header if sidebar doesn't change */}
-        <Button variant="ghost" size="icon" className="text-foreground hover:bg-accent hover:text-accent-foreground" aria-label="User menu">
+        <Button variant="ghost" size="icon" className="text-[rgb(var(--fg))] hover:bg-accent hover:text-accent-foreground" aria-label="User menu">
           <User className="w-5 h-5" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground w-56">
-        <DropdownMenuLabel className="font-normal px-2 py-1.5 text-muted-foreground">
-          <div className="truncate">{displayName || user.email || 'User'}</div>
+      <DropdownMenuContent align="end" className="bg-[rgb(var(--card))] border-border text-[rgb(var(--fg))] w-56">
+        <DropdownMenuLabel className="font-normal px-2 py-1.5 text-[rgb(var(--fg))] ">
+          <p className="text-xs leading-none text-[rgb(var(--fg))]">
+              {user.email}
+            </p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem asChild className="cursor-pointer hover:!bg-accent focus:!bg-accent">

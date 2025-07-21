@@ -9,6 +9,7 @@ import { MobileHeader } from '@/components/MobileHeader';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 export interface Chatbot {
   id: string;
@@ -25,6 +26,7 @@ const Index = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId, deleteChat } = useChatPersistence();
+  const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
 
   useEffect(() => {
     loadSavedChats();
@@ -155,6 +157,7 @@ const Index = () => {
             onLoadChat={handleLoadChat}
             onDeleteChat={handleDeleteSavedChat}
             onDeleteChatbot={handleDeleteChatbot}
+            markOnboardingAsSeen={markOnboardingAsSeen}
           />
           
           {/* Main content area with responsive margins */}

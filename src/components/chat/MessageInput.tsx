@@ -93,7 +93,7 @@ export function MessageInput({
   };
 
   return (
-    <div className="p-4 bg-[#36393f] border-t border-[#202225]">
+    <div className="p-4 bg-[rgb(var(--card))] border-t border-[#202225]">
       {!apiKey ? (
         <div className="bg-[#faa61a] text-black px-4 py-2 rounded mb-2 text-sm">
           Please configure your API key to start chatting
@@ -142,7 +142,7 @@ export function MessageInput({
             variant="outline"
             onClick={() => setShowCommands(!showCommands)}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-            className="p-2 bg-gray-700 text-gray-100 border-[#202225] hover:bg-[#202225] hover:text-white"
+            className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Toggle command toolbar"
           >
             <Wand2 className="w-5 h-5" />
@@ -160,7 +160,7 @@ export function MessageInput({
               }
             }}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
-            className="p-2 bg-gray-700 text-gray-100 border-[#202225] hover:bg-[#202225] hover:text-white"
+            className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Toggle suggested responses"
           >
             <Lightbulb className="w-5 h-5" aria-hidden="true" />
@@ -169,7 +169,7 @@ export function MessageInput({
             variant="outline"
             onClick={handleImageUploadButtonClick}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
-            className="p-2 bg-gray-700 text-gray-100 border-[#202225] hover:bg-[#202225] hover:text-white"
+            className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Attach image"
           >
             {isMobile ? <Paperclip className="w-5 h-5" /> : '📎 Image'}
@@ -191,13 +191,13 @@ export function MessageInput({
             onKeyPress={handleKeyPress}
             placeholder={getPlaceholderText()}
             aria-label="Chat message input"
-            className="flex-1 bg-[#40444b] border-[#202225] text-white placeholder-[#96989d]"
+            className="flex-1 bg-[rgb(var(--card))] border-[#202225] text-[rgb(var(--fg))] placeholder-[#96989d]"
             disabled={!apiKey || isLoading || selectedChatbots.length === 0}
           />
           <Button
             onClick={sendMessage}
             disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || isLoading || selectedChatbots.length === 0}
-            className="bg-[#5865f2] hover:bg-[#4752c4] text-white"
+            className="bg-[#5865f2] hover:bg-[#4752c4] text-[rgb(var(--fg))]"
             aria-label="Send message"
           >
             <Send className="w-4 h-4" aria-hidden="true" />
@@ -205,7 +205,7 @@ export function MessageInput({
           <Button
             onClick={onSaveChat}
             disabled={isSaving || selectedChatbots.length === 0}
-            className="bg-[#43b581] hover:bg-[#3aa873] text-white"
+            className="bg-[#43b581] hover:bg-[#3aa873] text-[rgb(var(--fg))]"
             aria-label="Save chat"
           >
             <Save className="w-4 h-4" />

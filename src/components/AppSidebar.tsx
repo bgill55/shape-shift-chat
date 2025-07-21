@@ -34,6 +34,7 @@ interface AppSidebarProps {
   onLoadChat: (chat: SavedChat) => void;
   onDeleteChat: (chatId: string) => void;
   onDeleteChatbot: (chatbotId: string) => void;
+  markOnboardingAsSeen: () => void;
 }
 
 export function AppSidebar({ 
@@ -46,7 +47,8 @@ export function AppSidebar({
   savedChats,
   onLoadChat,
   onDeleteChat,
-  onDeleteChatbot
+  onDeleteChatbot,
+  markOnboardingAsSeen
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
@@ -99,16 +101,16 @@ export function AppSidebar({
       <SidebarHeader className="p-4 border-b border-[var(--color-sidebar-border)]">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
+            <Sparkles className="w-5 h-5 text-[rgb(var(--fg))]" />
           </div>
-          <span className="font-semibold text-purple-50">Shape Shift</span>
+          <span className="font-semibold text-[rgb(var(--fg))]">Shape Shift</span>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         {/* Individual Channels */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-purple-200 text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
+          <SidebarGroupLabel className="text-[rgb(var(--fg))] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
             <Sparkles className="w-3 h-3" aria-hidden="true" />
             Individual Channels
           </SidebarGroupLabel>
@@ -121,13 +123,13 @@ export function AppSidebar({
                     onClick={() => onSelectSingleChatbot(chatbot)}
                     className={`flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] ${
                       selectedChatbots.length === 1 && isChatbotSelected(chatbot) 
-                        ? 'bg-purple-700 text-white' 
-                        : 'text-gray-100'
+                        ? 'bg-purple-700 text-[rgb(var(--fg))]' 
+                        : 'text-[rgb(var(--fg))]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-6 h-6 ${getChatbotIcon(chatbot.id).color} rounded-full flex items-center justify-center`}>
-                        <div className="w-4 h-4 text-white" aria-hidden="true">
+                        <div className="w-4 h-4 text-[rgb(var(--fg))]" aria-hidden="true">
                           {getChatbotIcon(chatbot.id).shape}
                         </div>
                       </div>
@@ -151,11 +153,11 @@ export function AppSidebar({
               <li className="mt-2">
                 <SidebarMenuButton 
                   onClick={onAddShape}
-                  className="w-full justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] text-gray-100"
+                  className="w-full justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] text-[rgb(var(--fg))]"
                   aria-label="Add a new Shape to the list"
                 >
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                    <Plus className="w-4 h-4 text-white" />
+                    <Plus className="w-4 h-4 text-[rgb(var(--fg))]" />
                   </div>
                   <span>Add New Shape</span>
                 </SidebarMenuButton>
@@ -166,7 +168,7 @@ export function AppSidebar({
 
         {/* Group Chat Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-purple-200 text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
+          <SidebarGroupLabel className="text-[rgb(var(--fg))] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
             <Users className="w-3 h-3" aria-hidden="true" />
             Group Chat (Max 3)
           </SidebarGroupLabel>
@@ -183,12 +185,12 @@ export function AppSidebar({
                     />
                     <div className="flex items-center gap-3 flex-1">
                       <div className={`w-6 h-6 ${getChatbotIcon(chatbot.id).color} rounded-full flex items-center justify-center`}>
-                        <div className="w-4 h-4 text-white" aria-hidden="true">
+                        <div className="w-4 h-4 text-[rgb(var(--fg))]" aria-hidden="true">
                           {getChatbotIcon(chatbot.id).shape}
                         </div>
                       </div>
                       <span className={`truncate ${
-                        isChatbotSelected(chatbot) && isGroupChatMode ? 'text-purple-300' : 'text-gray-100'
+                        isChatbotSelected(chatbot) && isGroupChatMode ? 'text-purple-300' : 'text-[rgb(var(--fg))]'
                       }`}>
                         {chatbot.name}
                       </span>
@@ -201,21 +203,21 @@ export function AppSidebar({
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-purple-200 text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
+          <SidebarGroupLabel className="text-[rgb(var(--fg))] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
             <Bookmark className="w-3 h-3" />
             Saved Chats
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <ul className="space-y-1">
               {savedChats.length === 0 ? (
-                <p className="text-gray-100 text-sm px-2 py-1">No saved chats yet. Start a conversation and click 'Save Chat'!</p>
+                <p className="text-gray-300 text-sm px-2 py-1">No saved chats yet. Start a conversation and click 'Save Chat'!</p>
               ) : (
                 savedChats.map((chat) => (
                   <li key={chat.id} className="flex justify-between items-center group">
                     <Button
                       variant="ghost"
                       onClick={() => onLoadChat(chat)}
-                      className="flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] text-gray-100"
+                      className="flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] text-[rgb(var(--fg))]"
                     >
                       <span className="truncate">{chat.title}</span>
                     </Button>
@@ -245,7 +247,7 @@ export function AppSidebar({
                 {selectedChatbots.map((chatbot) => (
                   <div key={chatbot.id} className="text-sm text-[var(--color-primary)] flex items-center gap-2">
                     <div className={`w-3 h-3 ${getChatbotIcon(chatbot.id).color} rounded-full flex items-center justify-center`} aria-hidden="true">
-                      <div className="w-2 h-2 text-white">
+                      <div className="w-2 h-2 text-[rgb(var(--fg))]" >
                         {getChatbotIcon(chatbot.id).shape}
                       </div>
                     </div>
@@ -263,7 +265,7 @@ export function AppSidebar({
         <div className="flex items-center gap-2">
           <SidebarMenuButton 
             onClick={onOpenApiConfig}
-            className="flex-grow justify-start text-left px-2 py-2 rounded hover:bg-blue-700 text-blue-50"
+            className="flex-grow justify-start text-left px-2 py-2 rounded hover:bg-blue-700 text-[rgb(var(--fg))]"
           >
             <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
             <span>API Configuration</span>

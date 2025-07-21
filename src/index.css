@@ -1,124 +1,35 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* ---------- THEME ENGINE ---------- */
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    --radius: 0.5rem;
-
-    /* Discord dark theme colors for sidebar */
-    --sidebar-background: 216 13% 18%;
-    --sidebar-foreground: 220 9% 46%;
-    --sidebar-primary: 235 86% 65%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 220 7% 23%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 216 13% 13%;
-    --sidebar-ring: 235 86% 65%;
+    /* Light theme (default) */
+    --bg: 255 255 255;
+    --fg: 15 23 42;
+    --card: 248 250 252;
+    --border: 226 232 240;
   }
 
   .dark {
-    --background: 0 0% 0%; /* OLED Black */
-    --foreground: 0 0% 98%; /* Near white for contrast */
-
-    --card: 0 0% 0%; /* OLED Black */
-    --card-foreground: 0 0% 98%; /* Near white for contrast */
-
-    --popover: 0 0% 0%; /* OLED Black */
-    --popover-foreground: 0 0% 98%; /* Near white for contrast */
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    
-    /* OLED Black theme colors for sidebar */
-    --sidebar-background: 0 0% 0%; /* True black */
-    --sidebar-foreground: 210 40% 98%; /* Near white */
-    --sidebar-primary: 210 40% 98%; /* Near white for primary elements */
-    --sidebar-primary-foreground: 222.2 47.4% 11.2%; /* Dark text on primary */
-    --sidebar-accent: 217.2 32.6% 17.5%; /* Dark gray for accent */
-    --sidebar-accent-foreground: 210 40% 98%; /* Near white */
-    --sidebar-border: 0 0% 0%; /* True black */
-    --sidebar-ring: 212.7 26.8% 83.9%; /* Light gray for ring */
+    /* Dark theme */
+    --bg: 15 23 42;
+    --fg: 226 232 240;
+    --card: 30 41 59;
+    --border: 51 65 85;
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
+  .oled {
+    /* OLED extra-high contrast */
+    --bg: 0 0 0;
+    --fg: 255 255 255;
+    --card: 10 10 10;
+    --border: 38 38 38;
   }
 
   body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Mobile browser safe area support */
-@supports (padding: max(0px)) {
-  .safe-area-inset-top {
-    padding-top: max(env(safe-area-inset-top), 0px);
-  }
-}
-
-/* Mobile viewport height fix */
-@media (max-width: 768px) {
-  .min-h-screen {
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
+    @apply bg-[rgb(var(--bg))] text-[rgb(var(--fg))];
   }
 }
 

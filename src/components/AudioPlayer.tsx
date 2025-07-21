@@ -76,7 +76,7 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
       <Button
         onClick={togglePlay}
         size="sm"
-        className="bg-[#5865f2] hover:bg-[#4752c4] text-white w-8 h-8 p-0"
+        className="bg-[#5865f2] hover:bg-[#4752c4] text-[rgb(var(--fg))] w-8 h-8 p-0"
       >
         {isPlaying ? <Pause className="w-4 h-4" aria-label="Pause audio" /> : <Play className="w-4 h-4" aria-label="Play audio" />}
       </Button>

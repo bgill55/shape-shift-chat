@@ -19,7 +19,7 @@ export function GroupChatHeader({ selectedChatbots }: GroupChatHeaderProps) {
               className="w-8 h-8 bg-[#5865f2] rounded-full flex items-center justify-center border-2 border-[#2f3136]"
               style={{ zIndex: selectedChatbots.length - index }}
             >
-              <Bot className="w-4 h-4 text-white" />
+              <Bot className="w-4 h-4 text-[rgb(var(--fg))]" />
             </div>
           ))}
         </div>
@@ -30,7 +30,7 @@ export function GroupChatHeader({ selectedChatbots }: GroupChatHeaderProps) {
             ) : (
               <MessageCircle className="w-4 h-4 text-[#96989d]" />
             )}
-            <h2 className="text-white font-semibold">
+            <h2 className="text-[rgb(var(--fg))] font-semibold">
               {isGroupChat 
                 ? `Group Chat (${selectedChatbots.length})` 
                 : selectedChatbots[0].name

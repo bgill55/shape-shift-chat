@@ -15,7 +15,7 @@ export const FullScreenImage: React.FC<FullScreenImageProps> = ({ src, onClose }
         <img src={src} alt="Full screen preview" className="w-full h-full object-contain" />
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-white text-2xl font-bold"
+          className="absolute top-4 right-4 text-[rgb(var(--fg))] text-2xl font-bold"
         >
           &times;
         </button>

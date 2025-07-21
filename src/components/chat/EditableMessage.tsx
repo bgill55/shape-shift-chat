@@ -36,7 +36,7 @@ export function EditableMessage({ content, onSave, onCancel }: EditableMessagePr
         value={editedContent}
         onChange={(e) => setEditedContent(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="min-h-[80px] resize-none bg-[#40444b] border-[#4f545c] text-white"
+        className="min-h-[80px] resize-none bg-[#40444b] border-[#4f545c] text-[rgb(var(--fg))]"
         autoFocus
       />
       <div className="flex gap-2">

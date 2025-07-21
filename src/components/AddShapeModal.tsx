@@ -55,9 +55,9 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-[#36393f] border-[#202225] text-white max-w-md">
+      <DialogContent className="bg-[#36393f] border-[#202225] text-[rgb(var(--fg))] max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-white">Add New Shape</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-[rgb(var(--fg))]">Add New Shape</DialogTitle>
         </DialogHeader>
 
         <div className="mt-4">
@@ -77,7 +77,7 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://shapes.inc/shape-name"
-                className="bg-[#40444b] border-[#202225] text-white placeholder-[#96989d]"
+                className="bg-[#40444b] border-[#202225] text-[rgb(var(--fg))] placeholder-[#96989d]"
                 disabled={showSuccess}
               />
             </div>
@@ -91,7 +91,7 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
             {!showSuccess && (
               <Button
                 type="submit"
-                className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-white"
+                className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-[rgb(var(--fg))]"
               >
                 Add Shape
               </Button>
