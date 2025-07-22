@@ -210,7 +210,7 @@ export function AppSidebar({
           <SidebarGroupContent>
             <ul className="space-y-1">
               {savedChats.length === 0 ? (
-                <p className="text-gray-300 text-sm px-2 py-1">No saved chats yet. Start a conversation and click 'Save Chat'!</p>
+                <p className="text-[rgb(var(--fg))] text-sm px-2 py-1">No saved chats yet. Start a conversation and click 'Save Chat'!</p>
               ) : (
                 savedChats.map((chat) => (
                   <li key={chat.id} className="flex justify-between items-center group">

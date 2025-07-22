@@ -20,7 +20,7 @@ type Theme = 'light' | 'dark' | 'oled';
 
 const App = () => {
   const [theme, setTheme] = useState<Theme>(() => {
-    return (localStorage.getItem('theme') as Theme) || 'light';
+    return (localStorage.getItem('theme') as Theme) || 'dark';
   });
 
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
