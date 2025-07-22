@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -55,9 +55,12 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-[#36393f] border-[#202225] text-[rgb(var(--fg))] max-w-md">
+      <DialogContent className="bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))] max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-[rgb(var(--fg))]">Add New Shape</DialogTitle>
+          <DialogDescription>
+            Enter a Shape's vanity URL to add it to your collection. Example: https://shapes.inc/jarvis-dev
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4">

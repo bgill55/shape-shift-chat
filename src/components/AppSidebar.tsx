@@ -35,6 +35,8 @@ interface AppSidebarProps {
   onDeleteChat: (chatId: string) => void;
   onDeleteChatbot: (chatbotId: string) => void;
   markOnboardingAsSeen: () => void;
+  theme: 'light' | 'dark' | 'oled';
+  setTheme: (theme: 'light' | 'dark' | 'oled') => void;
 }
 
 export function AppSidebar({ 
@@ -48,7 +50,9 @@ export function AppSidebar({
   onLoadChat,
   onDeleteChat,
   onDeleteChatbot,
-  markOnboardingAsSeen
+  markOnboardingAsSeen,
+  theme,
+  setTheme
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
@@ -261,6 +265,21 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[var(--color-sidebar-border)] space-y-3">
+        <div className="flex gap-2 justify-center">
+          {(['light', 'dark', 'oled'] as Theme[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTheme(t)}
+              className={`px-3 py-1 rounded text-sm capitalize border
+                ${theme === t
+                  ? 'bg-blue-500 text-[rgb(var(--fg))] border-blue-500'
+                  : 'border-[rgb(var(--border))] hover:bg-[rgb(var(--card))]'
+                }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
         
         <div className="flex items-center gap-2">
           <SidebarMenuButton 

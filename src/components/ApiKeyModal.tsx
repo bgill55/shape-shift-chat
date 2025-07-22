@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -63,9 +63,12 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[var(--color-background)] border-[var(--color-border)] text-[var(--color-text)] max-w-md">
+      <DialogContent className="bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))] max-w-md">
         <DialogHeader>
-          <h2 className="text-xl font-semibold">Shapes API Configuration</h2>
+          <DialogTitle className="text-xl font-semibold">Shapes API Configuration</DialogTitle>
+          <DialogDescription>
+            Enter your Shapes API key to connect with AI bots. You can find your API key in your Shapes account dashboard.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4">

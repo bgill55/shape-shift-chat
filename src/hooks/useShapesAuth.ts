@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { generateUUID } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -70,7 +71,7 @@ export function useShapesAuth() {
       // Implement client-side shapes_user_id logic
       let userId = localStorage.getItem('shapes_user_id');
       if (!userId) {
-        userId = crypto.randomUUID();
+        userId = generateUUID();
         localStorage.setItem('shapes_user_id', userId);
         console.log('[useShapesAuth] New Shapes User ID generated and stored:', userId);
       } else {

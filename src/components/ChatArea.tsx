@@ -157,8 +157,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
 
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[rgb(var(--bg))] pt-16 md:pt-0 text-center text-[rgb(var(--fg))] px-4">
-        <video src="/assets/Label_to_Character_Transformation.mp4" alt="Welcome to Shape Shift" className="w-64 h-64 mb-6 object-contain" autoPlay loop muted playsInline /> 
+      <div className="flex-1 flex flex-col items-center justify-center bg-[rgb(var(--bg))] pt-16 md:pt-0 text-center text-[rgb(var(--fg))] px-4 overflow-hidden">
+        <img src="/assets/X_large_image.png" alt="Welcome to Shape Shift" className="w-64 h-64 mb-6 object-contain" /> 
         <h2 className="text-3xl font-bold mb-3 text-[rgb(var(--fg))]">Welcome to Shape Shift!</h2>
         <p className="text-lg mb-2 text-[rgb(var(--fg))]">A Shift in the way you interact with your Shape.</p>
         <p className="text-sm mb-6 max-w-md text-[rgb(var(--fg))]">

@@ -9,6 +9,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { useSuggestedResponses } from '../../hooks/useSuggestedResponses';
 import { CommandToolbar } from './CommandToolbar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { generateUUID } from '@/lib/utils';
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
@@ -52,7 +53,7 @@ export function MessageInput({
     const currentImagePreviewUrl = imagePreviewUrl;
 
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       content: currentInput,
       sender: 'user',
       timestamp: new Date(),

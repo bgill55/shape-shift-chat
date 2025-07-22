@@ -60,23 +60,7 @@ const App = () => {
         </AuthProvider>
       </TooltipProvider>
 
-      {/* example toggle buttons */}
-      <div className="fixed top-4 right-4 flex gap-2 z-50">
-        {(['light', 'dark', 'oled'] as Theme[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTheme(t)}
-            className={`px-3 py-1 rounded text-sm capitalize border
-              ${theme === t
-                ? 'bg-blue-500 text-white border-blue-500'
-                : 'border-gray-400 hover:bg-gray-200'
-              }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-    </QueryClientProvider>
+      </QueryClientProvider>
   );
 };
 
