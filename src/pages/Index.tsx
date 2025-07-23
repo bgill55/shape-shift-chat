@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { AppFooter } from '@/components/AppFooter';
 
 export interface Chatbot {
   id: string;
@@ -189,6 +190,7 @@ const Index = () => {
         onSaveApiKey={saveApiKey}
         currentApiKey={apiKey}
       />
+      <AppFooter />
     </div>
   );
 };

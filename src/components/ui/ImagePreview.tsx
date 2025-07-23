@@ -23,18 +23,19 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ src, alt }) => {
   };
 
   return (
-    <div className="space-y-2">
-      <img 
-        src={src} 
-        alt={alt} 
-        className="max-w-full h-auto rounded cursor-pointer" 
+    <div className="relative group w-fit max-w-full">
+      <img
+        src={src}
+        alt={alt}
+        className="max-w-full h-auto rounded cursor-pointer"
         onClick={() => setIsFullScreen(true)}
       />
-      <button 
+      <button
         onClick={handleDownload}
-        className="bg-blue-500 hover:bg-blue-700 text-[rgb(var(--fg))] font-bold py-1 px-2 rounded text-xs"
+        className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-700 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+        aria-label="Download image"
       >
-        Download
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
       </button>
       {isFullScreen && <FullScreenImage src={src} onClose={() => setIsFullScreen(false)} />}
     </div>
