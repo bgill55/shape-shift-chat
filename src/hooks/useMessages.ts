@@ -68,7 +68,8 @@ export function useMessages() {
         content: data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response.",
         sender: 'bot',
         timestamp: new Date(),
-        botName: selectedChatbot.name 
+        botName: selectedChatbot.name,
+        chatbotId: selectedChatbot.id // Add chatbotId here
       };
       setMessages(prev => [...prev, botMessage]);
       return botMessage;
@@ -80,7 +81,8 @@ export function useMessages() {
         content: `Error from ${selectedChatbot.name}: ${errorMessageContent}. Please check your API key and try again.`,
         sender: 'bot',
         timestamp: new Date(),
-        botName: selectedChatbot.name
+        botName: selectedChatbot.name,
+        chatbotId: selectedChatbot.id // Add chatbotId here
       };
       setMessages(prev => [...prev, errorBotMessage]);
       toast({

@@ -57,7 +57,7 @@ export function EditableMessage({ content, onSave, onCancel }: EditableMessagePr
           Cancel
         </Button>
       </div>
-      <p className="text-xs text-[#72767d]">
+      <p className="text-xs text-[rgb(var(--fg))]">
         Press Ctrl+Enter to save, Escape to cancel
       </p>
     </div>

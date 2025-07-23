@@ -10,7 +10,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { Theme } from '../App'; // Import Theme type
 
 export interface Chatbot {
   id: string;
@@ -28,18 +27,6 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId, deleteChat } = useChatPersistence();
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
-
-  const [theme, setTheme] = useState<Theme>(() => {
-    return (localStorage.getItem('theme') as Theme) || 'dark';
-  });
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark', 'oled');
-    root.classList.add(theme);
-    localStorage.setItem('theme', theme);
-    return;
-  }, [theme]);
 
   useEffect(() => {
     loadSavedChats();
@@ -99,8 +86,14 @@ const Index = () => {
   };
 
   const handleSelectSingleChatbot = (chatbot: Chatbot) => {
+    // If the selected chatbot is already the only one selected, do nothing
+    if (selectedChatbots.length === 1 && selectedChatbots[0].id === chatbot.id) {
+      return;
+    }
     // Select only this chatbot (individual channel)
     setSelectedChatbots([chatbot]);
+    // Clear current chat ID to start a new conversation with this chatbot
+    setCurrentChatId(null);
     toast({
       title: "Channel Selected",
       description: `Now chatting with ${chatbot.name}`,
@@ -171,8 +164,6 @@ const Index = () => {
             onDeleteChat={handleDeleteSavedChat}
             onDeleteChatbot={handleDeleteChatbot}
             markOnboardingAsSeen={markOnboardingAsSeen}
-            theme={theme}
-            setTheme={setTheme}
           />
           
           {/* Main content area with responsive margins */}

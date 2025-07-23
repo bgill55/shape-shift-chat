@@ -1,6 +1,6 @@
 
-import { ThemeSwitcher } from "./ui/ThemeSwitcher";
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from "react-router-dom";
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,11 +10,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings } from 'lucide-react'; 
-import { Link } from 'react-router-dom';
+import { User, LogOut, Settings } from 'lucide-react';
 
 export function UserMenu() {
   const { user, displayName, signOut } = useAuth();
+  const navigate = useNavigate(); // Add this line
 
   if (!user) return null;
 
@@ -27,26 +27,22 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-[rgb(var(--card))] border-border text-[rgb(var(--fg))] w-56">
-        <DropdownMenuLabel className="font-normal px-2 py-1.5 text-[rgb(var(--fg))] ">
-          <p className="text-xs leading-none text-[rgb(var(--fg))]">
+        <DropdownMenuLabel className="font-normal" key={displayName}>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{displayName || user.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+          </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-border" />
-        <DropdownMenuItem asChild className="cursor-pointer hover:!bg-accent focus:!bg-accent">
-          <Link to="/settings/profile" className="flex items-center"> {/* Ensure Link takes full width and flex properties */}
-            <Settings className="w-4 h-4 mr-2" />
-            Profile Settings
-          </Link>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate("/settings/profile")} className="cursor-pointer">
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Profile Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-border" />
-        <DropdownMenuItem className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
-          <ThemeSwitcher />
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-border" />
-        <DropdownMenuItem onClick={signOut} className="cursor-pointer hover:!bg-accent focus:!bg-accent flex items-center">
-          <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
+        <DropdownMenuItem onClick={signOut}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "@/components/UserMenu";
+import { getChatbotIcon } from '@/utils/chatbotIcons';
 
 import { Chatbot, SavedChat } from '@/pages/Index';
 import { Button } from "@/components/ui/button";
@@ -35,59 +37,24 @@ interface AppSidebarProps {
   onDeleteChat: (chatId: string) => void;
   onDeleteChatbot: (chatbotId: string) => void;
   markOnboardingAsSeen: () => void;
-  theme: 'light' | 'dark' | 'oled';
-  setTheme: (theme: 'light' | 'dark' | 'oled') => void;
 }
 
-export function AppSidebar({ 
-  chatbots, 
-  selectedChatbots, 
-  onSelectChatbot, 
+export function AppSidebar({
+  chatbots,
+  selectedChatbots,
+  onSelectChatbot,
   onSelectSingleChatbot,
-  onAddShape, 
+  onAddShape,
   onOpenApiConfig,
   savedChats,
   onLoadChat,
   onDeleteChat,
   onDeleteChatbot,
-  markOnboardingAsSeen,
-  theme,
-  setTheme
+  markOnboardingAsSeen
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
-
-  // Define a set of shapes and colors
-  const SHAPES = [
-    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>, // Circle
-    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16"/></svg>, // Square
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20z"/></svg>, // Triangle
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>, // Star
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 6v12l9 5 9-5V6z"/></svg>, // Hexagon
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>, // Hollow Circle
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V5h14v14z"/></svg>, // Hollow Square
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5L2 21h20L12 4.5zm0 3.33L17.5 18H6.5L12 7.83z"/></svg>, // Hollow Triangle
-  ];
-
-  const COLORS = [
-    "bg-red-500", "bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500",
-    "bg-pink-500", "bg-indigo-500", "bg-teal-500", "bg-orange-500", "bg-cyan-500",
-  ];
-
-  const chatbotIconMap = useRef(new Map());
-
-  const getChatbotIcon = (chatbotId: string) => {
-    if (!chatbotIconMap.current.has(chatbotId)) {
-      const assignedCount = chatbotIconMap.current.size;
-      const shapeIndex = assignedCount % SHAPES.length;
-      const colorIndex = assignedCount % COLORS.length;
-      chatbotIconMap.current.set(chatbotId, {
-        shape: SHAPES[shapeIndex],
-        color: COLORS[colorIndex],
-      });
-    }
-    return chatbotIconMap.current.get(chatbotId);
-  };
+  const { theme, setTheme } = useTheme();
 
   const isChatbotSelected = (chatbot: Chatbot) => {
     return selectedChatbots.some(selected => selected.id === chatbot.id);

@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
@@ -11,6 +10,9 @@ import { EditableMessage } from './EditableMessage';
 import { ScrollArea } from '../ui/scroll-area';
 import { Skeleton } from '../ui/skeleton'; // Import Skeleton component
 import { Bot } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { getChatbotIcon } from '@/utils/chatbotIcons';
 
 interface MessageListProps {
   messages: Message[];
@@ -21,16 +23,17 @@ interface MessageListProps {
   selectedChatbots: Chatbot[];
 }
 
-export function MessageList({ 
-  messages, 
-  isLoading, 
-  onEditMessage, 
-  onDeleteMessage, 
+export function MessageList({
+  messages,
+  isLoading,
+  onEditMessage,
+  onDeleteMessage,
   onRegenerateMessage,
   selectedChatbots
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const { user, displayName } = useAuth();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,9 +71,9 @@ export function MessageList({
       return (
         <div className="space-y-1">
           {message.content && <MessageText content={message.content} />}
-          <ImagePreview 
-            src={message.imageUrl} 
-            alt="User upload preview" 
+          <ImagePreview
+            src={message.imageUrl}
+            alt="User upload preview"
           />
         </div>
       );
@@ -86,7 +89,7 @@ export function MessageList({
         </div>
       );
     }
-    
+
     const audioUrl = isAudioUrl(message.content);
     if (audioUrl && message.sender === 'bot') {
       const textContent = message.content.replace(audioUrl, '').trim();
@@ -97,7 +100,7 @@ export function MessageList({
         </div>
       );
     }
-    
+
     return <MessageText content={message.content} />;
   };
 
@@ -109,13 +112,36 @@ export function MessageList({
             {messages.map((message) => (
               <li
                 key={message.id}
-                className={`flex group ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex group mb-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
+                {message.sender === 'bot' && (
+                  <div className="flex-shrink-0 mr-2">
+                    {message.chatbotId && (
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getChatbotIcon(message.chatbotId).color}`}>
+                        <div className="w-5 h-5 text-[rgb(var(--fg))]" aria-hidden="true">
+                          {getChatbotIcon(message.chatbotId).shape}
+                        </div>
+                      </div>
+                    )}
+                    {!message.chatbotId && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-500">
+                        <Bot className="w-5 h-5 text-[rgb(var(--fg))]" />
+                      </div>
+                    )}
+                  </div>
+                )}
+                {message.sender === 'user' && user && (
+                  <div className="flex-shrink-0 ml-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{displayName ? displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : ''}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
                 <div
-                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative break-words overflow-wrap-anywhere ${
+                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-xl relative break-words overflow-wrap-anywhere ${
                     message.sender === 'user'
-                      ? 'bg-[#5865f2] text-[rgb(var(--fg))]'
-                      : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225]'
+                      ? 'bg-[#5865f2] text-[rgb(var(--fg))] rounded-br-none'
+                      : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225] rounded-bl-none'
                   }`}
                 >
                   <div className="absolute top-2 right-2">
@@ -142,7 +168,7 @@ export function MessageList({
                 </div>
               </li>
             ))}
-            
+
             {isLoading && (
               <li className="flex justify-start" aria-busy="true" aria-live="polite">
                 <div className="flex items-center space-x-2">
@@ -151,7 +177,7 @@ export function MessageList({
                 </div>
               </li>
             )}
-            
+
             <div ref={messagesEndRef} />
           </ul>
         </div>

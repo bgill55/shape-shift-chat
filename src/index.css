@@ -11,6 +11,8 @@
     --card: 248 250 252;
     --border: 226 232 240;
     --color-sidebar-bg: 248 250 252;
+    --muted: 203 213 225;
+    --muted-foreground: 148 163 184;
   }
 
   .dark {
@@ -20,6 +22,8 @@
     --card: 30 41 59;
     --border: 51 65 85;
     --color-sidebar-bg: 30 41 59;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
   }
 
   .oled {
@@ -29,6 +33,8 @@
     --card: 10 10 10;
     --border: 38 38 38;
     --color-sidebar-bg: 10 10 10;
+    --muted: 38 38 38;
+    --muted-foreground: 148 163 184;
   }
 
   body {

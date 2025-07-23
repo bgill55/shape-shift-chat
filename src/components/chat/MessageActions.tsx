@@ -30,7 +30,7 @@ export function MessageActions({
             <MoreHorizontal className="h-3 w-3" />
           </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36">
+      <DropdownMenuContent align="end" className="w-36 bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))]">
         {isBot && onRegenerate && (
           <DropdownMenuItem onClick={() => onRegenerate(messageId)}>
             <RotateCcw className="mr-2 h-3 w-3" />

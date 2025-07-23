@@ -6,4 +6,5 @@ export interface Message {
   timestamp: Date;
   imageUrl?: string;
   botName?: string; // Track which bot sent the message for multi-bot chats
+  chatbotId?: string; // Add chatbotId to the Message interface
 }

@@ -10,8 +10,31 @@ export default defineConfig({
       name: 'Shape Shift',
       short_name: 'ShapeShift',
       description: 'Your personal AI assistant',
-      theme_color: '#ffffff',
+      theme_color: '#1a1a1a',
+      background_color: '#1a1a1a',
+      display: 'standalone',
+      start_url: '/',
       icons: [
+        {
+          src: 'android-launchericon-48-48.png',
+          sizes: '48x48',
+          type: 'image/png',
+        },
+        {
+          src: 'android-launchericon-72-72.png',
+          sizes: '72x72',
+          type: 'image/png',
+        },
+        {
+          src: 'android-launchericon-96-96.png',
+          sizes: '96x96',
+          type: 'image/png',
+        },
+        {
+          src: 'android-launchericon-144-144.png',
+          sizes: '144x144',
+          type: 'image/png',
+        },
         {
           src: 'android-launchericon-192-192.png',
           sizes: '192x192',
