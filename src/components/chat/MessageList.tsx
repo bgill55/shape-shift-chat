@@ -8,7 +8,7 @@ import { MessageText } from './MessageText';
 import { MessageActions } from './MessageActions';
 import { EditableMessage } from './EditableMessage';
 import { ScrollArea } from '../ui/scroll-area';
-import { Skeleton } from '../ui/skeleton'; // Import Skeleton component
+import { Skeleton } from '../ui/skeleton';
 import { Bot } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -19,8 +19,9 @@ interface MessageListProps {
   isLoading: boolean;
   onEditMessage: (messageId: string, newContent: string) => void;
   onDeleteMessage: (messageId: string) => void;
-  onRegenerateMessage: (messageId: string) => void;
+  onRegenerateMessage: (messageId: string, apiKey: string, selectedChatbot: Chatbot) => void;
   selectedChatbots: Chatbot[];
+  apiKey: string;
 }
 
 export function MessageList({
@@ -29,7 +30,8 @@ export function MessageList({
   onEditMessage,
   onDeleteMessage,
   onRegenerateMessage,
-  selectedChatbots
+  selectedChatbots,
+  apiKey
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
@@ -105,83 +107,83 @@ export function MessageList({
   };
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col h-full">
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          <ul aria-live="polite" aria-atomic="false">
-            {messages.map((message) => (
-              <li
-                key={message.id}
-                className={`flex group mb-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+    <ScrollArea className="h-full p-4">
+      <div className="space-y-4">
+        <ul aria-live="polite" aria-atomic="false">
+          {messages.map((message) => (
+            <li
+              key={message.id}
+              className={`flex group mb-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              {message.sender === 'bot' && (
+                <div className="flex-shrink-0 mr-2">
+                  {message.chatbotId && (
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getChatbotIcon(message.chatbotId).color}`}>
+                      <div className="w-5 h-5 text-[rgb(var(--fg))]" aria-hidden="true">
+                        {getChatbotIcon(message.chatbotId).shape}
+                      </div>
+                    </div>
+                  )}
+                  {!message.chatbotId && (
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-500">
+                      <Bot className="w-5 h-5 text-[rgb(var(--fg))]" />
+                    </div>
+                  )}
+                </div>
+              )}
+              {message.sender === 'user' && user && (
+                <div className="flex-shrink-0 ml-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{displayName ? displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : ''}</AvatarFallback>
+                  </Avatar>
+                </div>
+              )}
+              <div
+                className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-xl relative break-words overflow-wrap-anywhere ${
+                  message.sender === 'user'
+                    ? 'bg-[#5865f2] text-[rgb(var(--fg))] rounded-br-none'
+                    : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225] rounded-bl-none'
+                }`}
               >
-                {message.sender === 'bot' && (
-                  <div className="flex-shrink-0 mr-2">
-                    {message.chatbotId && (
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getChatbotIcon(message.chatbotId).color}`}>
-                        <div className="w-5 h-5 text-[rgb(var(--fg))]" aria-hidden="true">
-                          {getChatbotIcon(message.chatbotId).shape}
-                        </div>
-                      </div>
-                    )}
-                    {!message.chatbotId && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-500">
-                        <Bot className="w-5 h-5 text-[rgb(var(--fg))]" />
-                      </div>
-                    )}
-                  </div>
-                )}
-                {message.sender === 'user' && user && (
-                  <div className="flex-shrink-0 ml-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{displayName ? displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : ''}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                )}
-                <div
-                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-xl relative break-words overflow-wrap-anywhere ${
-                    message.sender === 'user'
-                      ? 'bg-[#5865f2] text-[rgb(var(--fg))] rounded-br-none'
-                      : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225] rounded-bl-none'
-                  }`}
-                >
-                  <div className="absolute top-2 right-2">
-                    <MessageActions
-                      messageId={message.id}
-                      isBot={message.sender === 'bot'}
-                      onEdit={handleEdit}
-                      onDelete={onDeleteMessage}
-                      onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
-                    />
-                  </div>
-                  <div className="pr-8 overflow-hidden">
-                    {message.sender === 'bot' && selectedChatbots.length > 1 && (
-                      <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
-                        <Bot className="w-3 h-3" aria-hidden="true" />
-                        <span>{message.botName || 'Shape Response'}</span>
-                      </div>
-                    )}
-                    {renderMessageContent(message)}
-                    <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
+                <div className="absolute top-2 right-2 z-10">
+                  <MessageActions
+                    messageId={message.id}
+                    isBot={message.sender === 'bot'}
+                    onEdit={handleEdit}
+                    onDelete={onDeleteMessage}
+                    onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
+                    apiKey={apiKey}
+                    chatbot={message.chatbotId ? selectedChatbots.find(bot => bot.id === message.chatbotId) : (selectedChatbots.length > 0 ? selectedChatbots[0] : undefined)}
+                  />
                 </div>
-              </li>
-            ))}
-
-            {isLoading && (
-              <li className="flex justify-start" aria-busy="true" aria-live="polite">
-                <div className="flex items-center space-x-2">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <Skeleton className="h-8 w-[200px]" />
+                <div className="pr-8 overflow-hidden">
+                  {message.sender === 'bot' && selectedChatbots.length > 1 && (
+                    <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
+                      <Bot className="w-3 h-3" aria-hidden="true" />
+                      <span>{message.botName || 'Shape Response'}</span>
+                    </div>
+                  )}
+                  {renderMessageContent(message)}
+                  <p className="text-xs opacity-70 mt-1">
+                    {message.timestamp.toLocaleTimeString()}
+                  </p>
                 </div>
-              </li>
-            )}
+              </div>
+            </li>
+          ))}
 
-            <div ref={messagesEndRef} />
-          </ul>
-        </div>
-      </ScrollArea>
-    </div>
+          {isLoading && (
+            <li className="flex justify-start" aria-busy="true" aria-live="polite">
+              <div className="flex items-center space-x-2">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-8 w-[200px]" />
+              </div>
+            </li>
+          )}
+
+          <div ref={messagesEndRef} />
+        </ul>
+      </div>
+    </ScrollArea>
   );
 }

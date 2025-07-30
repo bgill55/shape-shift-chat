@@ -13,7 +13,9 @@ interface MessageActionsProps {
   isBot: boolean;
   onEdit: (messageId: string) => void;
   onDelete: (messageId: string) => void;
-  onRegenerate?: (messageId: string) => void;
+  onRegenerate?: (messageId: string, apiKey: string, selectedChatbot: Chatbot) => void;
+  apiKey: string;
+  chatbot?: Chatbot; // Make chatbot optional
 }
 
 export function MessageActions({ 
@@ -21,7 +23,9 @@ export function MessageActions({
   isBot, 
   onEdit, 
   onDelete, 
-  onRegenerate 
+  onRegenerate, 
+  apiKey, 
+  chatbot 
 }: MessageActionsProps) {
   return (
     <DropdownMenu>
@@ -31,19 +35,19 @@ export function MessageActions({
           </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-36 bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))]">
-        {isBot && onRegenerate && (
-          <DropdownMenuItem onClick={() => onRegenerate(messageId)}>
+        {isBot && onRegenerate && chatbot && (
+          <DropdownMenuItem onClick={() => onRegenerate(messageId, apiKey, chatbot)} className="cursor-pointer">
             <RotateCcw className="mr-2 h-3 w-3" />
             Regenerate
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onClick={() => onEdit(messageId)}>
+        <DropdownMenuItem onClick={() => onEdit(messageId)} className="cursor-pointer">
           <Edit className="mr-2 h-3 w-3" />
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => onDelete(messageId)}
-          className="text-red-600 focus:text-red-600"
+          className="text-red-600 focus:text-red-600 cursor-pointer"
         >
           <Trash2 className="mr-2 h-3 w-3" />
           Delete

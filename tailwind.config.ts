@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindcssPlugin from "tailwindcss/plugin";
 
 export default {
 	darkMode: ["class"],
@@ -93,8 +95,8 @@ export default {
 		}
 	},
 	plugins: [
-		require("tailwindcss-animate"),
-		require("tailwindcss/plugin")(function ({ addVariant }) {
+		tailwindcssAnimate,
+		tailwindcssPlugin(function ({ addVariant }) {
 			addVariant("oled", ".oled &");
 		}),
 	],

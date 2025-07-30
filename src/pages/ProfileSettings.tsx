@@ -104,7 +104,7 @@ export function ProfileSettings() {
         </CardContent>
         <CardFooter>
           <Button
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 border border-primary"
             onClick={handleSaveChanges}
             disabled={isButtonDisabled}
           >

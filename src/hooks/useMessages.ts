@@ -3,6 +3,7 @@ import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
 import { useToast } from '@/hooks/use-toast';
 import { getUniqueMentionedChatbots, parseMentions } from '@/utils/mentionUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -38,10 +39,13 @@ export function useMessages() {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
       
-      const messagesForApi = currentChatHistory.map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.content
-      }));
+      const messagesForApi = [
+        { role: "system", content: `You are a helpful assistant. Respond to the user's message in a conversational manner. Keep your response concise and relevant.` },
+        ...currentChatHistory.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        }))
+      ];
 
       if (typeof messageContent === 'string') {
         messagesForApi.push({ role: "user", content: messageContent });
@@ -104,30 +108,24 @@ export function useMessages() {
     textInput: string,
     chatHistory: Message[]
   ) => {
-    console.log("handleGroupChatResponse called");
     let currentChatHistory = [...chatHistory];
     const maxTurns = 3;
     let turn = 0;
     let lastBotMessage: Message | null = null;
 
-    // Determine initial recipient(s) based on user message
     const initialMentions = parseMentions(userMessage.content, selectedChatbots);
     const initialMentionedChatbots = getUniqueMentionedChatbots(initialMentions);
 
     let botsToInitiateConversation: Chatbot[] = [];
 
     if (initialMentionedChatbots.length > 0) {
-      // If user mentioned specific bots, only those bots initiate
       botsToInitiateConversation = initialMentionedChatbots;
     } else {
-      // If no specific bots mentioned, all selected bots initiate
       botsToInitiateConversation = selectedChatbots;
     }
 
-    // Initial response from determined recipient(s)
     for (const chatbot of botsToInitiateConversation) {
-      console.log(`Processing initial response for ${chatbot.name}`);
-      let apiMessageContent: any = textInput;
+      let apiMessageContent: string | { type: string; text?: string; image_url?: { url: string; }; }[] = textInput;
       if (imageFile) {
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -150,7 +148,7 @@ export function useMessages() {
             lastBotMessage = botResponse;
           }
         };
-        reader.onerror = (error) => {
+        reader.onerror = () => {
           toast({
             title: "File Read Error",
             description: "Could not read the selected image file.",
@@ -167,26 +165,18 @@ export function useMessages() {
       }
     }
 
-    // Bot-to-bot interaction loop
     while (lastBotMessage && turn < maxTurns) {
       turn++;
-      console.log(`Turn ${turn}: Last bot message: ${lastBotMessage.content}`);
       const mentions = parseMentions(lastBotMessage.content, selectedChatbots);
       const mentionedChatbots = getUniqueMentionedChatbots(mentions);
-      console.log(`Turn ${turn}: Mentioned chatbots:`, mentionedChatbots.map(b => b.name));
 
       if (mentionedChatbots.length === 0) {
-        // If no bots are mentioned, find the next bot in sequence
         const lastBotIndex = selectedChatbots.findIndex(bot => bot.name === lastBotMessage?.botName);
         const nextBotIndex = (lastBotIndex + 1) % selectedChatbots.length;
         const nextChatbot = selectedChatbots[nextBotIndex];
         
-        console.log(`Turn ${turn}: No bots mentioned. Next chatbot in sequence: ${nextChatbot.name}`);
-
-        // Ensure the next bot is not the same as the last one if there are multiple bots
         if (selectedChatbots.length > 1 && nextChatbot.name === lastBotMessage.botName) {
-          console.log(`Turn ${turn}: Next chatbot is the same as last. Breaking loop.`);
-          break; // Prevent a single bot from talking to itself indefinitely in a two-bot chat
+          break;
         }
 
         const botResponse = await performApiCall(apiKey, nextChatbot, lastBotMessage.content, currentChatHistory);
@@ -194,24 +184,19 @@ export function useMessages() {
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
         } else {
-          console.log(`Turn ${turn}: performApiCall failed for ${nextChatbot.name}. Breaking loop.`);
           break;
         }
       } else {
-        // If bots are mentioned, only the first mentioned bot responds
         const mentionedChatbot = mentionedChatbots[0];
-        console.log(`Turn ${turn}: Bots mentioned. Responding with ${mentionedChatbot.name}`);
         const botResponse = await performApiCall(apiKey, mentionedChatbot, lastBotMessage.content, currentChatHistory);
         if (botResponse) {
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
         } else {
-          console.log(`Turn ${turn}: performApiCall failed for ${mentionedChatbot.name}. Breaking loop.`);
           break;
         }
       }
     }
-    console.log("handleGroupChatResponse finished");
   }, [performApiCall, updateMessage, toast]);
 
   const editMessage = useCallback((messageId: string, newContent: string) => {

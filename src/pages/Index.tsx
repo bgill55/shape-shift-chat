@@ -9,6 +9,7 @@ import { MobileHeader } from '@/components/MobileHeader';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence';
+import { useMessages } from '@/hooks/useMessages';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { AppFooter } from '@/components/AppFooter';
 
@@ -27,6 +28,7 @@ const Index = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId, deleteChat } = useChatPersistence();
+  const { clearMessages } = useMessages();
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
 
   useEffect(() => {
@@ -93,8 +95,8 @@ const Index = () => {
     }
     // Select only this chatbot (individual channel)
     setSelectedChatbots([chatbot]);
-    // Clear current chat ID to start a new conversation with this chatbot
-    setCurrentChatId(null);
+    setCurrentChatId(null); // Set to null to indicate a new chat
+    clearMessages();
     toast({
       title: "Channel Selected",
       description: `Now chatting with ${chatbot.name}`,
@@ -165,10 +167,11 @@ const Index = () => {
             onDeleteChat={handleDeleteSavedChat}
             onDeleteChatbot={handleDeleteChatbot}
             markOnboardingAsSeen={markOnboardingAsSeen}
+            clearMessages={clearMessages}
           />
           
           {/* Main content area with responsive margins */}
-          <div className={`flex-1 ${isMobile ? 'pt-16' : 'md:ml-64'}`}>
+          <div className={`flex-1 flex flex-col ${isMobile ? 'pt-16' : 'md:ml-64'}`}>
             <ChatArea 
               selectedChatbots={selectedChatbots}
               apiKey={apiKey}

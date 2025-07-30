@@ -108,7 +108,7 @@ export function ApiKeyModal({ isOpen, onClose, onSaveApiKey, currentApiKey }: Ap
 
             <Button
               type="submit"
-              className="w-full bg-[var(--color-button-bg-primary)] hover:bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)]"
+              className="w-full bg-[var(--color-button-bg-primary)] hover:bg-[var(--color-button-bg-primary)] text-[var(--color-button-text-primary)] border border-[var(--color-button-bg-primary)]"
             >
               Save API Key
             </Button>

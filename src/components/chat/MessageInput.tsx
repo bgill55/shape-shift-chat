@@ -105,7 +105,7 @@ export function MessageInput({
 
       {showSuggestions && (
         <div
-          className="mb-2 p-3 border border-cyan-600 rounded text-sm bg-slate-700 text-neutral-300"
+          className="mb-2 p-3 border border-cyan-600 rounded text-sm bg-slate-700 text-neutral-300 w-full"
           style={{ minHeight: '60px' }}
         >
           {suggestionsLoading ? (
@@ -113,7 +113,7 @@ export function MessageInput({
           ) : suggestionsError ? (
             <p className="w-full text-center py-2 text-red-500">Error: {suggestionsError.message}</p>
           ) : suggestions.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap">
               {suggestions.map((suggestion) => (
                 <Button
                   key={suggestion.id}
@@ -125,7 +125,7 @@ export function MessageInput({
                     setShowSuggestions(false);
                     inputRef.current?.focus();
                   }}
-                  className="truncate bg-slate-700 hover:bg-slate-600 text-neutral-200 border-cyan-600"
+                  className="bg-slate-700 hover:bg-slate-600 text-neutral-200 border-cyan-600 text-wrap flex-shrink min-w-0 max-w-full m-1"
                 >
                   {suggestion.text}
                 </Button>
@@ -155,9 +155,7 @@ export function MessageInput({
               setShowSuggestions(newShowSuggestions);
               if (newShowSuggestions) {
                 const primaryChatbot = selectedChatbots && selectedChatbots.length > 0 ? selectedChatbots[0] : undefined;
-                const channelId = primaryChatbot?.id;
-                const modelShapeName = primaryChatbot?.name;
-                fetchSuggestions(chatHistory, channelId, modelShapeName);
+                fetchSuggestions(chatHistory, primaryChatbot);
               }
             }}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}

@@ -23,6 +23,7 @@ acc.fixes
 *.njsproj
 *.sln
 *.sw?
+.htaccess
 
 # Local Netlify folder
 .netlify

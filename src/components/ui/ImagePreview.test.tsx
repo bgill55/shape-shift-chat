@@ -1,7 +1,7 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import '@testing-library/jest-dom';
+
 import { ImagePreview } from './ImagePreview';
 
 describe('ImagePreview', () => {

@@ -52,8 +52,8 @@ const SidebarProvider = ({
   const [open, setOpen] = React.useState(defaultOpen)
   const isMobile = useIsMobile()
 
-  const onOpen = () => setOpen(true)
-  const onClose = () => setOpen(false)
+  const onOpen = React.useCallback(() => setOpen(true), [])
+  const onClose = React.useCallback(() => setOpen(false), [])
   const toggleSidebar = React.useCallback(() => setOpen((prev) => !prev), [])
 
   const value = React.useMemo(

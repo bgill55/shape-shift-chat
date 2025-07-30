@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 
 export function useImageUpload() {
@@ -6,9 +5,8 @@ export function useImageUpload() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Effect to handle object URL cleanup
   useEffect(() => {
-    let currentPreviewUrl = imagePreviewUrl;
+    const currentPreviewUrl = imagePreviewUrl;
     if (!selectedImageFile && currentPreviewUrl) {
       URL.revokeObjectURL(currentPreviewUrl);
       setImagePreviewUrl(null);
@@ -19,7 +17,7 @@ export function useImageUpload() {
         URL.revokeObjectURL(currentPreviewUrl);
       }
     };
-  }, [selectedImageFile]);
+  }, [selectedImageFile, imagePreviewUrl]);
 
   const handleImageUploadButtonClick = () => {
     fileInputRef.current?.click();

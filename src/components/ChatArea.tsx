@@ -1,23 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react'; 
-import { User as SupabaseUser } from '@supabase/supabase-js'; 
+import { useMemo, useEffect } from 'react';
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
 import { MessageInput } from './chat/MessageInput';
 import { useMessages } from '@/hooks/useMessages';
-import { useChatPersistence, SavedChat } from '@/hooks/useChatPersistence'; 
+import { useChatPersistence } from '@/hooks/useChatPersistence';
 import { Message } from '@/types/message';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext'; 
-import { Button } from '@/components/ui/button';
-import { Save, FileText, Trash2 } from 'lucide-react';
-import { parseMentions, getUniqueMentionedChatbots } from '@/utils/mentionUtils';
-
-interface ChatAreaProps {
-  selectedChatbots: Chatbot[];
-  apiKey: string;
-  currentChatId: string | null;
-}
 
 export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentChatId }: ChatAreaProps) {
   const { 
@@ -43,122 +32,32 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     setCurrentChatId
   } = useChatPersistence();
 
-  const selectedBotIdsKey = useMemo(() => selectedChatbots.map(bot => bot.id).sort().join(','), [selectedChatbots]);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (propCurrentChatId) {
       setCurrentChatId(propCurrentChatId);
-    }
-  }, [propCurrentChatId, setCurrentChatId]);
-
-  const { toast } = useToast();
-  const { user } = useAuth();
-
-  const prevUserRef = useRef<SupabaseUser | null>();
-  const prevSelectedBotIdsKeyRef = useRef<string>();
-
-  useEffect(() => {
-    if (propCurrentChatId) {
-      clearMessages();
       loadChat(propCurrentChatId).then((loadedMessages) => {
-        if (loadedMessages && loadedMessages.length > 0) {
-          loadMessages(loadedMessages);
-        }
+        loadMessages(loadedMessages || []);
       });
     } else {
       clearMessages();
     }
-  }, [propCurrentChatId, selectedBotIdsKey, loadChat, loadMessages, clearMessages]);
+  }, [propCurrentChatId, loadChat, loadMessages, clearMessages, setCurrentChatId]);
 
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
-
     if (selectedChatbots.length === 1) {
-      const chatbot = selectedChatbots[0];
-      
-      if (imageFile) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const base64DataUri = e.target?.result as string;
-          if (!base64DataUri) {
-            console.error("Failed to read file as Base64.");
-            updateMessage(userMessage.id, {
-              content: `${userMessage.content} [Image send failed (read error)]`
-            });
-            return;
-          }
-
-          const apiMessageContent: any[] = [];
-          if (textInput.trim()) {
-            apiMessageContent.push({ type: "text", text: textInput.trim() });
-          }
-          apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
-          
-          performApiCall(apiKey, chatbot, apiMessageContent, messages);
-        };
-        reader.onerror = (error) => {
-          console.error("FileReader error:", error);
-          updateMessage(userMessage.id, {
-            content: `${userMessage.content} [Image send failed (read error)]`
-          });
-          toast({
-            title: "File Read Error",
-            description: "Could not read the selected image file.",
-            variant: "destructive"
-          });
-        };
-        reader.readAsDataURL(imageFile);
-      } else {
-        await performApiCall(apiKey, chatbot, textInput, messages);
-      }
+      await performApiCall(apiKey, selectedChatbots[0], textInput, messages, imageFile);
     } else {
       await handleGroupChatResponse(apiKey, selectedChatbots, userMessage, imageFile, textInput, messages);
     }
   };
 
-  const handleEditMessage = (messageId: string, newContent: string) => {
-    editMessage(messageId, newContent);
-  };
-
-  const handleDeleteMessage = (messageId: string) => {
-    deleteMessage(messageId);
-  };
-
-  const handleRegenerateMessage = async (messageId: string) => {
-    if (selectedChatbots.length === 0) return;
-    await regenerateMessage(messageId, apiKey, selectedChatbots[0]);
-  };
-
-  const handleSaveChat = async () => {
-    if (selectedChatbots.length === 0 || messages.length === 0) return;
-    await saveChat(selectedChatbots[0], messages);
-  };
-
-  const handleNewChat = () => {
-    clearMessages();
-    startNewChat();
-    toast({
-      title: "New Chat Started",
-      description: "You can now start a fresh conversation.",
-    });
-  };
-
-  const handleDeleteChat = async () => {
-    if (!propCurrentChatId) return;
-    
-    await deleteChat(propCurrentChatId);
-    clearMessages();
-    
-    toast({
-      title: "Chat Deleted",
-      description: "The current chat has been deleted.",
-    });
-  };
-
   if (selectedChatbots.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[rgb(var(--bg))] pt-16 md:pt-0 text-center text-[rgb(var(--fg))] px-4 overflow-hidden">
-        <img src="/assets/X_large_image.png" alt="Welcome to Shape Shift" className="w-64 h-64 mb-6 object-contain" /> 
+      <div className="flex-1 flex flex-col items-center justify-start bg-[rgb(var(--bg))] pt-8 md:pt-0 text-center text-[rgb(var(--fg))] px-4 h-full overflow-y-auto">
+        <img src="/assets/X_large_image.png" alt="Welcome to Shape Shift" className="max-w-[50%] h-auto mb-4 object-contain flex-shrink-0" /> 
         <h2 className="text-3xl font-bold mb-3 text-[rgb(var(--fg))]">Welcome to Shape Shift!</h2>
         <p className="text-lg mb-2 text-[rgb(var(--fg))]">A Shift in the way you interact with your Shape.</p>
         <p className="text-sm mb-6 max-w-md text-[rgb(var(--fg))]">
@@ -174,75 +73,40 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[rgb(var(--bg))] pt-16 md:pt-0 h-screen md:h-auto border-2 border-cyan-600">
+    <div className="flex flex-col h-full w-full bg-[rgb(var(--bg))]">
       <GroupChatHeader selectedChatbots={selectedChatbots} />
       
-      {/* Chat Controls */}
-      <div className="px-4 py-2 bg-[rgb(var(--card))] border-b border-[#202225] flex gap-2 flex-shrink-0 border-2 border-cyan-500">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleNewChat}
-          className="bg-[#40444b] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
-        >
-          <FileText className="w-4 h-4 mr-1" />
-          New Chat
-        </Button>
-        
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleSaveChat}
-          disabled={messages.length === 0 || isSaving}
-          className="bg-[#40444b] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
-        >
-          <Save className="w-4 h-4 mr-1" aria-hidden="true" />
-          {isSaving ? 'Saving...' : 'Save Chat'}
-        </Button>
-        
-        {propCurrentChatId && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDeleteChat}
-            className="bg-[#40444b] text-[#96989d] border-[#202225] hover:bg-[#dc2626] hover:text-[rgb(var(--fg))]"
-          >
-            <Trash2 className="w-4 h-4 mr-1" />
-            Delete Chat
-          </Button>
-        )}
-        
-        {propCurrentChatId && (
-          <span className="text-xs text-[#72767d] self-center ml-2">
-            Auto-saved to database
-          </span>
-        )}
+      <div className="flex-1 relative">
+        <div className="absolute inset-0 overflow-y-auto">
+          <MessageList 
+            messages={messages} 
+            isLoading={isLoading}
+            onEditMessage={editMessage}
+            onDeleteMessage={deleteMessage}
+            onRegenerateMessage={regenerateMessage}
+            selectedChatbots={selectedChatbots}
+            apiKey={apiKey}
+          />
+        </div>
       </div>
 
-      {/* Messages area - fixed height container with flex */}
-      <div className="flex-1 flex flex-col min-h-0 border-2 border-cyan-600"> {/* Changed overflow-hidden to min-h-0 */}
-        <MessageList 
-          messages={messages} 
-          isLoading={isLoading}
-          onEditMessage={handleEditMessage}
-          onDeleteMessage={handleDeleteMessage}
-          onRegenerateMessage={handleRegenerateMessage}
-          selectedChatbots={selectedChatbots}
-        />
-      </div>
-
-      {/* Input area - fixed at bottom */}
-      <div className="flex-shrink-0 border-2 border-cyan-500">
+      <div className="flex-shrink-0 p-2 border-t border-border">
         <MessageInput 
           selectedChatbots={selectedChatbots}
           apiKey={apiKey}
           isLoading={isLoading}
           isSaving={isSaving}
           onSendMessage={handleSendMessage}
-          onSaveChat={handleSaveChat}
-          chatHistory={messages} // Added chatHistory prop
+          onSaveChat={() => saveChat(selectedChatbots[0], messages)}
+          chatHistory={messages}
         />
       </div>
     </div>
   );
+}
+
+interface ChatAreaProps {
+  selectedChatbots: Chatbot[];
+  apiKey: string;
+  currentChatId: string | null;
 }

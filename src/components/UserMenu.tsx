@@ -22,7 +22,7 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* Button color should adapt to theme or be explicitly set for header if sidebar doesn't change */}
-        <Button variant="ghost" size="icon" className="text-[rgb(var(--fg))] hover:bg-accent hover:text-accent-foreground" aria-label="User menu">
+        <Button variant="outline" size="icon" className="text-[rgb(var(--fg))] hover:bg-accent hover:text-accent-foreground" aria-label="User menu">
           <User className="w-5 h-5" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
