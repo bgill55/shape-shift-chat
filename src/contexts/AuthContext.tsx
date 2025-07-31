@@ -45,60 +45,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        if (currentUser) {
-          const name = await fetchProfileDisplayName(currentUser.id);
-          setDisplayName(name);
-        } else {
-          setDisplayName(null);
-        }
-        setLoading(false);
-      }
-    );
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
 
-    const checkExistingSession = async () => {
-      const { data: { session: initialSession } } = await supabase.auth.getSession();
-      setSession(initialSession);
-      const currentInitialUser = initialSession?.user ?? null;
-      setUser(currentInitialUser);
-      
-      if (currentInitialUser) {
-        const name = await fetchProfileDisplayName(currentInitialUser.id);
+      if (currentUser) {
+        const name = await fetchProfileDisplayName(currentUser.id);
         setDisplayName(name);
       } else {
         const shapesAuthToken = localStorage.getItem('shapes_auth_token');
-        const shapesUserId = localStorage.getItem('shapes_user_id');
-        if (shapesAuthToken && shapesUserId) {
+        if (shapesAuthToken) {
+          const shapesUserId = localStorage.getItem('shapes_user_id') || 'shapes-user-fallback';
           const mockUser = {
             id: shapesUserId,
             email: 'shapes-user@shapes.local',
             aud: 'authenticated',
             created_at: new Date().toISOString(),
             app_metadata: {},
-            user_metadata: {
-              provider: 'shapes',
-              shapes_auth_token: shapesAuthToken,
-              actual_shapes_user_id: shapesUserId,
-            }
-          } as User;
-          setUser(mockUser);
-          const name = await fetchProfileDisplayName(shapesUserId);
-          setDisplayName(name);
-        } else if (shapesAuthToken) {
-           const mockUser = {
-            id: 'shapes-user-fallback-initial',
-            email: 'shapes-user@shapes.local',
-            aud: 'authenticated',
-            created_at: new Date().toISOString(),
-            app_metadata: {},
             user_metadata: { provider: 'shapes', shapes_auth_token: shapesAuthToken }
           } as User;
-           setUser(mockUser);
-           setDisplayName(null);
+          setUser(mockUser);
+          if (shapesUserId !== 'shapes-user-fallback') {
+            const name = await fetchProfileDisplayName(shapesUserId);
+            setDisplayName(name);
+          } else {
+            setDisplayName(null);
+          }
         } else {
           setDisplayName(null);
         }
@@ -106,7 +80,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     };
 
-    checkExistingSession();
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfileDisplayName(session.user.id).then(setDisplayName);
+        } else {
+          setDisplayName(null);
+        }
+        setLoading(false);
+      }
+    );
 
     return () => {
       subscription.unsubscribe();

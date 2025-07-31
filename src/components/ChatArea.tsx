@@ -29,7 +29,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     startNewChat,
     loadChat,
     deleteChat,
-    setCurrentChatId
+    setCurrentChatId,
+    autoSaveChat
   } = useChatPersistence();
 
   const { toast } = useToast();
@@ -44,6 +45,12 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
       clearMessages();
     }
   }, [propCurrentChatId, loadChat, loadMessages, clearMessages, setCurrentChatId]);
+
+  useEffect(() => {
+    if (selectedChatbots.length > 0) {
+      autoSaveChat(selectedChatbots[0], messages);
+    }
+  }, [messages, selectedChatbots, autoSaveChat]);
 
   const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);

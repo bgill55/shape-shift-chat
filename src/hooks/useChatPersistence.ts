@@ -199,6 +199,12 @@ export function useChatPersistence() {
     setCurrentChatId(null);
   }, [setCurrentChatId]); // Added setCurrentChatId
 
+  const autoSaveChat = useCallback(async (chatbot: Chatbot, messages: Message[]) => {
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'bot') {
+      await saveChat(chatbot, messages, undefined, false);
+    }
+  }, [saveChat]);
+
   // useEffect hooks AFTER function definitions
   // Load saved chats on mount and when user changes
   useEffect(() => {
@@ -221,6 +227,7 @@ export function useChatPersistence() {
     deleteChat,
     startNewChat,
     loadSavedChats,
-    setCurrentChatId
+    setCurrentChatId,
+    autoSaveChat
   };
 }
