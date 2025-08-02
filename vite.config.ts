@@ -85,9 +85,7 @@ export default defineConfig({
         },
       ],
     },
-    devOptions: {
-      enabled: true
-    }
+    
   })],
   resolve: {
     alias: {

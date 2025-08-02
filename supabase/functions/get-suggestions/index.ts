@@ -77,7 +77,8 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const rawSuggestions = data.choices?.map((choice: any) => choice.message?.content).filter(Boolean);
+    interface Choice { message?: { content?: string; }; }
+    const rawSuggestions = data.choices?.map((choice: Choice) => choice.message?.content).filter(Boolean);
 
     return new Response(JSON.stringify({ rawSuggestions }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -30,7 +30,7 @@ export function MessageActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0" aria-label="More message actions">
+        <Button variant="ghost" size="sm" className="h-6 w-6 p-0" aria-label="More message actions">
             <MoreHorizontal className="h-3 w-3" />
           </Button>
       </DropdownMenuTrigger>

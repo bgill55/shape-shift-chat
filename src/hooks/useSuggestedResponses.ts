@@ -41,7 +41,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       }
 
       const MAX_CHAT_HISTORY_PAYLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
-      let limitedChatHistory: Message[] = [];
+      const limitedChatHistory: Message[] = [];
       let currentPayloadSize = 0;
 
       // Iterate from the end of the chat history to get the most recent messages

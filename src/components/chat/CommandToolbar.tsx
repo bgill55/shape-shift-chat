@@ -12,6 +12,7 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
     { id: 'sleep', label: '!sleep', description: 'Save memories from the current conversation' },
     { id: 'info', label: '!info', description: 'Get information about the shape' },
     { id: 'wack', label: '!wack', description: 'Reset short-term memory' },
+    { id: 'voice', label: '!voice', description: 'Request a spoken response from the bot' },
   ];
 
   return (
