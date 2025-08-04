@@ -73,19 +73,23 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       console.log('[useSuggestedResponses] rawSuggestions:', rawSuggestions, 'Type:', typeof rawSuggestions);
 
       if (typeof rawSuggestions === 'string') {
-        const suggestionTexts = rawSuggestions
+        const uniqueSuggestionTexts = new Set<string>();
+        rawSuggestions
           .split('\n')
-          .map(text => text.trim().replace(/^\d+\.\s*|^- /, ''))
-          .filter(text => text.length > 0);
+          .map(text => text.trim().replace(/^\d+\.\s*|^-\s/, ''))
+          .filter(text => text.length > 0)
+          .forEach(text => uniqueSuggestionTexts.add(text));
         
-        setSuggestions(suggestionTexts.map((text, index) => ({ id: `sugg-${index}-${Date.now()}`, text })));
+        setSuggestions(Array.from(uniqueSuggestionTexts).map((text, index) => ({ id: `sugg-${index}-${Date.now()}`, text })));
       } else if (Array.isArray(rawSuggestions)) {
         // Fallback for cases where it might already be an array
-        const suggestionTexts = rawSuggestions
-          .map(text => text.trim().replace(/^\d+\.\s*|^- /, ''))
-          .filter(text => text.length > 0);
+        const uniqueSuggestionTexts = new Set<string>();
+        rawSuggestions
+          .map(text => text.trim().replace(/^\d+\.\s*|^-\s/, ''))
+          .filter(text => text.length > 0)
+          .forEach(text => uniqueSuggestionTexts.add(text));
 
-        setSuggestions(suggestionTexts.map((text, index) => ({ id: `sugg-${index}-${Date.now()}`, text })));
+        setSuggestions(Array.from(uniqueSuggestionTexts).map((text, index) => ({ id: `sugg-${index}-${Date.now()}`, text })));
       } else {
         setSuggestions([]);
       }
