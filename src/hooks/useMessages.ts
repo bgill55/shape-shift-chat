@@ -20,9 +20,7 @@ export function useMessages() {
     ));
   }, []);
 
-  type ApiMessageContent = string | Array<{ type: string; text?: string; image_url?: { url: string; }; }>;
-
-  const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: ApiMessageContent, currentChatHistory: Message[]) => {
+  const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: any, currentChatHistory: Message[]) => {
     setIsLoading(true);
     try {
       const shapeUsername = selectedChatbot.url.split('/').pop() || selectedChatbot.name.toLowerCase().replace(/\s+/g, '-');
