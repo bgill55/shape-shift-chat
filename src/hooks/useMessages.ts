@@ -40,7 +40,7 @@ export function useMessages() {
       }
       
       const messagesForApi = [
-        { role: "system", content: `You are a helpful assistant. Respond to the user's message in a conversational manner. Keep your response concise and relevant.` },
+        { role: "system", content: `You are a helpful assistant. Respond to the user's message in a conversational manner. Keep your response concise and relevant. Do not simply echo the user's input; generate a new and distinct reply.` },
         ...currentChatHistory.map(msg => ({
           role: msg.sender === 'user' ? 'user' : 'assistant',
           content: msg.content
