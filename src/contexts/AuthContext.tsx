@@ -11,7 +11,9 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   refreshShapesAuthStatus: () => void;
   displayName: string | null;
+  persona: string | null;
   updateDisplayName: (newName: string) => Promise<{ error: AuthError | null }>;
+  updatePersona: (newPersona: string) => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,26 +22,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [persona, setPersona] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfileDisplayName = async (userId: string) => {
+  const fetchProfile = async (userId: string) => {
     if (!userId) return null;
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('display_name')
+        .select('display_name, persona')
         .eq('id', userId)
         .single();
 
       if (error) {
         if (error.code !== 'PGRST116') {
-          console.error('Error fetching profile for display name:', error.message);
+          console.error('Error fetching profile:', error.message);
         }
         return null;
       }
-      return profile?.display_name || null;
+      return profile;
     } catch (e) {
-      console.error('Exception fetching profile for display name:', e);
+      console.error('Exception fetching profile:', e);
       return null;
     }
   };
@@ -52,8 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentUser);
 
       if (currentUser) {
-        const name = await fetchProfileDisplayName(currentUser.id);
-        setDisplayName(name);
+        const profile = await fetchProfile(currentUser.id);
+        setDisplayName(profile?.display_name || null);
+        setPersona(profile?.persona || null);
       } else {
         const shapesAuthToken = localStorage.getItem('shapes_auth_token');
         if (shapesAuthToken) {
@@ -68,10 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } as User;
           setUser(mockUser);
           if (shapesUserId !== 'shapes-user-fallback') {
-            const name = await fetchProfileDisplayName(shapesUserId);
-            setDisplayName(name);
+            const profile = await fetchProfile(shapesUserId);
+            setDisplayName(profile?.display_name || null);
+            setPersona(profile?.persona || null);
           } else {
             setDisplayName(null);
+            setPersona(null);
           }
         } else {
           setDisplayName(null);
@@ -87,9 +93,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          fetchProfileDisplayName(session.user.id).then(setDisplayName);
+          fetchProfile(session.user.id).then(profile => {
+            setDisplayName(profile?.display_name || null);
+            setPersona(profile?.persona || null);
+          });
         } else {
           setDisplayName(null);
+          setPersona(null);
         }
         setLoading(false);
       }
@@ -158,8 +168,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } as User;
       setUser(mockUser);
-      const name = await fetchProfileDisplayName(shapesUserId);
-      setDisplayName(name);
+      const profile = await fetchProfile(shapesUserId);
+      setDisplayName(profile?.display_name || null);
+      setPersona(profile?.persona || null);
     } else if (shapesAuthToken) { 
       const mockUser = {
         id: 'shapes-user-fallback-refresh',
@@ -215,16 +226,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updatePersona = async (newPersona: string) => {
+    if (!user) {
+      return { error: { name: 'AuthError', message: 'User not authenticated.' } as AuthError };
+    }
+
+    try {
+      const profileDataToUpsert = {
+        id: user.id, 
+        persona: newPersona.trim(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data, error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(profileDataToUpsert)
+        .select() 
+        .single(); 
+
+      if (upsertError) {
+        return { error: upsertError };
+      }
+
+      if (data) {
+        setPersona(data.persona);
+      } else {
+        setPersona(newPersona.trim());
+      }
+      return { error: null };
+    } catch (e: unknown) {
+      const error = e as AuthError;
+      return { error: { name: error.name, message: error.message } };
+    }
+  };
+
   const value = {
     user,
     session,
     loading,
     displayName,
+    persona,
     signIn,
     signUp,
     signOut,
     refreshShapesAuthStatus,
     updateDisplayName,
+    updatePersona,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

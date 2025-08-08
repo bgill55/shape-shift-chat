@@ -15,20 +15,22 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom'; // Added
 
 export function ProfileSettings() {
-  const { user, displayName, updateDisplayName } = useAuth();
+  const { user, displayName, persona, updateDisplayName, updatePersona } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate(); // Added
   const [newDisplayName, setNewDisplayName] = useState<string>('');
+  const [newPersona, setNewPersona] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (displayName) {
       setNewDisplayName(displayName);
-    } else {
-      setNewDisplayName(''); // Initialize as empty if no displayName yet
     }
-  }, [displayName]);
+    if (persona) {
+      setNewPersona(persona);
+    }
+  }, [displayName, persona]);
 
   const handleSaveChanges = async () => {
     if (!user) {
@@ -37,46 +39,73 @@ export function ProfileSettings() {
       return;
     }
 
-    const trimmedNewDisplayName = newDisplayName.trim();
-
-    // Button should be disabled if this is the case, but as a safeguard:
-    if (trimmedNewDisplayName === (displayName || '')) {
-      return;
-    }
-    if (trimmedNewDisplayName.length < 3) {
-      setError("Display name must be at least 3 characters long.");
-      // Toast is optional here as the button's disabled state and local error message provide feedback
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
-    const { error: updateError } = await updateDisplayName(trimmedNewDisplayName);
+    const trimmedDisplayName = newDisplayName.trim();
+    const trimmedPersona = (newPersona || '').trim();
 
-    if (updateError) {
-      const errorMessage = updateError.message || "Failed to update display name.";
-      setError(errorMessage);
-      toast({
-        title: 'Update Failed',
-        description: errorMessage,
-        variant: 'destructive',
-      });
-    } else {
-      toast({
-        title: 'Success!',
-        description: 'Display name updated successfully.',
-      });
-      navigate('/'); // Added redirect
+    const displayNameChanged = trimmedDisplayName !== (displayName || '');
+    const personaChanged = trimmedPersona !== (persona || '');
+
+    if (displayNameChanged) {
+      if (trimmedDisplayName.length < 3) {
+        setError("Display name must be at least 3 characters long.");
+        setIsLoading(false);
+        return;
+      }
+      const { error: displayNameError } = await updateDisplayName(trimmedDisplayName);
+      if (displayNameError) {
+        const errorMessage = displayNameError.message || "Failed to update display name.";
+        setError(errorMessage);
+        toast({
+          title: 'Update Failed',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
     }
+
+    if (personaChanged) {
+      const { error: personaError } = await updatePersona(trimmedPersona);
+      if (personaError) {
+        const errorMessage = personaError.message || "Failed to update persona.";
+        setError(errorMessage);
+        toast({
+          title: 'Update Failed',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    toast({
+      title: 'Success!',
+      description: 'Profile updated successfully.',
+    });
+    navigate('/');
     setIsLoading(false);
   };
 
   // Disable button if display name is unchanged, or shorter than 3 chars (after trim), or loading
-  const isButtonDisabled =
-    isLoading ||
-    newDisplayName.trim().length < 3 ||
-    newDisplayName.trim() === (displayName || '');
+  const isButtonDisabled = (() => {
+    if (isLoading) return true;
+
+    const trimmedDisplayName = newDisplayName.trim();
+    const trimmedPersona = (newPersona || '').trim();
+
+    const displayNameChanged = trimmedDisplayName !== (displayName || '');
+    const personaChanged = trimmedPersona !== (persona || '');
+
+    if (!displayNameChanged && !personaChanged) return true; // No changes
+    if (displayNameChanged && trimmedDisplayName.length < 3) return true; // Invalid display name
+
+    return false;
+  })();
 
   return (
     <div className="flex justify-center items-start pt-10 min-h-screen bg-background text-foreground">
@@ -96,6 +125,18 @@ export function ProfileSettings() {
               value={newDisplayName}
               onChange={(e) => setNewDisplayName(e.target.value)}
               placeholder="Enter your display name"
+              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="persona" className="text-foreground">Persona</Label>
+            <Input
+              id="persona"
+              type="text"
+              value={newPersona}
+              onChange={(e) => setNewPersona(e.target.value)}
+              placeholder="Describe your persona"
               className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
               disabled={isLoading}
             />

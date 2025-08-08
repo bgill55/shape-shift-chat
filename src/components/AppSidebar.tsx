@@ -38,6 +38,7 @@ interface AppSidebarProps {
   onDeleteChatbot: (chatbotId: string) => void;
   markOnboardingAsSeen: () => void;
   clearMessages: () => void;
+  onClose: () => void;
 }
 
 export function AppSidebar({
@@ -52,7 +53,8 @@ export function AppSidebar({
   onDeleteChat,
   onDeleteChatbot,
   markOnboardingAsSeen,
-  clearMessages
+  clearMessages,
+  onClose
 }: AppSidebarProps) {
   const { open } = useSidebar();
   const { user } = useAuth();
@@ -93,7 +95,7 @@ export function AppSidebar({
                 <li key={chatbot.id} className="flex justify-between items-center group">
                   <Button
                     variant="ghost"
-                    onClick={() => { onSelectSingleChatbot(chatbot); onClose(); }}
+                    onClick={() => { onSelectSingleChatbot(chatbot); onClose && onClose(); }}
                     className={`flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] ${
                       selectedChatbots.length === 1 && isChatbotSelected(chatbot) 
                         ? 'bg-purple-700/80 shadow-md text-[rgb(var(--fg))]' 
@@ -189,7 +191,7 @@ export function AppSidebar({
                   <li key={chat.id} className="flex justify-between items-center group">
                     <Button
                       variant="ghost"
-                      onClick={() => { onLoadChat(chat); clearMessages(); onClose(); }}
+                      onClick={() => { onLoadChat(chat); clearMessages(); onClose && onClose(); }}
                       className="flex-grow justify-start text-left px-2 py-1 rounded hover:bg-[var(--color-sidebar-item-hover)] text-[rgb(var(--fg))]"
                     >
                       <span className="truncate">{chat.title}</span>

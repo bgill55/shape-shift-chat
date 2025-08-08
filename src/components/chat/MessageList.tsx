@@ -38,7 +38,7 @@ export function MessageList({
   const { user, displayName } = useAuth();
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
   };
 
   useEffect(() => {
@@ -146,15 +146,22 @@ export function MessageList({
                 }`}
               >
                 <div className="absolute top-2 right-2 z-10">
-                  <MessageActions
-                    messageId={message.id}
-                    isBot={message.sender === 'bot'}
-                    onEdit={handleEdit}
-                    onDelete={onDeleteMessage}
-                    onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
-                    apiKey={apiKey}
-                    chatbot={message.chatbotId ? selectedChatbots.find(bot => bot.id === message.chatbotId) : (selectedChatbots.length > 0 ? selectedChatbots[0] : undefined)}
-                  />
+                  {(() => {
+                    const currentChatbot = message.chatbotId
+                      ? selectedChatbots.find(bot => bot.id === message.chatbotId)
+                      : (selectedChatbots.length > 0 ? selectedChatbots[0] : undefined);
+                    return (
+                      <MessageActions
+                        messageId={message.id}
+                        isBot={message.sender === 'bot'}
+                        onEdit={handleEdit}
+                        onDelete={onDeleteMessage}
+                        onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
+                        apiKey={apiKey}
+                        chatbot={currentChatbot}
+                      />
+                    );
+                  })()}
                 </div>
                 <div className="pr-8 overflow-hidden">
                   {message.sender === 'bot' && selectedChatbots.length > 1 && (

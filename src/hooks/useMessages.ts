@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
@@ -20,8 +21,16 @@ export function useMessages() {
     ));
   }, []);
 
-  const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: any, currentChatHistory: Message[]) => {
+  
+  
+
+  const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: string, currentChatHistory: Message[], imageFile: File | null = null) => {
+''
+    
+    
+
     setIsLoading(true);
+
     try {
       const shapeUsername = selectedChatbot.url.split('/').pop() || selectedChatbot.name.toLowerCase().replace(/\s+/g, '-');
       
@@ -39,7 +48,7 @@ export function useMessages() {
         headers['Authorization'] = `Bearer ${apiKey}`;
       }
       
-      const messagesForApi = [
+      let messagesForApi: any[] = [
         { role: "system", content: `You are a helpful assistant. Respond to the user's message in a conversational manner. Keep your response concise and relevant. Do not simply echo the user's input; generate a new and distinct reply.` },
         ...currentChatHistory.map(msg => ({
           role: msg.sender === 'user' ? 'user' : 'assistant',
@@ -47,9 +56,31 @@ export function useMessages() {
         }))
       ];
 
-      if (typeof messageContent === 'string') {
-        messagesForApi.push({ role: "user", content: messageContent });
-      } else if (Array.isArray(messageContent)) {
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        await new Promise<void>((resolve, reject) => {
+          reader.onload = () => {
+            const base64DataUri = reader.result as string;
+            const userMessageContent: any[] = [];
+            if (messageContent) {
+              userMessageContent.push({ type: "text", text: messageContent });
+            }
+            userMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
+            messagesForApi.push({ role: "user", content: userMessageContent });
+            resolve();
+          };
+          reader.onerror = (error) => {
+            console.error("Error reading image file:", error);
+            toast({
+              title: "Image Upload Error",
+              description: "Failed to read the selected image file.",
+              variant: "destructive"
+            });
+            reject(error);
+          };
+        });
+      } else {
         messagesForApi.push({ role: "user", content: messageContent });
       }
 
@@ -67,9 +98,23 @@ export function useMessages() {
       }
 
       const data = await response.json();
+      const botMessageContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
+      
+      let cleanedContent = botMessageContent;
+      const debugMarker1 = '\n\n*Debug Information*';
+      const debugMarker2 = '* - ID:';
+      let debugIndex = cleanedContent.indexOf(debugMarker1);
+      if (debugIndex === -1) {
+        debugIndex = cleanedContent.indexOf(debugMarker2);
+      }
+
+      if (debugIndex !== -1) {
+        cleanedContent = cleanedContent.substring(0, debugIndex).trim();
+      }
+
       const botMessage: Message = {
         id: (Date.now() + Math.random()).toString(),
-        content: data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response.",
+        content: cleanedContent,
         sender: 'bot',
         timestamp: new Date(),
         botName: selectedChatbot.name,
@@ -142,7 +187,7 @@ export function useMessages() {
           }
           apiMessageContent.push({ type: "image_url", image_url: { url: base64DataUri } });
           
-          const botResponse = await performApiCall(apiKey, chatbot, apiMessageContent, currentChatHistory);
+          const botResponse = await performApiCall(apiKey, chatbot, textInput, currentChatHistory, imageFile);
           if (botResponse) {
             currentChatHistory = [...currentChatHistory, botResponse];
             lastBotMessage = botResponse;
@@ -157,7 +202,7 @@ export function useMessages() {
         };
         reader.readAsDataURL(imageFile);
       } else {
-        const botResponse = await performApiCall(apiKey, chatbot, apiMessageContent, currentChatHistory);
+        const botResponse = await performApiCall(apiKey, chatbot, textInput, currentChatHistory, null);
         if (botResponse) {
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
@@ -228,7 +273,7 @@ export function useMessages() {
     
     setMessages(prev => prev.filter(msg => msg.id !== messageId));
     
-    await performApiCall(apiKey, selectedChatbot, lastUserMessage.content, messages);
+    await performApiCall(apiKey, selectedChatbot, lastUserMessage.content, messages, lastUserMessage.imageUrl ? { name: 'image', type: 'image/png', size: 0 } as File : null);
     
     toast({
       title: "Message Regenerated",

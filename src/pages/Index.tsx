@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from '@/components/AppSidebar';
 import { ChatArea } from '@/components/ChatArea';
 import { AddShapeModal } from '@/components/AddShapeModal';
@@ -29,6 +29,7 @@ const Index = () => {
   const isMobile = useIsMobile();
   const { savedChats, loadSavedChats, loadChat, setCurrentChatId, currentChatId, deleteChat } = useChatPersistence();
   const { clearMessages } = useMessages();
+  const { onClose: closeSidebar } = useSidebar();
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
 
   useEffect(() => {
@@ -168,6 +169,7 @@ const Index = () => {
             onDeleteChatbot={handleDeleteChatbot}
             markOnboardingAsSeen={markOnboardingAsSeen}
             clearMessages={clearMessages}
+            onClose={closeSidebar}
           />
           
           {/* Main content area with responsive margins */}

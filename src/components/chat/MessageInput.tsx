@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { Send, Lightbulb, Wand2, Save, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,8 @@ import { useSuggestedResponses } from '../../hooks/useSuggestedResponses';
 import { CommandToolbar } from './CommandToolbar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { generateUUID } from '@/lib/utils';
+import { handleCommand } from '@/lib/commandHandler';
+
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
@@ -63,7 +64,16 @@ export function MessageInput({
     setInputValue('');
     handleRemoveSelectedImage();
 
-    onSendMessage(userMessage, currentImageFile, currentInput);
+    if (currentInput.startsWith('!info') || currentInput.startsWith('!web')) {
+      const [command, ...args] = currentInput.split(' ');
+      const commandArgs = args.join(' ');
+      onSendMessage(userMessage, null, currentInput); // Display user's command immediately
+      
+      const botMessage = await handleCommand(command, commandArgs);
+      onSendMessage(botMessage, null, botMessage.content); // Display bot's response when ready
+    } else {
+      onSendMessage(userMessage, currentImageFile, currentInput);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -73,9 +83,11 @@ export function MessageInput({
     }
   };
 
-  const handleCommand = (command: string) => {
+  const handleToolbarCommand = (command: string) => {
     if (command === '!imagine') {
       setInputValue('!imagine ');
+    } else if (command === '!web') {
+      setInputValue('!web ');
     } else {
       setInputValue(command);
     }
@@ -101,7 +113,7 @@ export function MessageInput({
         </div>
       ) : null}
 
-      {showCommands && <CommandToolbar onCommand={handleCommand} />}
+      {showCommands && <CommandToolbar onCommand={handleToolbarCommand} />}
 
       {showSuggestions && (
         <div
@@ -155,7 +167,7 @@ export function MessageInput({
               setShowSuggestions(newShowSuggestions);
               if (newShowSuggestions) {
                 const primaryChatbot = selectedChatbots && selectedChatbots.length > 0 ? selectedChatbots[0] : undefined;
-                fetchSuggestions(chatHistory, primaryChatbot);
+                fetchSuggestions(chatHistory, primaryChatbot?.id, primaryChatbot?.name);
               }
             }}
             disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}

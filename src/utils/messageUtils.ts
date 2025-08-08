@@ -11,9 +11,10 @@ export const isImageUrl = (content: string): string | null => {
   return match ? match[0] : null;
 };
 
-export const parseInnerThoughts = (text: string) => {
+  
+  export const parseInnerThoughts = (text: string) => {
   const parts: Array<{ text: string; isInnerThought: boolean }> = [];
-  const regex = /(\*[^*]+\*)/g;
+  const regex = /(\*[^\*]+\*)/g;
   let lastIndex = 0;
   let match;
 

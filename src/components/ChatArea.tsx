@@ -1,3 +1,4 @@
+
 import { useMemo, useEffect } from 'react';
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
@@ -7,6 +8,8 @@ import { useMessages } from '@/hooks/useMessages';
 import { useChatPersistence } from '@/hooks/useChatPersistence';
 import { Message } from '@/types/message';
 import { useToast } from '@/hooks/use-toast';
+import { handleCommand } from '@/lib/commandHandler';
+
 
 export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentChatId }: ChatAreaProps) {
   const { 
@@ -52,7 +55,9 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     }
   }, [messages, selectedChatbots, autoSaveChat]);
 
-  const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
+  
+
+const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     addMessage(userMessage);
     if (selectedChatbots.length === 1) {
       await performApiCall(apiKey, selectedChatbots[0], textInput, messages, imageFile);
