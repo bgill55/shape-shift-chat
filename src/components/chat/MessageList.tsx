@@ -9,8 +9,9 @@ import { MessageActions } from './MessageActions';
 import { EditableMessage } from './EditableMessage';
 import { ScrollArea } from '../ui/scroll-area';
 import { Skeleton } from '../ui/skeleton';
-import { Bot } from 'lucide-react';
+import { Bot, Share2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMessages } from '@/hooks/useMessages';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getChatbotIcon } from '@/utils/chatbotIcons';
 
@@ -36,6 +37,8 @@ export function MessageList({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const { user, displayName } = useAuth();
+  const { typingUsers } = useMessages();
+  console.log('[MessageList] Rendered with typingUsers:', typingUsers);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -139,10 +142,10 @@ export function MessageList({
                 </div>
               )}
               <div
-                className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-2 rounded-xl relative break-words overflow-wrap-anywhere ${
+                className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-3 rounded-xl relative break-words overflow-wrap-anywhere ${
                   message.sender === 'user'
-                    ? 'bg-[#5865f2] text-[rgb(var(--fg))] rounded-br-none'
-                    : 'bg-[#2f3136] text-[rgb(var(--fg))] border border-[#202225] rounded-bl-none'
+                    ? 'bg-primary text-primary-foreground rounded-br-none'
+                    : 'bg-card text-card-foreground border border-border rounded-bl-none'
                 }`}
               >
                 <div className="absolute top-2 right-2 z-10">
@@ -157,6 +160,14 @@ export function MessageList({
                         onEdit={handleEdit}
                         onDelete={onDeleteMessage}
                         onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
+                        onShareToReddit={() => {
+                          const subreddit = 'ShapesInc';
+                          const title = 'A cool message from Shape Shift';
+                          const text = message.content;
+                          const url = `https://www.reddit.com/r/${subreddit}/submit?title=${encodeURIComponent(title)}&text=${encodeURIComponent(text)}`;
+                          console.log('Generated Reddit URL:', url);
+                          window.open(url, '_blank');
+                        }}
                         apiKey={apiKey}
                         chatbot={currentChatbot}
                       />
@@ -165,7 +176,7 @@ export function MessageList({
                 </div>
                 <div className="pr-8 overflow-hidden">
                   {message.sender === 'bot' && selectedChatbots.length > 1 && (
-                    <div className="flex items-center gap-1 mb-1 text-xs text-[#96989d]">
+                    <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
                       <Bot className="w-3 h-3" aria-hidden="true" />
                       <span>{message.botName || 'Shape Response'}</span>
                     </div>
@@ -180,16 +191,21 @@ export function MessageList({
           ))}
 
           {isLoading && (
-            <li className="flex justify-start" aria-busy="true" aria-live="polite">
-              <div className="flex items-center space-x-2">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-8 w-[200px]" />
+            <li className="flex justify-start">
+              <div className="flex-shrink-0 mr-2">
+                <Skeleton className="w-8 h-8 rounded-full" />
+              </div>
+              <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-xl bg-card text-card-foreground border border-border rounded-bl-none">
+                <Skeleton className="h-4 w-32" />
               </div>
             </li>
           )}
 
           <div ref={messagesEndRef} />
         </ul>
+
+          
+
       </div>
     </ScrollArea>
   );

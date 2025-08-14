@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Send, Lightbulb, Wand2, Save, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,12 +10,13 @@ import { CommandToolbar } from './CommandToolbar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { generateUUID } from '@/lib/utils';
 import { handleCommand } from '@/lib/commandHandler';
+import { useAuth } from '@/contexts/AuthContext';
+import { useMessages } from '@/hooks/useMessages';
 
 
 interface MessageInputProps {
   selectedChatbots: Chatbot[];
   apiKey: string;
-  isLoading: boolean;
   isSaving: boolean;
   onSendMessage: (userMessage: Message, imageFile: File | null, textInput: string) => void;
   onSaveChat: () => void;
@@ -25,7 +26,6 @@ interface MessageInputProps {
 export function MessageInput({
   selectedChatbots,
   apiKey,
-  isLoading,
   isSaving,
   onSendMessage,
   onSaveChat,
@@ -36,29 +36,23 @@ export function MessageInput({
   const [showCommands, setShowCommands] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
-  const {
-    selectedImageFile,
-    imagePreviewUrl,
-    fileInputRef,
-    handleImageUploadButtonClick,
-    handleFileSelected,
-    handleRemoveSelectedImage,
-  } = useImageUpload();
+  const { user, displayName } = useAuth();
+
   const { suggestions, isLoading: suggestionsLoading, error: suggestionsError, fetchSuggestions } = useSuggestedResponses();
+  const { selectedImageFile, imagePreviewUrl, fileInputRef, handleImageUploadButtonClick, handleFileSelected, handleRemoveSelectedImage } = useImageUpload();
 
   const sendMessage = async () => {
     if ((!inputValue.trim() && !selectedImageFile) || selectedChatbots.length === 0 || !apiKey) return;
 
     const currentInput = inputValue;
     const currentImageFile = selectedImageFile;
-    const currentImagePreviewUrl = imagePreviewUrl;
 
     const userMessage: Message = {
       id: generateUUID(),
       content: currentInput,
       sender: 'user',
       timestamp: new Date(),
-      imageUrl: currentImageFile ? currentImagePreviewUrl : undefined,
+      imageUrl: imagePreviewUrl,
     };
 
     setInputValue('');
@@ -117,7 +111,7 @@ export function MessageInput({
 
       {showSuggestions && (
         <div
-          className="mb-2 p-3 border border-cyan-600 rounded text-sm bg-slate-700 text-neutral-300 w-full"
+          className="mb-2 p-3 border border-[rgb(var(--primary))] rounded text-sm bg-[rgb(var(--card))] text-[rgb(var(--fg))] w-full"
           style={{ minHeight: '60px' }}
         >
           {suggestionsLoading ? (
@@ -137,7 +131,7 @@ export function MessageInput({
                     setShowSuggestions(false);
                     inputRef.current?.focus();
                   }}
-                  className="bg-slate-700 hover:bg-slate-600 text-neutral-200 border-cyan-600 text-wrap flex-shrink min-w-0 max-w-full m-1"
+                  className="bg-[rgb(var(--card))] hover:bg-[rgb(var(--muted))] text-[rgb(var(--fg))] border-[rgb(var(--primary))] text-wrap flex-shrink min-w-0 max-w-full m-1"
                 >
                   {suggestion.text}
                 </Button>
@@ -154,7 +148,7 @@ export function MessageInput({
           <Button
             variant="outline"
             onClick={() => setShowCommands(!showCommands)}
-            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+            disabled={!apiKey || selectedChatbots.length === 0}
             className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Toggle command toolbar"
           >
@@ -170,7 +164,7 @@ export function MessageInput({
                 fetchSuggestions(chatHistory, primaryChatbot?.id, primaryChatbot?.name);
               }
             }}
-            disabled={!apiKey || isLoading || selectedChatbots.length === 0 || !chatHistory}
+            disabled={!apiKey || selectedChatbots.length === 0 || !chatHistory}
             className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Toggle suggested responses"
           >
@@ -179,7 +173,7 @@ export function MessageInput({
           <Button
             variant="outline"
             onClick={handleImageUploadButtonClick}
-            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+            disabled={!apiKey || selectedChatbots.length === 0}
             className="p-2 bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-[#202225] hover:bg-[#202225] hover:text-[rgb(var(--fg))]"
             aria-label="Attach image"
           >
@@ -203,11 +197,11 @@ export function MessageInput({
             placeholder={getPlaceholderText()}
             aria-label="Chat message input"
             className="flex-1 bg-[rgb(var(--card))] border-[#202225] text-[rgb(var(--fg))] placeholder-[#96989d]"
-            disabled={!apiKey || isLoading || selectedChatbots.length === 0}
+            disabled={!apiKey || selectedChatbots.length === 0}
           />
           <Button
             onClick={sendMessage}
-            disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || isLoading || selectedChatbots.length === 0}
+            disabled={(!inputValue.trim() && !selectedImageFile) || !apiKey || selectedChatbots.length === 0}
             className="bg-[#5865f2] hover:bg-[#4752c4] text-[rgb(var(--fg))]"
             aria-label="Send message"
           >

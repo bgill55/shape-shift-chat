@@ -24,7 +24,7 @@ export function CommandToolbar({ onCommand }: CommandToolbarProps) {
           variant="outline"
           size="sm"
           onClick={() => onCommand(command.label)}
-          className="bg-[rgb(var(--card))] hover:bg-[rgb(var(--card))] text-[rgb(var(--fg))] border-cyan-600 text-xs whitespace-nowrap"
+          className="bg-[rgb(var(--card))] hover:bg-[rgb(var(--muted))] text-[rgb(var(--fg))] border-[rgb(var(--primary))] text-xs whitespace-nowrap"
           title={command.description}
           aria-label={command.description}
         >

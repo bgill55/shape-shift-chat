@@ -1,5 +1,5 @@
 
-import { MoreHorizontal, Edit, Trash2, RotateCcw } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, RotateCcw, Share2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ interface MessageActionsProps {
   onEdit: (messageId: string) => void;
   onDelete: (messageId: string) => void;
   onRegenerate?: (messageId: string, apiKey: string, selectedChatbot: Chatbot) => void;
+  onShareToReddit: () => void;
   apiKey: string;
   chatbot?: Chatbot; // Make chatbot optional
 }
@@ -24,6 +25,7 @@ export function MessageActions({
   onEdit, 
   onDelete, 
   onRegenerate, 
+  onShareToReddit,
   apiKey, 
   chatbot 
 }: MessageActionsProps) {
@@ -35,6 +37,10 @@ export function MessageActions({
           </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-36 bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))]">
+        <DropdownMenuItem onClick={onShareToReddit} className="cursor-pointer">
+          <Share2 className="mr-2 h-3 w-3" />
+          Share
+        </DropdownMenuItem>
         {isBot && onRegenerate && chatbot && (
           <DropdownMenuItem onClick={() => onRegenerate(messageId, apiKey, chatbot)} className="cursor-pointer">
             <RotateCcw className="mr-2 h-3 w-3" />

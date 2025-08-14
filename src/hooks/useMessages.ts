@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
@@ -21,16 +20,8 @@ export function useMessages() {
     ));
   }, []);
 
-  
-  
-
   const performApiCall = useCallback(async (apiKey: string, selectedChatbot: Chatbot, messageContent: string, currentChatHistory: Message[], imageFile: File | null = null) => {
-''
-    
-    
-
     setIsLoading(true);
-
     try {
       const shapeUsername = selectedChatbot.url.split('/').pop() || selectedChatbot.name.toLowerCase().replace(/\s+/g, '-');
       
@@ -120,14 +111,13 @@ export function useMessages() {
         botName: selectedChatbot.name,
         chatbotId: selectedChatbot.id // Add chatbotId here
       };
-      setMessages(prev => [...prev, botMessage]);
       return botMessage;
     } catch (error) {
       console.error('Error calling Shapes API:', error);
       const errorMessageContent = error instanceof Error ? error.message : "Sorry, I encountered an error while processing your message.";
       const errorBotMessage: Message = {
         id: (Date.now() + Math.random()).toString(),
-        content: `Error from ${selectedChatbot.name}: ${errorMessageContent}. Please check your API key and try again.`,
+        content: `Error from ${selectedChatbot.name}: ${errorMessageContent}. Please check your API key and try again.`, 
         sender: 'bot',
         timestamp: new Date(),
         botName: selectedChatbot.name,
@@ -266,14 +256,31 @@ export function useMessages() {
     const messageIndex = messages.findIndex(msg => msg.id === messageId);
     if (messageIndex === -1) return;
 
-    const userMessages = messages.slice(0, messageIndex).filter(msg => msg.sender === 'user');
-    if (userMessages.length === 0) return;
+    const messageToRegenerate = messages[messageIndex];
+    if (messageToRegenerate.sender !== 'bot') return; // Only regenerate bot messages
 
-    const lastUserMessage = userMessages[userMessages.length - 1];
+    const userMessageIndex = messages.slice(0, messageIndex).reverse().findIndex(msg => msg.sender === 'user');
+    if (userMessageIndex === -1) return; // No preceding user message found
+
+    const lastUserMessage = messages[messageIndex - (userMessageIndex + 1)];
     
+    // Remove the bot's message that is being regenerated
     setMessages(prev => prev.filter(msg => msg.id !== messageId));
+
+    // Get chat history up to the user's message
+    const chatHistoryForRegeneration = messages.slice(0, messageIndex - userMessageIndex - 1);
     
-    await performApiCall(apiKey, selectedChatbot, lastUserMessage.content, messages, lastUserMessage.imageUrl ? { name: 'image', type: 'image/png', size: 0 } as File : null);
+    const botResponse = await performApiCall(
+      apiKey,
+      selectedChatbot,
+      lastUserMessage.content,
+      chatHistoryForRegeneration,
+      lastUserMessage.imageUrl ? { name: 'image', type: 'image/png', size: 0 } as File : null
+    );
+
+    if (botResponse) {
+      setMessages(prev => [...prev, botResponse]);
+    }
     
     toast({
       title: "Message Regenerated",

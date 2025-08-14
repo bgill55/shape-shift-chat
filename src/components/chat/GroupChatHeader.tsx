@@ -10,7 +10,7 @@ export function GroupChatHeader({ selectedChatbots }: GroupChatHeaderProps) {
   const isGroupChat = selectedChatbots.length > 1;
   
   return (
-    <div className="px-4 py-3 bg-[#2f3136] border-b border-[#202225] flex-shrink-0">
+    <div className="px-4 py-3 bg-[#111111] border-b border-[#2f3136] flex-shrink-0">
       <div className="flex items-center gap-3">
         <div className="flex -space-x-2">
           {selectedChatbots.map((chatbot, index) => (

@@ -22,8 +22,9 @@ import { UserMenu } from "@/components/UserMenu";
 import { getChatbotIcon } from '@/utils/chatbotIcons';
 
 import { Chatbot, SavedChat } from '@/pages/Index';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 interface AppSidebarProps {
   chatbots: Chatbot[];
@@ -236,33 +237,25 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[var(--color-sidebar-border)] space-y-3">
-        <div className="flex gap-2 justify-center">
-          {(['light', 'dark', 'oled'] as Theme[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTheme(t)}
-              className={`px-3 py-1 rounded text-sm capitalize border
-                ${theme === t
-                  ? 'bg-blue-500 text-[rgb(var(--fg))] border-blue-500'
-                  : 'border-[rgb(var(--border))] hover:bg-[rgb(var(--card))]'
-                }`}
+        <Card className="bg-transparent border-0 shadow-none">
+          <CardHeader className="p-2">
+            <CardTitle className="text-lg">Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="p-2 space-y-4">
+            <div className="flex flex-col space-y-2">
+              <span className="text-sm font-medium text-muted-foreground">Theme</span>
+              <ThemeSwitcher />
+            </div>
+            <Button 
+              onClick={onOpenApiConfig}
+              variant="ghost"
+              className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
             >
-              {t}
-            </button>
-          ))}
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <SidebarMenuButton 
-            onClick={onOpenApiConfig}
-            variant="outline"
-            className="flex-grow justify-start text-left px-2 py-2 rounded hover:bg-blue-700 text-[rgb(var(--fg))] border border-[var(--color-sidebar-border))]"
-          >
-            <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
-            <span>API Configuration</span>
-          </SidebarMenuButton>
-          
-        </div>
+              <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
+              <span>API Configuration</span>
+            </Button>
+          </CardContent>
+        </Card>
 
         {user && (
           <>

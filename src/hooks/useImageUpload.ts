@@ -6,18 +6,19 @@ export function useImageUpload() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const currentPreviewUrl = imagePreviewUrl;
-    if (!selectedImageFile && currentPreviewUrl) {
-      URL.revokeObjectURL(currentPreviewUrl);
+    if (!selectedImageFile && imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
       setImagePreviewUrl(null);
     }
-    
+  }, [selectedImageFile, imagePreviewUrl]);
+
+  useEffect(() => {
     return () => {
-      if (currentPreviewUrl) {
-        URL.revokeObjectURL(currentPreviewUrl);
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
       }
     };
-  }, [selectedImageFile, imagePreviewUrl]);
+  }, [imagePreviewUrl]);
 
   const handleImageUploadButtonClick = () => {
     fileInputRef.current?.click();
@@ -25,15 +26,15 @@ export function useImageUpload() {
 
   const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
     if (file) {
       setSelectedImageFile(file);
       const newPreviewUrl = URL.createObjectURL(file);
       setImagePreviewUrl(newPreviewUrl);
     } else {
       setSelectedImageFile(null);
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
       setImagePreviewUrl(null);
     }
     event.target.value = '';

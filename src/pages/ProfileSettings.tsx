@@ -12,7 +12,8 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom'; // Added
+import { Textarea } from '@/components/ui/textarea';
+import { useNavigate } from 'react-router-dom';
 
 export function ProfileSettings() {
   const { user, displayName, persona, updateDisplayName, updatePersona } = useAuth();
@@ -110,13 +111,13 @@ export function ProfileSettings() {
   return (
     <div className="flex justify-center items-start pt-10 min-h-screen bg-background text-foreground">
       <Card className="w-full max-w-md shadow-lg bg-card text-card-foreground border-border">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl text-card-foreground">Profile Settings</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Manage your display name. This name will be visible to others.
+            Manage your display name and persona.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 pt-6">
+        <CardContent className="space-y-4 pt-4">
           <div className="space-y-2">
             <Label htmlFor="displayName" className="text-foreground">Display Name</Label>
             <Input
@@ -131,19 +132,18 @@ export function ProfileSettings() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="persona" className="text-foreground">Persona</Label>
-            <Input
+            <Textarea
               id="persona"
-              type="text"
               value={newPersona}
               onChange={(e) => setNewPersona(e.target.value)}
-              placeholder="Describe your persona"
-              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
+              placeholder="Describe your persona in a few sentences..."
+              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring min-h-[100px]"
               disabled={isLoading}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pt-4">
           <Button
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 border border-primary"
             onClick={handleSaveChanges}

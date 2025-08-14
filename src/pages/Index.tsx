@@ -147,7 +147,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--fg))]">
       <SidebarProvider defaultOpen={false}>
         <div className="min-h-screen flex w-full relative">
           {/* Mobile Header */}
@@ -173,7 +173,7 @@ const Index = () => {
           />
           
           {/* Main content area with responsive margins */}
-          <div className={`flex-1 flex flex-col ${isMobile ? 'pt-16' : 'md:ml-64'}`}>
+          <div className={`flex-1 flex flex-col ${isMobile ? 'pt-16' : 'md:ml-64'} bg-[rgb(var(--bg))]`}>
             <ChatArea 
               selectedChatbots={selectedChatbots}
               apiKey={apiKey}

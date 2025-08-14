@@ -1,3 +1,32 @@
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--scrollbar-track));
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--scrollbar-thumb));
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--scrollbar-thumb), 0.7);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,6 +42,11 @@
     --color-sidebar-bg: 248 250 252;
     --muted: 203 213 225;
     --muted-foreground: 148 163 184;
+    --tiffany-blue: 0 150 145;
+    --primary: var(--tiffany-blue);
+    --primary-foreground: 255 255 255;
+    --scrollbar-thumb: 203 213 225;
+    --scrollbar-track: 248 250 252;
   }
 
   .dark {
@@ -24,6 +58,10 @@
     --color-sidebar-bg: 30 41 59;
     --muted: 30 41 59;
     --muted-foreground: 148 163 184;
+    --primary: 0 170 165;
+    --primary-foreground: 255 255 255;
+    --scrollbar-thumb: 51 65 85;
+    --scrollbar-track: 30 41 59;
   }
 
   .oled {
@@ -35,6 +73,68 @@
     --color-sidebar-bg: 10 10 10;
     --muted: 38 38 38;
     --muted-foreground: 148 163 184;
+    --scrollbar-thumb: 38 38 38;
+    --scrollbar-track: 10 10 10;
+  }
+
+  .matrix {
+    /* Matrix theme */
+    --bg: 0 0 0;
+    --fg: 0 255 0;
+    --card: 0 20 0;
+    --border: 0 40 0;
+    --color-sidebar-bg: 0 20 0;
+    --muted: 0 40 0;
+    --muted-foreground: 0 150 0;
+    --primary: 0 255 0;
+    --primary-foreground: 0 0 0;
+    --scrollbar-thumb: 0 150 0;
+    --scrollbar-track: 0 20 0;
+  }
+
+  .forest-dark {
+    /* Forest Dark theme */
+    --bg: 20 30 20;
+    --fg: 210 235 210;
+    --card: 15 25 15;
+    --border: 30 50 30;
+    --color-sidebar-bg: 15 25 15;
+    --muted: 30 50 30;
+    --muted-foreground: 120 180 120;
+    --primary: 60 140 60;
+    --primary-foreground: 255 255 255;
+    --scrollbar-thumb: 30 50 30;
+    --scrollbar-track: 15 25 15;
+  }
+
+  .forest {
+    /* Forest theme */
+    --bg: 235 245 235;
+    --fg: 20 60 20;
+    --card: 210 235 210;
+    --border: 180 215 180;
+    --color-sidebar-bg: 210 235 210;
+    --muted: 180 215 180;
+    --muted-foreground: 90 150 90;
+    --primary: 40 120 40;
+    --primary-foreground: 255 255 255;
+    --scrollbar-thumb: 180 215 180;
+    --scrollbar-track: 210 235 210;
+  }
+
+  .crimson {
+    /* Crimson theme */
+    --bg: 17 17 17;
+    --fg: 220 220 220;
+    --card: 17 17 17;
+    --border: 94 0 8;
+    --color-sidebar-bg: 17 17 17;
+    --muted: 94 0 8;
+    --muted-foreground: 150 150 150;
+    --primary: 94 0 8;
+    --primary-foreground: 255 255 255;
+    --scrollbar-thumb: 94 0 8;
+    --scrollbar-track: 17 17 17;
   }
 
   body {

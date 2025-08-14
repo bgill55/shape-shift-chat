@@ -14,7 +14,7 @@ import { handleCommand } from '@/lib/commandHandler';
 export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentChatId }: ChatAreaProps) {
   const { 
     messages, 
-    isLoading, 
+    isLoading,
     addMessage, 
     updateMessage, 
     performApiCall,
@@ -58,11 +58,15 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   
 
 const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
+    const updatedMessages = [...messages, userMessage];
     addMessage(userMessage);
     if (selectedChatbots.length === 1) {
-      await performApiCall(apiKey, selectedChatbots[0], textInput, messages, imageFile);
+      const botMessage = await performApiCall(apiKey, selectedChatbots[0], textInput, updatedMessages, imageFile);
+      if (botMessage) {
+        addMessage(botMessage);
+      }
     } else {
-      await handleGroupChatResponse(apiKey, selectedChatbots, userMessage, imageFile, textInput, messages);
+      await handleGroupChatResponse(apiKey, selectedChatbots, userMessage, imageFile, textInput, updatedMessages);
     }
   };
 
@@ -104,14 +108,14 @@ const handleSendMessage = async (userMessage: Message, imageFile: File | null, t
 
       <div className="flex-shrink-0 p-2 border-t border-border">
         <MessageInput 
-          selectedChatbots={selectedChatbots}
-          apiKey={apiKey}
-          isLoading={isLoading}
-          isSaving={isSaving}
-          onSendMessage={handleSendMessage}
-          onSaveChat={() => saveChat(selectedChatbots[0], messages)}
-          chatHistory={messages}
-        />
+            key={propCurrentChatId || selectedChatbots.map(c => c.id).join('-')}
+            selectedChatbots={selectedChatbots}
+            apiKey={apiKey}
+            isSaving={isSaving}
+            onSendMessage={handleSendMessage}
+            onSaveChat={() => saveChat(selectedChatbots[0], messages)}
+            chatHistory={messages}
+          />
       </div>
     </div>
   );

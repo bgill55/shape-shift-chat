@@ -56,22 +56,17 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))] max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-[rgb(var(--fg))]">Add New Shape</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-2xl font-semibold text-card-foreground">Add New Shape</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Enter a Shape's vanity URL to add it to your collection. Example: https://shapes.inc/jarvis-dev
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4">
-          <p className="text-[#96989d] text-sm mb-4">
-            Enter a Shape's vanity URL to add it to your collection. Example: 
-            https://shapes.inc/jarvis-dev
-          </p>
-
+        <div className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="shape-url" className="block text-sm font-medium mb-2">
+              <label htmlFor="shape-url" className="block text-sm font-medium mb-2 text-foreground">
                 Shape URL
               </label>
               <Input
@@ -80,13 +75,13 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://shapes.inc/shape-name"
-                className="bg-[#40444b] border-[#202225] text-[rgb(var(--fg))] placeholder-[#96989d]"
+                className="bg-input border-border text-foreground placeholder-muted-foreground"
                 disabled={showSuccess}
               />
             </div>
 
             {showSuccess && (
-              <div className="text-[#43b581] text-center font-medium">
+              <div className="text-green-500 text-center font-medium">
                 Shape added successfully!
               </div>
             )}
@@ -94,7 +89,7 @@ export function AddShapeModal({ isOpen, onClose, onAddShape }: AddShapeModalProp
             {!showSuccess && (
               <Button
                 type="submit"
-                className="w-full bg-[#5865f2] hover:bg-[#4752c4] text-[rgb(var(--fg))]"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Add Shape
               </Button>
