@@ -29,3 +29,4 @@ acc.fixes
 # Local Netlify folder
 .netlify
 pwa-install/
+src/env.ts
