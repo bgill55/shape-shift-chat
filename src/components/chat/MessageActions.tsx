@@ -1,5 +1,5 @@
 
-import { MoreHorizontal, Edit, Trash2, RotateCcw, Share2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, RotateCcw, Share2, Reply } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Chatbot } from '@/pages/Index';
 
 interface MessageActionsProps {
   messageId: string;
@@ -17,6 +18,7 @@ interface MessageActionsProps {
   onShareToReddit: () => void;
   apiKey: string;
   chatbot?: Chatbot; // Make chatbot optional
+  onReply: (messageId: string) => void; // New prop
 }
 
 export function MessageActions({ 
@@ -27,7 +29,8 @@ export function MessageActions({
   onRegenerate, 
   onShareToReddit,
   apiKey, 
-  chatbot 
+  chatbot,
+  onReply // New prop
 }: MessageActionsProps) {
   return (
     <DropdownMenu>
@@ -37,6 +40,10 @@ export function MessageActions({
           </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-36 bg-[rgb(var(--card))] border-[rgb(var(--border))] text-[rgb(var(--fg))]">
+        <DropdownMenuItem onClick={() => onReply(messageId)} className="cursor-pointer">
+          <Reply className="mr-2 h-3 w-3" />
+          Reply
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={onShareToReddit} className="cursor-pointer">
           <Share2 className="mr-2 h-3 w-3" />
           Share

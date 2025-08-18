@@ -21,6 +21,8 @@ interface MessageInputProps {
   onSendMessage: (userMessage: Message, imageFile: File | null, textInput: string) => void;
   onSaveChat: () => void;
   chatHistory: Message[];
+  replyingToMessageId?: string | null; // New prop for threading
+  onCancelReply: () => void; // New prop for threading
 }
 
 export function MessageInput({
@@ -30,6 +32,8 @@ export function MessageInput({
   onSendMessage,
   onSaveChat,
   chatHistory,
+  replyingToMessageId, // New prop
+  onCancelReply, // New prop
 }: MessageInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -37,6 +41,10 @@ export function MessageInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useIsMobile();
   const { user, displayName } = useAuth();
+
+  const parentMessage = replyingToMessageId
+    ? chatHistory.find(msg => msg.id === replyingToMessageId)
+    : undefined;
 
   const { suggestions, isLoading: suggestionsLoading, error: suggestionsError, fetchSuggestions } = useSuggestedResponses();
   const { selectedImageFile, imagePreviewUrl, fileInputRef, handleImageUploadButtonClick, handleFileSelected, handleRemoveSelectedImage } = useImageUpload();
@@ -53,10 +61,12 @@ export function MessageInput({
       sender: 'user',
       timestamp: new Date(),
       imageUrl: imagePreviewUrl,
+      parent_message_id: replyingToMessageId || undefined, // Add this line
     };
 
     setInputValue('');
     handleRemoveSelectedImage();
+    onCancelReply(); // Clear reply state after sending
 
     if (currentInput.startsWith('!info') || currentInput.startsWith('!web')) {
       const [command, ...args] = currentInput.split(' ');
@@ -108,6 +118,17 @@ export function MessageInput({
       ) : null}
 
       {showCommands && <CommandToolbar onCommand={handleToolbarCommand} />}
+
+      {replyingToMessageId && parentMessage && (
+        <div className="mb-2 p-3 border border-[rgb(var(--primary))] rounded text-sm bg-[rgb(var(--card))] text-[rgb(var(--fg))] w-full flex items-center justify-between">
+          <div className="flex-grow">
+            Replying to: <span className="font-medium">"{parentMessage.content.substring(0, 50)}..."</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onCancelReply} className="text-red-500 hover:text-red-700 p-1">
+            X
+          </Button>
+        </div>
+      )}
 
       {showSuggestions && (
         <div

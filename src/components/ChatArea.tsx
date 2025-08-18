@@ -1,5 +1,5 @@
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Chatbot } from '@/pages/Index';
 import { GroupChatHeader } from './chat/GroupChatHeader';
 import { MessageList } from './chat/MessageList';
@@ -37,6 +37,7 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
   } = useChatPersistence();
 
   const { toast } = useToast();
+  const [replyingToMessageId, setReplyingToMessageId] = useState<string | null>(null); // New state for threading
 
   useEffect(() => {
     if (propCurrentChatId) {
@@ -55,7 +56,13 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     }
   }, [messages, selectedChatbots, autoSaveChat]);
 
-  
+  const handleReply = (messageId: string) => {
+    setReplyingToMessageId(messageId);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingToMessageId(null);
+  };
 
 const handleSendMessage = async (userMessage: Message, imageFile: File | null, textInput: string) => {
     const updatedMessages = [...messages, userMessage];
@@ -102,6 +109,7 @@ const handleSendMessage = async (userMessage: Message, imageFile: File | null, t
             onRegenerateMessage={regenerateMessage}
             selectedChatbots={selectedChatbots}
             apiKey={apiKey}
+            onReply={handleReply}
           />
         </div>
       </div>
@@ -115,6 +123,8 @@ const handleSendMessage = async (userMessage: Message, imageFile: File | null, t
             onSendMessage={handleSendMessage}
             onSaveChat={() => saveChat(selectedChatbots[0], messages)}
             chatHistory={messages}
+            replyingToMessageId={replyingToMessageId}
+            onCancelReply={handleCancelReply}
           />
       </div>
     </div>

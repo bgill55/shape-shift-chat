@@ -23,6 +23,7 @@ interface MessageListProps {
   onRegenerateMessage: (messageId: string, apiKey: string, selectedChatbot: Chatbot) => void;
   selectedChatbots: Chatbot[];
   apiKey: string;
+  onReply: (messageId: string) => void; // New prop for threading
 }
 
 export function MessageList({
@@ -32,10 +33,12 @@ export function MessageList({
   onDeleteMessage,
   onRegenerateMessage,
   selectedChatbots,
-  apiKey
+  apiKey,
+  onReply // New prop
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [replyingToMessageId, setReplyingToMessageId] = useState<string | null>(null); // New state for threading
   const { user, displayName } = useAuth();
   const { typingUsers } = useMessages();
   console.log('[MessageList] Rendered with typingUsers:', typingUsers);
@@ -59,6 +62,11 @@ export function MessageList({
 
   const handleCancelEdit = () => {
     setEditingMessageId(null);
+  };
+
+  const handleReply = (messageId: string) => {
+    setReplyingToMessageId(messageId);
+    onReply(messageId);
   };
 
   const renderMessageContent = (message: Message) => {
@@ -113,82 +121,94 @@ export function MessageList({
     <ScrollArea className="h-full p-4">
       <div className="space-y-4">
         <ul aria-live="polite" aria-atomic="false">
-          {messages.map((message) => (
-            <li
-              key={message.id}
-              className={`flex group mb-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.sender === 'bot' && (
-                <div className="flex-shrink-0 mr-2">
-                  {message.chatbotId && (
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getChatbotIcon(message.chatbotId).color}`}>
-                      <div className="w-5 h-5 text-[rgb(var(--fg))]" aria-hidden="true">
-                        {getChatbotIcon(message.chatbotId).shape}
-                      </div>
-                    </div>
-                  )}
-                  {!message.chatbotId && (
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-500">
-                      <Bot className="w-5 h-5 text-[rgb(var(--fg))]" />
-                    </div>
-                  )}
-                </div>
-              )}
-              {message.sender === 'user' && user && (
-                <div className="flex-shrink-0 ml-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{displayName ? displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : ''}</AvatarFallback>
-                  </Avatar>
-                </div>
-              )}
-              <div
-                className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-3 rounded-xl relative break-words overflow-wrap-anywhere ${
-                  message.sender === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-none'
-                    : 'bg-card text-card-foreground border border-border rounded-bl-none'
-                }`}
+          {messages.map((message) => {
+            const isReply = !!message.parent_message_id;
+            const findMessageById = (id: string) => messages.find(msg => msg.id === id);
+            const parentMessage = isReply ? findMessageById(message.parent_message_id!) : undefined;
+
+            return (
+              <li
+                key={message.id}
+                className={`flex group mb-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${isReply ? 'ml-8' : ''}`}
               >
-                <div className="absolute top-2 right-2 z-10">
-                  {(() => {
-                    const currentChatbot = message.chatbotId
-                      ? selectedChatbots.find(bot => bot.id === message.chatbotId)
-                      : (selectedChatbots.length > 0 ? selectedChatbots[0] : undefined);
-                    return (
-                      <MessageActions
-                        messageId={message.id}
-                        isBot={message.sender === 'bot'}
-                        onEdit={handleEdit}
-                        onDelete={onDeleteMessage}
-                        onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
-                        onShareToReddit={() => {
-                          const subreddit = 'ShapesInc';
-                          const title = 'A cool message from Shape Shift';
-                          const text = message.content;
-                          const url = `https://www.reddit.com/r/${subreddit}/submit?title=${encodeURIComponent(title)}&text=${encodeURIComponent(text)}`;
-                          console.log('Generated Reddit URL:', url);
-                          window.open(url, '_blank');
-                        }}
-                        apiKey={apiKey}
-                        chatbot={currentChatbot}
-                      />
-                    );
-                  })()}
+                {message.sender === 'bot' && (
+                  <div className="flex-shrink-0 mr-2">
+                    {message.chatbotId && (
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getChatbotIcon(message.chatbotId).color}`}>
+                        <div className="w-5 h-5 text-[rgb(var(--fg))]" aria-hidden="true">
+                          {getChatbotIcon(message.chatbotId).shape}
+                        </div>
+                      </div>
+                    )}
+                    {!message.chatbotId && (
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-500">
+                        <Bot className="w-5 h-5 text-[rgb(var(--fg))]" />
+                      </div>
+                    )}
+                  </div>
+                )}
+                {message.sender === 'user' && user && (
+                  <div className="flex-shrink-0 ml-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{displayName ? displayName[0].toUpperCase() : user.email ? user.email[0].toUpperCase() : ''}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+                <div
+                  className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-4 py-3 rounded-xl relative break-words overflow-wrap-anywhere ${
+                    message.sender === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-br-none'
+                      : 'bg-card text-card-foreground border border-border rounded-bl-none'
+                  }`}
+                >
+                  <div className="absolute top-2 right-2 z-10">
+                    {(() => {
+                      const currentChatbot = message.chatbotId
+                        ? selectedChatbots.find(bot => bot.id === message.chatbotId)
+                        : (selectedChatbots.length > 0 ? selectedChatbots[0] : undefined);
+                      return (
+                        <MessageActions
+                          messageId={message.id}
+                          isBot={message.sender === 'bot'}
+                          onEdit={handleEdit}
+                          onDelete={onDeleteMessage}
+                          onRegenerate={message.sender === 'bot' ? onRegenerateMessage : undefined}
+                          onShareToReddit={() => {
+                            const subreddit = 'ShapesInc';
+                            const title = 'A cool message from Shape Shift';
+                            const text = message.content;
+                            const url = `https://www.reddit.com/r/${subreddit}/submit?title=${encodeURIComponent(title)}&text=${encodeURIComponent(text)}`;
+                            console.log('Generated Reddit URL:', url);
+                            window.open(url, '_blank');
+                          }}
+                          apiKey={apiKey}
+                          chatbot={currentChatbot}
+                          onReply={handleReply} // Pass the new prop here
+                        />
+                      );
+                    })()}
+                  </div>
+                  <div className="pr-8 overflow-hidden">
+                    {isReply && parentMessage && (
+                      <div className="text-xs text-muted-foreground mb-1 border-l-2 border-border pl-2">
+                        Replying to: "{parentMessage.content.substring(0, 50)}..."
+                      </div>
+                    )}
+                    {message.sender === 'bot' && selectedChatbots.length > 1 && (
+                      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                        <Bot className="w-3 h-3" aria-hidden="true" />
+                        <span>{message.botName || 'Shape Response'}</span>
+                      </div>
+                    )}
+                    {renderMessageContent(message)}
+                    <p className="text-xs opacity-70 mt-1">
+                      {message.timestamp.toLocaleTimeString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="pr-8 overflow-hidden">
-                  {message.sender === 'bot' && selectedChatbots.length > 1 && (
-                    <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
-                      <Bot className="w-3 h-3" aria-hidden="true" />
-                      <span>{message.botName || 'Shape Response'}</span>
-                    </div>
-                  )}
-                  {renderMessageContent(message)}
-                  <p className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
 
           {isLoading && (
             <li className="flex justify-start">
