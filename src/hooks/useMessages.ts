@@ -92,7 +92,9 @@ export function useMessages() {
       const botMessageContent = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
       
       let cleanedContent = botMessageContent;
-      const debugMarker1 = '\n\n*Debug Information*';
+      const debugMarker1 = `  
+
+*Debug Information*`;
       const debugMarker2 = '* - ID:';
       let debugIndex = cleanedContent.indexOf(debugMarker1);
       if (debugIndex === -1) {

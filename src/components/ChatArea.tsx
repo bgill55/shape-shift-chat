@@ -23,7 +23,8 @@ export function ChatArea({ selectedChatbots, apiKey, currentChatId: propCurrentC
     regenerateMessage,
     loadMessages,
     clearMessages,
-    handleGroupChatResponse
+    handleGroupChatResponse,
+    typingUsers, // New prop from useMessages
   } = useMessages();
   
   const {

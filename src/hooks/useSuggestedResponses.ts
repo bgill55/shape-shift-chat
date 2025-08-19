@@ -78,8 +78,7 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       const model = `shapesinc/${apiModelShapeName}`;
 
       // Construct Prompt
-      const userDisplayNameForPrompt = currentUserDisplayName || 'me';
-      const suggestionPrompt = `You are acting as ${userDisplayNameForPrompt}. Based on the previous conversation, suggest three short, distinct replies that ${userDisplayNameForPrompt} could send next. Each suggestion should be on a new line and be less than 15 words. Make sure it is relevant to current conversation, NSFW is allowed and encouraged.  Do not respond as the assistant. Only provide the three suggestions.`;
+      const suggestionPrompt = `Based on the previous conversation, suggest three short, distinct replies that the user could send next. Each suggestion should be on a new line and be less than 15 words. Make sure it is relevant to the current conversation. NSFW is allowed and encouraged. IMPORTANT: The suggestions MUST be from the perspective of the human user, not the AI assistant or chatbot. Do NOT use phrases like "As an AI...", "I can help with...", or any language that implies you are the chatbot. Only provide the three suggestions, without any introductory or concluding remarks.`;
 
       // Transform chatHistory
       const apiMessages = chatHistory.map(msg => ({
@@ -87,10 +86,6 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
         content: msg.content
       }));
       apiMessages.push({ role: 'user', content: suggestionPrompt });
-
-      console.log("Fetching suggestions with model:", model, "and prompt for user:", userDisplayNameForPrompt);
-      console.log("API Messages being sent:", JSON.stringify(apiMessages, null, 2));
-
 
       // API Call
       const response = await fetch('https://api.shapes.inc/v1/chat/completions', {

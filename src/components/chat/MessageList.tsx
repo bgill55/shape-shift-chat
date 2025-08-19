@@ -24,6 +24,7 @@ interface MessageListProps {
   selectedChatbots: Chatbot[];
   apiKey: string;
   onReply: (messageId: string) => void; // New prop for threading
+  typingUsers: string[]; // New prop for typing indicators
 }
 
 export function MessageList({
@@ -34,14 +35,16 @@ export function MessageList({
   onRegenerateMessage,
   selectedChatbots,
   apiKey,
-  onReply // New prop
+  onReply, // New prop
+  typingUsers = [] // Default to empty array if undefined
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [replyingToMessageId, setReplyingToMessageId] = useState<string | null>(null); // New state for threading
   const { user, displayName } = useAuth();
-  const { typingUsers } = useMessages();
+  // const { typingUsers } = useMessages(); // Removed, now passed as prop
   console.log('[MessageList] Rendered with typingUsers:', typingUsers);
+  console.log('[MessageList] typingUsers prop received:', typingUsers); // New debug log
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
@@ -220,6 +223,32 @@ export function MessageList({
               </div>
             </li>
           )}
+
+          {/* Typing indicators */}
+          {typingUsers.map(chatbotId => {
+            const chatbot = selectedChatbots.find(bot => bot.id === chatbotId);
+            if (!chatbot) return null;
+            const icon = getChatbotIcon(chatbot.id);
+
+            return (
+              <li key={`typing-${chatbotId}`} className="flex justify-start mb-2">
+                <div className="flex-shrink-0 mr-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${icon.color}`}>
+                    <div className="w-5 h-5 text-[rgb(var(--fg))] animate-pulse" aria-hidden="true">
+                      {icon.shape}
+                    </div>
+                  </div>
+                </div>
+                <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-xl bg-card text-card-foreground border border-border rounded-bl-none">
+                  <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                    <Bot className="w-3 h-3" aria-hidden="true" />
+                    <span>{chatbot.name} is typing...</span>
+                  </div>
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </li>
+            );
+          })}
 
           <div ref={messagesEndRef} />
         </ul>

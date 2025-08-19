@@ -30,3 +30,4 @@ acc.fixes
 .netlify
 pwa-install/
 src/env.ts
+dev-dist

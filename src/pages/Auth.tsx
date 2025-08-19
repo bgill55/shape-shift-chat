@@ -15,7 +15,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--bg))] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg bg-card text-card-foreground border-border">
+      <Card className="w-96 h-48 shadow-lg bg-card text-card-foreground border-border">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl text-card-foreground">
             Sign In
