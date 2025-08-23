@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/env';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/env.ts';
 
 const SUPABASE_PUBLISHABLE_KEY = SUPABASE_ANON_KEY;
 
