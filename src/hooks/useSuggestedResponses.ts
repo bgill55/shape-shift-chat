@@ -80,9 +80,9 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       // Construct Prompt
       const suggestionPrompt = `Based on the previous conversation, suggest three short, distinct replies that the user could send next. Each suggestion should be on a new line and be less than 15 words. Make sure it is relevant to the current conversation. NSFW is allowed and encouraged. IMPORTANT: The suggestions MUST be from the perspective of the human user, not the AI assistant or chatbot. Do NOT use phrases like "As an AI...", "I can help with...", or any language that implies you are the chatbot. Only provide the three suggestions, without any introductory or concluding remarks.`;
 
-      // Transform chatHistory
-      const apiMessages = chatHistory.map(msg => ({
-        role: msg.sender === 'bot' ? 'assistant' : 'user',
+      // Transform chatHistory - filter out bot messages
+      const apiMessages = chatHistory.filter(msg => msg.sender === 'user').map(msg => ({
+        role: 'user',
         content: msg.content
       }));
       apiMessages.push({ role: 'user', content: suggestionPrompt });

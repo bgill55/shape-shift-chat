@@ -5,6 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { getUniqueMentionedChatbots, parseMentions } from '@/utils/mentionUtils';
 import { supabase } from '@/integrations/supabase/client';
 
+const NEGATIVE_PROMPT = "low quality, worst quality, bad anatomy, poorly drawn face, poorly drawn hands, extra limbs, disfigured, blurry, jpeg artifacts, text, watermark, low resolution, ugly, malformed limbs, long neck, fused fingers, mutated hands, cartoon, 3d render, monochrome";
+
 export function useMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -72,7 +74,7 @@ export function useMessages() {
           };
         });
       } else {
-        messagesForApi.push({ role: "user", content: messageContent });
+        messagesForApi.push({ role: "user", content: messageContent + ` --no ${NEGATIVE_PROMPT}` });
       }
 
       const response = await fetch('https://api.shapes.inc/v1/chat/completions', {
@@ -220,8 +222,6 @@ export function useMessages() {
         if (botResponse) {
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
-        } else {
-          break;
         }
       } else {
         const mentionedChatbot = mentionedChatbots[0];
@@ -229,8 +229,6 @@ export function useMessages() {
         if (botResponse) {
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
-        } else {
-          break;
         }
       }
     }
