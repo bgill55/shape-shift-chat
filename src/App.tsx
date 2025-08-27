@@ -34,7 +34,7 @@ const App = () => {
           <ThemeProvider>
             <Toaster />
             <Sonner />
-            <pwa-install manifest-url="/manifest.webmanifest" name="Shape Shift" icon="assets/android/android-launchericon-192-192.png"></pwa-install>
+            <pwa-install manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg"></pwa-install>
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>

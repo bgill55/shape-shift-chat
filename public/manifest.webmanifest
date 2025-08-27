@@ -1,8 +1,8 @@
 {
   "name": "Shape Shift",
   "short_name": "ShapeShift",
-  "description": "Your personal AI assistant",
-  "theme_color": "#1a1a1a",
+  "description": "A Shift in the way you talk to your Shape",
+  "theme_color": "#0EE5DD",
   "background_color": "#1a1a1a",
   "display": "standalone",
   "start_url": "/",
@@ -37,6 +37,15 @@
       "src": "/assets/android/android-launchericon-512-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/shapeshift_pwa.jpg",
+      "sizes": "1280x800",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Shape Shift PWA Screenshot"
     }
   ]
 }
