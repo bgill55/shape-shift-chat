@@ -183,6 +183,7 @@ export function useMessages() {
           
           const botResponse = await performApiCall(apiKey, chatbot, textInput, currentChatHistory, imageFile);
           if (botResponse) {
+            addMessage(botResponse);
             currentChatHistory = [...currentChatHistory, botResponse];
             lastBotMessage = botResponse;
           }
@@ -198,6 +199,7 @@ export function useMessages() {
       } else {
         const botResponse = await performApiCall(apiKey, chatbot, textInput, currentChatHistory, null);
         if (botResponse) {
+          addMessage(botResponse);
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
         }
@@ -220,6 +222,7 @@ export function useMessages() {
 
         const botResponse = await performApiCall(apiKey, nextChatbot, lastBotMessage.content, currentChatHistory);
         if (botResponse) {
+          addMessage(botResponse);
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
         }
@@ -227,12 +230,13 @@ export function useMessages() {
         const mentionedChatbot = mentionedChatbots[0];
         const botResponse = await performApiCall(apiKey, mentionedChatbot, lastBotMessage.content, currentChatHistory);
         if (botResponse) {
+          addMessage(botResponse);
           currentChatHistory = [...currentChatHistory, botResponse];
           lastBotMessage = botResponse;
         }
       }
     }
-  }, [performApiCall, updateMessage, toast]);
+  }, [performApiCall, updateMessage, toast, addMessage]);
 
   const editMessage = useCallback((messageId: string, newContent: string) => {
     setMessages(prev => prev.map(msg =>
@@ -279,14 +283,14 @@ export function useMessages() {
     );
 
     if (botResponse) {
-      setMessages(prev => [...prev, botResponse]);
+      addMessage(botResponse);
     }
     
     toast({
       title: "Message Regenerated",
       description: "A new response has been generated.",
     });
-  }, [messages, performApiCall, toast]);
+  }, [messages, performApiCall, toast, addMessage]);
 
   const loadMessages = useCallback((newMessages: Message[]) => {
     setMessages(newMessages);

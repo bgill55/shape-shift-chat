@@ -9,18 +9,16 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '@/components/ui/textarea';
 import { useNavigate } from 'react-router-dom';
 
 export function ProfileSettings() {
-  const { user, displayName, persona, updateDisplayName, updatePersona } = useAuth();
+  const { user, displayName, updateDisplayName } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate(); // Added
+  const navigate = useNavigate();
   const [newDisplayName, setNewDisplayName] = useState<string>('');
-  const [newPersona, setNewPersona] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,10 +26,7 @@ export function ProfileSettings() {
     if (displayName) {
       setNewDisplayName(displayName);
     }
-    if (persona) {
-      setNewPersona(persona);
-    }
-  }, [displayName, persona]);
+  }, [displayName]);
 
   const handleSaveChanges = async () => {
     if (!user) {
@@ -44,10 +39,7 @@ export function ProfileSettings() {
     setError(null);
 
     const trimmedDisplayName = newDisplayName.trim();
-    const trimmedPersona = (newPersona || '').trim();
-
     const displayNameChanged = trimmedDisplayName !== (displayName || '');
-    const personaChanged = trimmedPersona !== (persona || '');
 
     if (displayNameChanged) {
       if (trimmedDisplayName.length < 3) {
@@ -69,21 +61,6 @@ export function ProfileSettings() {
       }
     }
 
-    if (personaChanged) {
-      const { error: personaError } = await updatePersona(trimmedPersona);
-      if (personaError) {
-        const errorMessage = personaError.message || "Failed to update persona.";
-        setError(errorMessage);
-        toast({
-          title: 'Update Failed',
-          description: errorMessage,
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
-      }
-    }
-
     toast({
       title: 'Success!',
       description: 'Profile updated successfully.',
@@ -92,17 +69,13 @@ export function ProfileSettings() {
     setIsLoading(false);
   };
 
-  // Disable button if display name is unchanged, or shorter than 3 chars (after trim), or loading
   const isButtonDisabled = (() => {
     if (isLoading) return true;
 
     const trimmedDisplayName = newDisplayName.trim();
-    const trimmedPersona = (newPersona || '').trim();
-
     const displayNameChanged = trimmedDisplayName !== (displayName || '');
-    const personaChanged = trimmedPersona !== (persona || '');
 
-    if (!displayNameChanged && !personaChanged) return true; // No changes
+    if (!displayNameChanged) return true; // No changes
     if (displayNameChanged && trimmedDisplayName.length < 3) return true; // Invalid display name
 
     return false;
@@ -114,7 +87,7 @@ export function ProfileSettings() {
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl text-card-foreground">Profile Settings</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Manage your display name and persona.
+            Manage your display name.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-4">
@@ -127,17 +100,6 @@ export function ProfileSettings() {
               onChange={(e) => setNewDisplayName(e.target.value)}
               placeholder="Enter your display name"
               className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
-              disabled={isLoading}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="persona" className="text-foreground">Persona</Label>
-            <Textarea
-              id="persona"
-              value={newPersona}
-              onChange={(e) => setNewPersona(e.target.value)}
-              placeholder="Describe your persona in a few sentences..."
-              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring min-h-[100px]"
               disabled={isLoading}
             />
           </div>
