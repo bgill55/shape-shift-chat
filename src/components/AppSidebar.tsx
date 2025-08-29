@@ -1,4 +1,3 @@
-
 import { Plus, Settings, Sparkles, Users, Bookmark, Trash2, Download } from 'lucide-react';
 import React, { useRef, useState, useEffect } from 'react';
 import {
@@ -264,6 +263,24 @@ export function AppSidebar({
       </SidebarContent>
 
       <SidebarFooter className="p-4 border-t border-[var(--color-sidebar-border)] space-y-3">
+        {isInstallable && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-[rgb(var(--fg))] text-xs uppercase font-semibold px-2 mb-2 flex items-center gap-1">
+              <Download className="w-3 h-3" />
+              Install App
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <Button
+                onClick={handleInstallClick}
+                variant="outline"
+                className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
+              >
+                <span>Install Shape Shift</span>
+              </Button>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
         <Card className="bg-transparent border-0 shadow-none">
           <CardHeader className="p-2">
             <CardTitle className="text-lg">Settings</CardTitle>
@@ -281,16 +298,6 @@ export function AppSidebar({
               <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
               <span>API Configuration</span>
             </Button>
-            {isInstallable && (
-              <Button
-                onClick={handleInstallClick}
-                variant="outline"
-                className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
-              >
-                <Download className="w-4 h-4 mr-3" aria-hidden="true" />
-                <span>Install App</span>
-              </Button>
-            )}
           </CardContent>
         </Card>
 
