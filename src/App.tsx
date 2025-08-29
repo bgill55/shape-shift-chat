@@ -5,9 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState, useRef } from 'react';
 import { useOnboarding } from "./hooks/useOnboarding";
 import OnboardingFlow from "./components/OnboardingFlow";
+import { InstallBanner } from "./components/InstallBanner";
 import { ThemeProvider } from './contexts/ThemeContext';
 import '@khmyznikov/pwa-install';
 
@@ -26,21 +27,34 @@ const LoadingScreen = () => (
 
 const App = () => {
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const pwaInstallRef = useRef<any>(null);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      console.log('Raw beforeinstallprompt event has fired!', e);
-      alert('SUCCESS: The raw "beforeinstallprompt" event has fired! The browser is working correctly.');
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+    const pwaInstallElement = document.getElementById('pwa-install-dialog');
+    pwaInstallRef.current = pwaInstallElement;
+    const dismissed = localStorage.getItem('shapeShiftInstallDismissed');
+    if (!dismissed) {
+      const timer = setTimeout(() => {
+        if (pwaInstallRef.current?.isInstallAvailable) {
+          setShowInstallBanner(true);
+        }
+      }, 10000); // 10 seconds
+      return () => clearTimeout(timer);
+    }
   }, []);
+
+  const handleInstall = () => {
+    if (pwaInstallRef.current) {
+      pwaInstallRef.current.showDialog(true);
+    }
+    setShowInstallBanner(false);
+  };
+
+  const handleDismiss = () => {
+    localStorage.setItem('shapeShiftInstallDismissed', 'true');
+    setShowInstallBanner(false);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -49,6 +63,7 @@ const App = () => {
           <ThemeProvider>
             <Toaster />
             <Sonner />
+            {showInstallBanner && <InstallBanner onInstall={handleInstall} onDismiss={handleDismiss} />}
             <pwa-install id="pwa-install-dialog" manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg" manual-chrome="true" manual-apple="true"></pwa-install>
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
