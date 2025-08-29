@@ -64,7 +64,7 @@ export function AppSidebar({
   const handleInstallClick = () => {
     const pwaInstallElement = document.getElementById('pwa-install-dialog') as any;
     if (pwaInstallElement) {
-      pwaInstallElement.showDialog();
+      pwaInstallElement.install();
     } else {
       console.error('PWA install component not found. Make sure it is mounted in the DOM.');
     }
