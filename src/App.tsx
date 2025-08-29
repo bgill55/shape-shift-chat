@@ -49,7 +49,7 @@ const App = () => {
           <ThemeProvider>
             <Toaster />
             <Sonner />
-            <pwa-install id="pwa-install-dialog" manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg"></pwa-install>
+            <pwa-install id="pwa-install-dialog" manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg" manual-chrome="true" manual-apple="true"></pwa-install>
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>

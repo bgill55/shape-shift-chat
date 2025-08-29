@@ -1,6 +1,6 @@
 
 import { Plus, Settings, Sparkles, Users, Bookmark, Trash2, Download } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -60,11 +60,29 @@ export function AppSidebar({
   const { open } = useSidebar();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
+  const [isInstallable, setIsInstallable] = useState(false);
+  const pwaInstallRef = useRef<any>(null);
+
+  useEffect(() => {
+    const pwaInstallElement = document.getElementById('pwa-install-dialog');
+    if (pwaInstallElement) {
+      pwaInstallRef.current = pwaInstallElement;
+      const checkInstallability = () => {
+        setIsInstallable((pwaInstallRef.current as any)?.isInstallAvailable);
+      };
+      // Check immediately
+      checkInstallability();
+      // Listen for the event that indicates installability status has changed
+      pwaInstallElement.addEventListener('pwa-install-available-event', checkInstallability);
+      return () => {
+        pwaInstallElement.removeEventListener('pwa-install-available-event', checkInstallability);
+      };
+    }
+  }, []);
 
   const handleInstallClick = () => {
-    const pwaInstallElement = document.getElementById('pwa-install-dialog') as any;
-    if (pwaInstallElement) {
-      pwaInstallElement.install();
+    if (pwaInstallRef.current) {
+      (pwaInstallRef.current as any).showDialog(true);
     } else {
       console.error('PWA install component not found. Make sure it is mounted in the DOM.');
     }
@@ -263,14 +281,16 @@ export function AppSidebar({
               <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
               <span>API Configuration</span>
             </Button>
-            <Button 
-              onClick={handleInstallClick}
-              variant="outline"
-              className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
-            >
-              <Download className="w-4 h-4 mr-3" aria-hidden="true" />
-              <span>Install App</span>
-            </Button>
+            {isInstallable && (
+              <Button
+                onClick={handleInstallClick}
+                variant="outline"
+                className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
+              >
+                <Download className="w-4 h-4 mr-3" aria-hidden="true" />
+                <span>Install App</span>
+              </Button>
+            )}
           </CardContent>
         </Card>
 
