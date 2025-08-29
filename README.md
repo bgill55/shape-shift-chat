@@ -1,4 +1,4 @@
-# 🚀 Shape Shift: Your Dynamic AI Chat Companion 🚀
+# ▲ Shape Shift: Your Dynamic AI Chat Companion ●
 
 ![Static Badge](https://img.shields.io/badge/Shape-Shift-purple?style=plastic&logo=googlemessages&logoColor=cyan&logoSize=auto&labelColor=dark-gray&link=https%3A%2F%2Fshapeshift.is-great.org%2F)
 
