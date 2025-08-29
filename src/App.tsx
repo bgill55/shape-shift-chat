@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { useOnboarding } from "./hooks/useOnboarding";
 import OnboardingFlow from "./components/OnboardingFlow";
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -27,6 +27,21 @@ const LoadingScreen = () => (
 const App = () => {
   const { hasSeenOnboarding, markOnboardingAsSeen } = useOnboarding();
 
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      console.log('Raw beforeinstallprompt event has fired!', e);
+      alert('SUCCESS: The raw "beforeinstallprompt" event has fired! The browser is working correctly.');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -34,7 +49,7 @@ const App = () => {
           <ThemeProvider>
             <Toaster />
             <Sonner />
-            <pwa-install manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg"></pwa-install>
+            <pwa-install id="pwa-install-dialog" manifest-url="/manifest.webmanifest" name="Shape Shift" icon="/assets/shapeshift_pwa.jpg"></pwa-install>
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>

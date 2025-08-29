@@ -20,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
@@ -89,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           fetchProfile(session.user.id).then(profile => {
             setDisplayName(profile?.display_name || null);
+            setDescription(profile?.description || null);
           });
         } else {
           setDisplayName(null);
@@ -180,26 +182,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
-  const updateDisplayName = async (newName: string) => {
+  const updateProfile = async (profile: { displayName: string; description: string }) => {
     if (!user) {
       return { error: { name: 'AuthError', message: 'User not authenticated.' } as AuthError };
     }
-    if (!newName || newName.trim().length < 3) {
+    const { displayName, description } = profile;
+    if (!displayName || displayName.trim().length < 3) {
       return { error: { name: 'AuthError', message: 'Display name must be at least 3 characters.' } as AuthError };
     }
 
     try {
       const profileDataToUpsert = {
         id: user.id, 
-        display_name: newName.trim(),
+        display_name: displayName.trim(),
+        description: description,
         updated_at: new Date().toISOString(),
       };
 
       const { data, error: upsertError } = await supabase
         .from('profiles')
         .upsert(profileDataToUpsert)
-        .select() 
-        .single(); 
+        .select()
+        .single();
 
       if (upsertError) {
         return { error: upsertError };
@@ -207,8 +211,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data) {
         setDisplayName(data.display_name);
+        setDescription(data.description);
       } else {
-        setDisplayName(newName.trim());
+        setDisplayName(displayName.trim());
+        setDescription(description);
       }
       return { error: null };
     } catch (e: unknown) {
@@ -226,7 +232,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     refreshShapesAuthStatus,
     displayName,
-    updateDisplayName,
+    description,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

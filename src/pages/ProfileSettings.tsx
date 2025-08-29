@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
   CardHeader,
@@ -15,10 +16,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export function ProfileSettings() {
-  const { user, displayName, updateDisplayName } = useAuth();
+  const { user, displayName, description, updateProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
   const [newDisplayName, setNewDisplayName] = useState<string>('');
+  const [newDescription, setNewDescription] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +29,10 @@ export function ProfileSettings() {
     if (displayName) {
       setNewDisplayName(displayName);
     }
-  }, [displayName]);
+    if (description) {
+      setNewDescription(description);
+    }
+  }, [displayName, description]);
 
   const handleSaveChanges = async () => {
     if (!user) {
@@ -39,17 +45,23 @@ export function ProfileSettings() {
     setError(null);
 
     const trimmedDisplayName = newDisplayName.trim();
-    const displayNameChanged = trimmedDisplayName !== (displayName || '');
+    const trimmedDescription = newDescription.trim();
 
-    if (displayNameChanged) {
+    const profileChanged = trimmedDisplayName !== (displayName || '') || trimmedDescription !== (description || '');
+
+    if (profileChanged) {
       if (trimmedDisplayName.length < 3) {
         setError("Display name must be at least 3 characters long.");
         setIsLoading(false);
         return;
       }
-      const { error: displayNameError } = await updateDisplayName(trimmedDisplayName);
-      if (displayNameError) {
-        const errorMessage = displayNameError.message || "Failed to update display name.";
+      const { error: profileError } = await updateProfile({
+        displayName: trimmedDisplayName,
+        description: trimmedDescription,
+      });
+
+      if (profileError) {
+        const errorMessage = profileError.message || "Failed to update profile.";
         setError(errorMessage);
         toast({
           title: 'Update Failed',
@@ -73,10 +85,11 @@ export function ProfileSettings() {
     if (isLoading) return true;
 
     const trimmedDisplayName = newDisplayName.trim();
-    const displayNameChanged = trimmedDisplayName !== (displayName || '');
+    const trimmedDescription = newDescription.trim();
+    const profileChanged = trimmedDisplayName !== (displayName || '') || trimmedDescription !== (description || '');
 
-    if (!displayNameChanged) return true; // No changes
-    if (displayNameChanged && trimmedDisplayName.length < 3) return true; // Invalid display name
+    if (!profileChanged) return true;
+    if (trimmedDisplayName.length < 3) return true;
 
     return false;
   })();
@@ -87,7 +100,7 @@ export function ProfileSettings() {
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl text-card-foreground">Profile Settings</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Manage your display name.
+            Manage your display name and description.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-4">
@@ -101,6 +114,18 @@ export function ProfileSettings() {
               placeholder="Enter your display name"
               className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
               disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-foreground">Brief Description</Label>
+            <Textarea
+              id="description"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="A brief description for the Shape to use."
+              className="w-full bg-input text-foreground placeholder-muted-foreground border-border focus-visible:ring-1 focus-visible:ring-ring"
+              disabled={isLoading}
+              rows={4}
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}

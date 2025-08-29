@@ -1,5 +1,5 @@
 
-import { Plus, Settings, Sparkles, Users, Bookmark, Trash2 } from 'lucide-react';
+import { Plus, Settings, Sparkles, Users, Bookmark, Trash2, Download } from 'lucide-react';
 import React, { useRef } from 'react';
 import {
   Sidebar,
@@ -60,6 +60,15 @@ export function AppSidebar({
   const { open } = useSidebar();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
+
+  const handleInstallClick = () => {
+    const pwaInstallElement = document.getElementById('pwa-install-dialog') as any;
+    if (pwaInstallElement) {
+      pwaInstallElement.showDialog();
+    } else {
+      console.error('PWA install component not found. Make sure it is mounted in the DOM.');
+    }
+  };
 
   const isChatbotSelected = (chatbot: Chatbot) => {
     return selectedChatbots.some(selected => selected.id === chatbot.id);
@@ -248,11 +257,19 @@ export function AppSidebar({
             </div>
             <Button 
               onClick={onOpenApiConfig}
-              variant="ghost"
+              variant="outline"
               className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
             >
               <Settings className="w-4 h-4 mr-3" aria-hidden="true" />
               <span>API Configuration</span>
+            </Button>
+            <Button 
+              onClick={handleInstallClick}
+              variant="outline"
+              className="w-full justify-start text-left px-2 py-2 rounded hover:bg-primary/90 text-[rgb(var(--fg))]"
+            >
+              <Download className="w-4 h-4 mr-3" aria-hidden="true" />
+              <span>Install App</span>
             </Button>
           </CardContent>
         </Card>
