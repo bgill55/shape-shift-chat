@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from '@/components/AppSidebar';
 import { ChatArea } from '@/components/ChatArea';
-import { AddShapeModal } from '@/components/AddShapeModal';
+import { AddModelModal } from '@/components/AddModelModal';
 import { ApiKeyModal } from '@/components/ApiKeyModal';
 import { MobileHeader } from '@/components/MobileHeader';
 import { useToast } from '@/hooks/use-toast';
@@ -22,7 +21,7 @@ export interface Chatbot {
 const Index = () => {
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [selectedChatbots, setSelectedChatbots] = useState<Chatbot[]>([]);
-  const [isAddShapeModalOpen, setIsAddShapeModalOpen] = useState(false);
+  const [isAddModelModalOpen, setIsAddModelModalOpen] = useState(false);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [apiKey, setApiKey] = useState<string>('');
   const { toast } = useToast();
@@ -37,7 +36,7 @@ const Index = () => {
   }, [loadSavedChats]);
 
   useEffect(() => {
-    const savedApiKey = localStorage.getItem('shapes-api-key');
+    const savedApiKey = localStorage.getItem('openrouter_api_key');
     if (savedApiKey) {
       setApiKey(savedApiKey);
     }
@@ -66,7 +65,7 @@ const Index = () => {
     
     // Show success toast
     toast({
-      title: "Shape Added Successfully!",
+      title: "Model Added Successfully!",
       description: `${newChatbot.name} now has its own dedicated channel.`,
     });
   };
@@ -79,7 +78,7 @@ const Index = () => {
       } else {
         toast({
           title: "Maximum Reached",
-          description: "You can select up to 3 shapes for a group chat.",
+          description: "You can select up to 3 models for a group chat.",
           variant: "destructive"
         });
       }
@@ -136,14 +135,14 @@ const Index = () => {
     setSelectedChatbots(prev => prev.filter(bot => bot.id !== chatbotId));
 
     toast({
-      title: "Shape Deleted",
+      title: "Model Deleted",
       description: "Chatbot has been successfully removed.",
     });
   };
 
   const saveApiKey = (key: string) => {
     setApiKey(key);
-    localStorage.setItem('shapes-api-key', key);
+    localStorage.setItem('openrouter_api_key', key);
   };
 
   return (
@@ -152,7 +151,7 @@ const Index = () => {
         <div className="min-h-screen flex w-full relative">
           {/* Mobile Header */}
           <MobileHeader 
-            onAddShape={() => setIsAddShapeModalOpen(true)}
+            onAddModel={() => setIsAddModelModalOpen(true)}
             onOpenApiConfig={() => setIsApiKeyModalOpen(true)}
           />
           
@@ -161,7 +160,7 @@ const Index = () => {
             selectedChatbots={selectedChatbots}
             onSelectChatbot={handleChatbotSelection}
             onSelectSingleChatbot={handleSelectSingleChatbot}
-            onAddShape={() => setIsAddShapeModalOpen(true)}
+            onAddModel={() => setIsAddModelModalOpen(true)}
             onOpenApiConfig={() => setIsApiKeyModalOpen(true)}
             savedChats={savedChats}
             onLoadChat={handleLoadChat}
@@ -183,10 +182,10 @@ const Index = () => {
         </div>
       </SidebarProvider>
 
-      <AddShapeModal 
-        isOpen={isAddShapeModalOpen}
-        onClose={() => setIsAddShapeModalOpen(false)}
-        onAddShape={addChatbot}
+      <AddModelModal
+        isOpen={isAddModelModalOpen}
+        onClose={() => setIsAddModelModalOpen(false)}
+        onAddModel={addChatbot}
       />
 
       <ApiKeyModal 
