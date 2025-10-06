@@ -9,7 +9,6 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
-  refreshShapesAuthStatus: () => void;
   displayName: string | null;
   updateDisplayName: (newName: string) => Promise<{ error: AuthError | null }>;
 }
@@ -56,27 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const profile = await fetchProfile(currentUser.id);
         setDisplayName(profile?.display_name || null);
       } else {
-        const shapesAuthToken = localStorage.getItem('shapes_auth_token');
-        if (shapesAuthToken) {
-          const shapesUserId = localStorage.getItem('shapes_user_id') || 'shapes-user-fallback';
-          const mockUser = {
-            id: shapesUserId,
-            email: 'shapes-user@shapes.local',
-            aud: 'authenticated',
-            created_at: new Date().toISOString(),
-            app_metadata: {},
-            user_metadata: { provider: 'shapes', shapes_auth_token: shapesAuthToken }
-          } as User;
-          setUser(mockUser);
-          if (shapesUserId !== 'shapes-user-fallback') {
-            const profile = await fetchProfile(shapesUserId);
-            setDisplayName(profile?.display_name || null);
-          } else {
-            setDisplayName(null);
-          }
-        } else {
-          setDisplayName(null);
-        }
+        setDisplayName(null);
       }
       setLoading(false);
     };
@@ -126,14 +105,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    localStorage.removeItem('shapes_auth_token');
-    localStorage.removeItem('shapes_app_id');
-    localStorage.removeItem('shapes_user_id');
-    
     const { error } = await supabase.auth.signOut();
     
     if (!error) {
-      window.location.href = '/auth';
+      window.location.href = '/';
     } else {
       console.error("Error signing out from Supabase:", error);
       setUser(null);
@@ -142,45 +117,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const refreshShapesAuthStatus = async () => {
-    setLoading(true);
-    setSession(null); 
-    const shapesAuthToken = localStorage.getItem('shapes_auth_token');
-    const shapesUserId = localStorage.getItem('shapes_user_id');
-
-    if (shapesAuthToken && shapesUserId) {
-      const mockUser = {
-        id: shapesUserId,
-        email: 'shapes-user@shapes.local',
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        app_metadata: {},
-        user_metadata: {
-          provider: 'shapes',
-          shapes_auth_token: shapesAuthToken,
-          actual_shapes_user_id: shapesUserId,
-        }
-      } as User;
-      setUser(mockUser);
-      const profile = await fetchProfile(shapesUserId);
-      setDisplayName(profile?.display_name || null);
-    } else if (shapesAuthToken) { 
-      const mockUser = {
-        id: 'shapes-user-fallback-refresh',
-        email: 'shapes-user@shapes.local',
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        app_metadata: {},
-        user_metadata: { provider: 'shapes', shapes_auth_token: shapesAuthToken }
-      } as User;
-      setUser(mockUser);
-      setDisplayName(null);
-    } else {
-      setUser(null);
-      setDisplayName(null);
-    }
-    setLoading(false);
-  };
 
   const updateProfile = async (profile: { displayName: string; description: string }) => {
     if (!user) {
@@ -230,7 +166,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signOut,
-    refreshShapesAuthStatus,
     displayName,
     description,
     updateProfile,
