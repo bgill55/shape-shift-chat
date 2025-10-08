@@ -34,30 +34,5 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-unused-vars": "off",
     },
-  },
-  {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["supabase/functions/**/*.{ts,tsx}"],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: [
-          "./supabase/functions/get-suggestions/tsconfig.json",
-          "./supabase/functions/shapes-auth-exchange/tsconfig.json",
-          "./supabase/functions/_shared/tsconfig.json",
-        ],
-        ecmaVersion: 2020,
-        sourceType: "module",
-        globals: globals.browser,
-      },
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      "@typescript-eslint/no-unused-vars": "off",
-    },
   }
 );
