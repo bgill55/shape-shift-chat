@@ -5,7 +5,7 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { ImagePreview } from './ImagePreview';
 
 describe('ImagePreview', () => {
-  const mockSrc = 'https://files.shapes.inc/test-image.png';
+  const mockSrc = 'https://files.openrouter.ai/test-image.png';
   const mockAlt = 'Test Image Alt Text';
 
   test('renders the image with correct src and alt attributes', { timeout: 10000 }, () => {
@@ -66,7 +66,7 @@ describe('ImagePreview', () => {
   });
 
   test('clicking the Download button uses default filename if URL has no obvious filename', () => {
-    const mockSrcNoFilename = 'https://files.shapes.inc/somepath/';
+    const mockSrcNoFilename = 'https://files.openrouter.ai/somepath/';
     // Create a real anchor element for this test
     const actualLinkElementNoFilename = document.createElement('a');
     const linkClickSpyNoFilename = vi.spyOn(actualLinkElementNoFilename, 'click');

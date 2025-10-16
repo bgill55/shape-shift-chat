@@ -1,8 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Message } from '@/types/message';
 import { Chatbot } from '@/pages/Index';
-import { isAudioUrl, isImageUrl } from '@/utils/messageUtils';
-import { AudioPlayer } from '../AudioPlayer';
 import { ImagePreview } from '../ui/ImagePreview';
 import { MessageText } from './MessageText';
 import { MessageActions } from './MessageActions';
@@ -95,28 +93,6 @@ export function MessageList({
       );
     }
 
-    const botImageUrl = isImageUrl(message.content);
-    if (botImageUrl && message.sender === 'bot') {
-      const textContent = message.content.replace(botImageUrl, '').trim();
-      return (
-        <div className="space-y-2">
-          {textContent && <MessageText content={textContent} />}
-          <ImagePreview src={botImageUrl} alt="Bot image content" />
-        </div>
-      );
-    }
-
-    const audioUrl = isAudioUrl(message.content);
-    if (audioUrl && message.sender === 'bot') {
-      const textContent = message.content.replace(audioUrl, '').trim();
-      return (
-        <div className="space-y-2">
-          {textContent && <MessageText content={textContent} />}
-          <AudioPlayer src={audioUrl} />
-        </div>
-      );
-    }
-
     return <MessageText content={message.content} />;
   };
 
@@ -200,7 +176,7 @@ export function MessageList({
                     {message.sender === 'bot' && selectedChatbots.length > 1 && (
                       <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
                         <Bot className="w-3 h-3" aria-hidden="true" />
-                        <span>{message.botName || 'Shape Response'}</span>
+                        <span>{message.botName || 'Model Response'}</span>
                       </div>
                     )}
                     {renderMessageContent(message)}

@@ -77,11 +77,11 @@ export function useMessages() {
         messagesForApi.push({ role: "user", content: messageContent + ` --no ${NEGATIVE_PROMPT}` });
       }
 
-      const response = await fetch('https://api.shapes.inc/v1/chat/completions', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          model: `shapesinc/${shapeUsername}`,
+          model: shapeUsername,
           messages: messagesForApi,
         })
       });
