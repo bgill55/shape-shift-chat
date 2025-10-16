@@ -89,16 +89,18 @@ export function useSuggestedResponses(): UseSuggestedResponsesReturn {
       apiMessages.push({ role: 'user', content: suggestionPrompt });
 
       // API Call
-      const response = await fetch('https://api.shapes.inc/v1/chat/completions', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`, // Use static API key for Bearer token
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://shape-shift.is-great.org/',
+          'X-Title': 'Shape Shift',
         },
         body: JSON.stringify({
           model: model,
           messages: apiMessages,
-          max_tokens: 75, // Increased slightly to ensure 3 short suggestions fit
+          max_tokens: 75,
           n: 1,
           temperature: 0.7,
         }),

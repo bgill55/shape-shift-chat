@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('shapes_auth_token');
     localStorage.removeItem('shapes_app_id');
     localStorage.removeItem('shapes_user_id');
-    
+
     const { error } = await supabase.auth.signOut();
     
     if (!error) {
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshShapesAuthStatus = async () => {
     setLoading(true);
-    setSession(null); 
+    setSession(null);
     const shapesAuthToken = localStorage.getItem('shapes_auth_token');
     const shapesUserId = localStorage.getItem('shapes_user_id');
 
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(mockUser);
       const profile = await fetchProfile(shapesUserId);
       setDisplayName(profile?.display_name || null);
-    } else if (shapesAuthToken) { 
+    } else if (shapesAuthToken) {
       const mockUser = {
         id: 'shapes-user-fallback-refresh',
         email: 'shapes-user@shapes.local',

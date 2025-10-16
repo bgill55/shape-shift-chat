@@ -12,7 +12,6 @@ import { InstallBanner } from "./components/InstallBanner";
 import { ThemeProvider } from './contexts/ThemeContext';
 import '@khmyznikov/pwa-install';
 
-const Auth = lazy(() => import('./pages/Auth'));
 const Index = lazy(() => import('./pages/Index'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ProfileSettings = lazy(() => import('./pages/ProfileSettings'));
@@ -68,7 +67,6 @@ const App = () => {
             <BrowserRouter>
               <Suspense fallback={<LoadingScreen />}>
                 <Routes>
-                  <Route path="/auth" element={<Auth />} />
                   <Route path="/" element={
                     <ProtectedRoute>
                       {hasSeenOnboarding ? <Index /> : <OnboardingFlow onComplete={markOnboardingAsSeen} />}

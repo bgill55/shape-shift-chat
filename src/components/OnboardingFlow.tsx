@@ -27,12 +27,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       case 2:
         icon = <PlusCircle className="w-16 h-16 text-green-500 mb-4" />;
         title = 'Add Your First Shape';
-        description = 'To get started, you\'ll need to add at least one AI model, or \'Shape\'. You can do this from the sidebar using its vanity URL, for example: <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-sm">https://shapes.inc/jarvis-dev</span>.';
+        description = 'To get started, you\'ll need to add at least one AI model, or \'Shape\'. You can do this from the sidebar using its vanity URL, for example: <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-sm">https://openrouter.ai/google/gemini-flash-1.5</span>.';
         break;
       case 3:
         icon = <Key className="w-16 h-16 text-yellow-500 mb-4" />;
         title = 'Configure Your API Key';
-        description = 'Shape Shift uses your own API keys to interact with AI models. You\'ll need to configure this in the settings. You can get your API key from <a href="https://shapes.inc/developer" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">shapes.inc/developer</a>.';
+        description = 'Shape Shift uses your own API keys to interact with AI models. You\'ll need to configure this in the settings. You can get your API key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">openrouter.ai/keys</a>.';
         break;
       case 4:
         icon = <MessageSquare className="w-16 h-16 text-purple-500 mb-4" />;

@@ -182,6 +182,10 @@ const Index = () => {
         </div>
       </SidebarProvider>
 
+      <AddShapeModal
+        isOpen={isAddShapeModalOpen}
+        onClose={() => setIsAddShapeModalOpen(false)}
+        onAddShape={addChatbot}
       <AddModelModal
         isOpen={isAddModelModalOpen}
         onClose={() => setIsAddModelModalOpen(false)}

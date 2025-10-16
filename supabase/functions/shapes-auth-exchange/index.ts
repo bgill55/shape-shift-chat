@@ -19,8 +19,8 @@ serve(async (req) => {
     if (!code) {
       return new Response(
         JSON.stringify({ error: 'One-time code is required' }),
-        { 
-          status: 400, 
+        {
+          status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
@@ -29,8 +29,8 @@ serve(async (req) => {
     if (!app_id) {
       return new Response(
         JSON.stringify({ error: 'App ID is required' }),
-        { 
-          status: 400, 
+        {
+          status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
@@ -44,9 +44,9 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         app_id: app_id,
-        code: code 
+        code: code
       }),
     });
 
@@ -58,7 +58,7 @@ serve(async (req) => {
       console.error('[shapes-auth-exchange] Shapes API error. Raw response:', responseText);
       return new Response(
         JSON.stringify({ error: 'Failed to exchange code with Shapes', details: responseText }),
-        { 
+        {
           status: shapesResponse.status, // Use actual status from Shapes API
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
@@ -80,7 +80,7 @@ serve(async (req) => {
         }
       );
     }
-    
+
     // Log specific fields from shapesData
     console.log('[shapes-auth-exchange] shapesData.auth_token:', shapesData?.auth_token);
     // Removed logs for user, user_id, and user.id from shapesData as they are not expected
@@ -91,7 +91,7 @@ serve(async (req) => {
         auth_token: shapesData.auth_token
         // No 'user' field anymore
       }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
@@ -100,8 +100,8 @@ serve(async (req) => {
     console.error('Error in shapes-auth-exchange:', error)
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
-      { 
-        status: 500, 
+      {
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     )

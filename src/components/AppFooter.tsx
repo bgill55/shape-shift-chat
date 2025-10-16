@@ -9,8 +9,8 @@ export function AppFooter() {
           <a href="https://www.instagram.com/bgill55_art/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
             <Instagram className="h-5 w-5" aria-label="Instagram" />
           </a>
-          <a href="https://shapes.inc" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500">
-            <Bot className="h-5 w-5" aria-label="Shapes.inc" />
+          <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500">
+            <Bot className="h-5 w-5" aria-label="OpenRouter" />
           </a>
           <a href="https://x.com/bgill55_art" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">
             <Twitter className="h-5 w-5" aria-label="X (Twitter)" />
